@@ -615,11 +615,11 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                     </div>
                   </div>
                 ) : (
-                  <SliderEl label="Current Salary" value={salary} min={0} max={40} step={1} onChange={makeSalaryChange} format={fmtSalary} color={PICTON} shaking={shakeSalary} } />
+                  <SliderEl label="Current Salary" value={salary} min={0} max={40} step={1} onChange={makeSalaryChange} format={fmtSalary} color={PICTON} shaking={shakeSalary} />
                 )}
 
-                <SliderEl label="Cert Cost" value={certCost} min={0} max={2} step={0.05} onChange={setCertCost} format={fmtCost} color={AMBER} } />
-                {!isStudent && <SliderEl label="Expected Hike" value={hikePercent} min={5} max={80} step={5} onChange={makeHikeChange} format={fmtHike} color={EMERALD} shaking={shakeHike} } />}
+                <SliderEl label="Cert Cost" value={certCost} min={0} max={2} step={0.05} onChange={setCertCost} format={fmtCost} color={AMBER} />
+                {!isStudent && <SliderEl label="Expected Hike" value={hikePercent} min={5} max={80} step={5} onChange={makeHikeChange} format={fmtHike} color={EMERALD} shaking={shakeHike} />}
               </SpotlightCard>
 
               {/* FIX: Affiliate links filtered by cert domain */}
