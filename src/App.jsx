@@ -372,7 +372,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
           transition: 'background 0.3s, border-color 0.3s',
         }}
       >
-        <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 20px' }}>
+        <div className="subtabs" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 12px', display: 'flex', justifyContent: 'center', height: '48px', alignItems: 'stretch', overflowX: 'auto', gap: '2px' }}>
           <div style={{ display: 'flex', alignItems: 'center', height: '58px', gap: '4px' }}>
 
             {/* Logo */}
@@ -427,7 +427,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                       : <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--indigo), var(--emerald))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={12} color="white" /></div>
                     }
                     <button onClick={signOut} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '7px', color: '#EF4444', fontSize: '11px', padding: '4px 9px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'Inter, sans-serif' }}>
-  <LogOut size={11} /><span className="signout-text">Sign out</span>
+  <LogOut size={11} /><span className="signout-text">Sign out</span><span className="signout-text">Sign out</span>
 </button>
                   </>
                 ) : (
@@ -437,7 +437,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
   title={!import.meta.env.VITE_FIREBASE_API_KEY ? 'Sign-in requires Firebase setup' : ''}
   style={{ display: 'flex', opacity: !import.meta.env.VITE_FIREBASE_API_KEY ? 0.4 : 1, background: 'var(--indigo)', border: 'none', borderRadius: '7px', padding: '6px 10px', cursor: !import.meta.env.VITE_FIREBASE_API_KEY ? 'not-allowed' : 'pointer', color: 'white', alignItems: 'center', gap: '4px', fontFamily: 'Inter, sans-serif' }}
                   >
-                    <LogIn size={12} />{signingIn ? '...' : 'Sign in'}
+                    <LogIn size={12} /><span className="signin-text">{signingIn ? '...' : 'Sign in'}</span>
                   </button>
                 )
               )}
