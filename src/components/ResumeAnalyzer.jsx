@@ -437,7 +437,7 @@ const ResumeAnalyzer = ({ mode = 'professional', onCertSelected }) => {
       <AnimatePresence>
         {!hasTyped && !hasResult && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} style={{ overflow: 'hidden' }}>
-            <NeonCard color={dragging ? PICTON : hasFile ? EMERALD : 'var(--text-4)'} speed={0.022} borderRadius="11px">
+            <NeonCard color={dragging ? PICTON : hasFile ? EMERALD : '#6366F1'} speed={0.022} borderRadius="11px">
               <div onDragOver={e => { e.preventDefault(); setDragging(true) }} onDragLeave={() => setDragging(false)} onDrop={handleDrop} onClick={() => !hasFile && fileRef.current?.click()} style={{ padding: '22px', cursor: hasFile ? 'default' : 'pointer', textAlign: 'center' }}>
                 <input ref={fileRef} type="file" accept=".txt,.pdf,.doc,.docx" style={{ display: 'none' }} onChange={e => readFile(e.target.files[0])} />
                 {pdfLoading ? (
@@ -496,14 +496,14 @@ const ResumeAnalyzer = ({ mode = 'professional', onCertSelected }) => {
       </AnimatePresence>
 
       {!hasResult && (
-        loading ? <ScanningBeam name={detectedName} /> : (
-          <motion.button onClick={handleAnalyse} disabled={!text.trim()} whileHover={{ scale: 1.01, y: -1 }} whileTap={{ scale: 0.98 }}
-            style={{ width: '100%', fontSize: '15px', padding: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px', background: !text.trim() ? 'var(--surface)' : 'linear-gradient(135deg, ' + PICTON + ', #3B8CC7)', border: 'none', borderRadius: '12px', color: !text.trim() ? 'var(--text-4)' : 'white', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', cursor: !text.trim() ? 'not-allowed' : 'pointer', boxShadow: !text.trim() ? 'none' : '0 4px 20px rgba(81,177,231,0.3)', letterSpacing: '-0.01em', transition: 'all 0.2s' }}>
-            <Sparkles size={16} />
-            Analyse My Resume with AI
-          </motion.button>
-        )
-      )}
+  loading ? <ScanningBeam name={detectedName} /> : (
+    <motion.button onClick={handleAnalyse} disabled={!text.trim()} whileHover={{ scale: 1.01, y: -1 }} whileTap={{ scale: 0.98 }}
+      style={{ width: '100%', fontSize: '15px', padding: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px', background: !text.trim() ? 'transparent' : 'linear-gradient(135deg, ' + PICTON + ', #3B8CC7)', border: !text.trim() ? '1px solid var(--border)' : 'none', borderRadius: '12px', color: !text.trim() ? 'var(--text-4)' : 'white', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', cursor: !text.trim() ? 'not-allowed' : 'pointer', boxShadow: !text.trim() ? 'none' : '0 4px 20px rgba(81,177,231,0.3)', letterSpacing: '-0.01em', transition: 'all 0.2s' }}>
+      <Sparkles size={16} />
+      Analyse My Resume with AI
+    </motion.button>
+  )
+)}
 
       {error && (
         <div style={{ padding: '12px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', fontSize: '13px', color: '#FCA5A5', display: 'flex', gap: '8px', alignItems: 'flex-start', fontFamily: 'Inter, sans-serif' }}>

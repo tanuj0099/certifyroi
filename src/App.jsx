@@ -330,10 +330,10 @@ const NAV_LINKS = [
 ]
 
 const APP_TABS = [
-  { id: 'resume',     label: 'Step 1 · Find Your Cert',  icon: FileText,      desc: 'Upload resume → AI picks your cert'      },
-  { id: 'calculator', label: 'Step 2 · Calculate ROI',   icon: TrendingUp,    desc: 'Break-even, 5yr gain, Ghost of Inaction' },
-  { id: 'heatmap',    label: 'Step 3 · City Demand',     icon: Map,           desc: 'Is this cert hot in your city?'          },
-  { id: 'college',    label: 'Degree vs Certs',          icon: GraduationCap, desc: 'MBA vs 4 certifications — numbers'       },
+  { id: 'resume',     label: 'Step 1 · Find Cert',  icon: FileText,      desc: 'Upload resume → AI picks your cert'      },
+  { id: 'calculator', label: 'Step 2 · ROI',        icon: TrendingUp,    desc: 'Break-even, 5yr gain, Ghost of Inaction' },
+  { id: 'heatmap',    label: 'Step 3 · City',       icon: Map,           desc: 'Is this cert hot in your city?'          },
+  { id: 'college',    label: 'Degree vs Certs',     icon: GraduationCap, desc: 'MBA vs 4 certifications — numbers'       },
 ]
 
 const HAMBURGER_FEATURES = [
@@ -427,7 +427,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                       : <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--indigo), var(--emerald))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={12} color="white" /></div>
                     }
                     <button onClick={signOut} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '7px', color: '#EF4444', fontSize: '11px', padding: '4px 9px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'Inter, sans-serif' }}>
-  <LogOut size={11} /><span className="signout-text">Sign out</span><span className="signout-text">Sign out</span>
+  <LogOut size={11} /><span className="signout-text">Sign out</span>
 </button>
                   </>
                 ) : (

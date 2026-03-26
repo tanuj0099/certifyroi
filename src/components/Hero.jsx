@@ -512,8 +512,7 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 14px', borderRadius: '20px', background: `${PICTON}10`, border: `1px solid ${PICTON}28`, fontSize: '11px', color: PICTON, marginBottom: '16px', letterSpacing: '0.08em', fontFamily: 'JetBrains Mono, monospace' }}>
               {isStudent
                 ? <><GraduationCap size={11} /> {firstName ? `${firstName.toUpperCase()}'S FIRST OFFER PATH` : 'STUDENT MODE — FIRST OFFER PATH'}</>
-                : <><Zap size={11} /> {firstName ? `WELCOME BACK, ${firstName.toUpperCase()} · INDIA TECH 2026` : 'INDIA TECH · DATA MARCH 2026'}</>
-              }
+                : <><Zap size={11} /> {firstName ? `WELCOME BACK, ${firstName.toUpperCase()} · INDIA TECH 2026` : "INDIA'S FIRST AI CERT ROI CALCULATOR · 2026"}</>              }
             </div>
             <h1 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: 'clamp(2.4rem,5.5vw,4.2rem)', letterSpacing: '-0.03em', lineHeight: 1.05, color: 'var(--text)', marginBottom: '12px' }}>
               {isStudent
@@ -521,12 +520,12 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                 : <>{firstName ? <>{firstName}, is your<br /></> : <>IS YOUR CERT<br /></>}<span style={{ color: PICTON }}>WORTH THE MONEY?</span></>
               }
             </h1>
-            <p style={{ fontSize: '15px', color: 'var(--text-3)', maxWidth: '420px', margin: '0 auto', lineHeight: '1.7', fontFamily: 'Inter, sans-serif' }}>
-              {isStudent
-                ? 'Find the right cert, build your portfolio, land your first ₹4.8L+ offer in India.'
-                : 'Live ROI for Indian tech professionals. Break-even, 5-year gain, AI verdict — before you spend a rupee.'
-              }
-            </p>
+            <p style={{ fontSize: '15px', color: 'var(--text-3)', maxWidth: '460px', margin: '0 auto', lineHeight: '1.7', fontFamily: 'Inter, sans-serif' }}>
+  {isStudent
+    ? 'Find the right cert, build your portfolio, land your first ₹4.8L+ offer in India.'
+    : "India's first AI-powered certification ROI calculator. Break-even date, 5-year gain, personalised verdict — before you spend a rupee."
+  }
+</p>
           </motion.div>
 
           {/* Bento grid */}
