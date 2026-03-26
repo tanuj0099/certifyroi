@@ -506,8 +506,8 @@ const ResumeAnalyzer = ({ mode = 'professional', onCertSelected }) => {
 
     setLoading(true); setResult(null); setError(null); setRejection(null)
     try {
-      const safeText = text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').slice(0, 2200).trim()
-const raw = await callGroqForResume(null, buildPrompt(safeText, mode, goal, domain))
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY
+      if (!apiKey || apiKey === 'your_groq_key_here') throw new Error('NO_KEY')
       const safeText = text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').slice(0, 2200).trim()
       const raw      = await callGroqForResume(apiKey, buildPrompt(safeText, mode, goal, domain))
       if (!raw || raw.length < 30) throw new Error('Empty response — try again')
