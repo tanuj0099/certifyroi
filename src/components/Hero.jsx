@@ -10,7 +10,7 @@ import {
 import {
   Sparkles, TrendingUp, Clock, DollarSign, AlertTriangle,
   GraduationCap, ExternalLink, Lock, Zap, Target, Star,
-  Save, X, Mail, Flame, CheckCircle
+  X, Mail, Flame, CheckCircle
 } from 'lucide-react'
 import { useROICalc, useGuestCounter, useLocalStorage, useWindowWidth } from '../hooks/hooks.jsx'
 import { analyzeROI, getMockResponse } from '../services/aiService.jsx'
@@ -41,7 +41,7 @@ const AnimatedNumber = ({ value, prefix = '', suffix = '', decimals = 0, color }
   )
 }
 
-// ── Spotlight card (3D tilt + mouse glow) ─────────────────
+// ── Spotlight card ────────────────────────────────────────
 const SpotlightCard = ({ children, style = {}, accent = PICTON, onClick, padding = '20px' }) => {
   const ref   = useRef(null)
   const mxRaw = useMotionValue(0)
@@ -138,7 +138,7 @@ const ScanningBeam = ({ certName }) => {
           return (
             <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ width: 26, height: 26, borderRadius: '7px', flexShrink: 0, background: done ? 'rgba(16,185,129,0.1)' : active ? `${PICTON}14` : 'var(--bg)', border: `1px solid ${done ? 'rgba(16,185,129,0.3)' : active ? PICTON + '44' : 'var(--border)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: done ? EMERALD : active ? PICTON : 'var(--text-4)' }}>
-                {done ? '✓' : s.icon || '›'}
+                {done ? '✓' : '›'}
               </div>
               <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', color: done ? 'var(--text-4)' : active ? 'var(--text)' : 'var(--text-4)', textDecoration: done ? 'line-through' : 'none' }}>{s}</span>
               {active && <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity }} style={{ width: 5, height: 5, borderRadius: '50%', background: PICTON, marginLeft: 'auto', flexShrink: 0 }} />}
@@ -150,7 +150,6 @@ const ScanningBeam = ({ certName }) => {
       <div style={{ height: '3px', borderRadius: '2px', background: 'var(--border)', overflow: 'hidden' }}>
         <motion.div animate={{ width: `${pct}%` }} transition={{ duration: 0.5, ease: 'easeOut' }} style={{ height: '100%', borderRadius: '2px', background: `linear-gradient(90deg, ${PICTON}, #818CF8)` }} />
       </div>
-
       <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '7px' }}>
         {[75, 60, 70, 50].map((w, i) => <div key={i} className="shimmer" style={{ height: '11px', width: `${w}%`, borderRadius: '5px' }} />)}
       </div>
@@ -158,7 +157,7 @@ const ScanningBeam = ({ certName }) => {
   )
 }
 
-// ── Holographic AI badge ──────────────────────────────────
+// ── Holographic badge ─────────────────────────────────────
 const HolographicBadge = ({ active, thinking, latency }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
     <motion.div
@@ -255,15 +254,15 @@ const ChartTooltip = ({ active, payload, label }) => {
 }
 
 // ── AI panel ──────────────────────────────────────────────
-const AIPanel = ({ response, loading, certName, latency }) => {
+const AIPanel = ({ response, loading, certName, latency, isStudent }) => {
   if (loading) return <ScanningBeam certName={certName} />
   if (!response) return null
 
   const rows = [
-    { key: 'verdict',    icon: Target,     color: PICTON,     label: 'VERDICT'     },
-    { key: 'breakEven',  icon: Clock,      color: AMBER,      label: 'BREAK-EVEN'  },
-    { key: 'projection', icon: TrendingUp, color: EMERALD,    label: '5-YEAR'      },
-    { key: 'bottomLine', icon: Zap,        color: 'var(--text)', label: 'ACTION'   },
+    { key: 'verdict',    icon: Target,     color: PICTON,        label: 'VERDICT'    },
+    { key: 'breakEven',  icon: Clock,      color: AMBER,         label: isStudent ? 'TIME TO OFFER' : 'BREAK-EVEN' },
+    { key: 'projection', icon: TrendingUp, color: EMERALD,       label: isStudent ? 'EARNING POTENTIAL' : '5-YEAR'  },
+    { key: 'bottomLine', icon: Zap,        color: 'var(--text)', label: 'ACTION'     },
   ]
 
   return (
@@ -272,7 +271,9 @@ const AIPanel = ({ response, loading, certName, latency }) => {
 
       <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Sparkles size={13} color={PICTON} />
-        <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '12px', color: PICTON, letterSpacing: '0.04em' }}>DECISION ENGINE</span>
+        <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '12px', color: PICTON, letterSpacing: '0.04em' }}>
+          {isStudent ? 'CAREER LAUNCH ENGINE' : 'DECISION ENGINE'}
+        </span>
         <span style={{ marginLeft: 'auto', fontFamily: 'JetBrains Mono, monospace', fontSize: '9px', color: 'var(--text-4)' }}>llama-3.3-70b · india 2026</span>
       </div>
 
@@ -315,7 +316,7 @@ const AIPanel = ({ response, loading, certName, latency }) => {
 
         {response.studentTrack && (
           <div style={{ padding: '10px 12px', borderRadius: '9px', background: 'var(--indigo-dim)', border: '1px solid var(--border-accent)' }}>
-            <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '9px', color: 'var(--indigo-light)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>STUDENT TRACK</div>
+            <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '9px', color: 'var(--indigo-light)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>STUDENT FAST TRACK</div>
             <div style={{ fontSize: '12px', color: 'var(--text-2)', lineHeight: '1.6', fontFamily: 'Inter, sans-serif' }}>{response.studentTrack}</div>
           </div>
         )}
@@ -346,6 +347,38 @@ const AuthGate = ({ onSignIn, onDismiss }) => (
   </motion.div>
 )
 
+// ── Student first offer roadmap ───────────────────────────
+const StudentRoadmap = ({ certName }) => {
+  const certMonths = CERTIFICATIONS.find(c => c.name === certName)?.timeMonths || 3
+  const steps = [
+    { step: '1', title: `Get ${certName.split(' ').slice(0,2).join(' ')} certified`, desc: `Complete the cert in ~${certMonths} months — use Coursera, Udemy, or official platform`, color: '#6366F1' },
+    { step: '2', title: 'Build 2 portfolio projects', desc: 'Apply what you learned — GitHub projects are essential. Recruiters check this first', color: PICTON },
+    { step: '3', title: 'Target your first ₹4.8L+ offer', desc: 'Apply to Capgemini iON, Infosys Instep, TCS NQT, Wipro Elite — all hire freshers with certs', color: EMERALD },
+  ]
+  return (
+    <div style={{ padding: '18px', borderRadius: '14px', background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'inset 0 1px 0 var(--card-highlight)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+        <GraduationCap size={14} color="#6366F1" />
+        <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '13px', color: 'var(--text)' }}>YOUR FIRST OFFER ROADMAP</div>
+      </div>
+      {steps.map((s, i) => (
+        <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: i < 2 ? '14px' : '0' }}>
+          <div style={{ width: 28, height: 28, borderRadius: '8px', background: s.color + '18', border: '1px solid ' + s.color + '28', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '12px', color: s.color, fontWeight: '700' }}>{s.step}</span>
+          </div>
+          <div>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text)', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '2px' }}>{s.title}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-3)', fontFamily: 'Inter, sans-serif', lineHeight: '1.5' }}>{s.desc}</div>
+          </div>
+          {i < 2 && (
+            <div style={{ position: 'absolute', marginLeft: '13px', marginTop: '28px', width: '1px', height: '14px', background: 'var(--border)' }} />
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ─────────────────────────────────────────────────────────
 // HERO — MAIN
 // ─────────────────────────────────────────────────────────
@@ -374,17 +407,18 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
 
   const { user, signInGoogle }             = useAuth()
   const { remaining, exceeded, increment } = useGuestCounter(GUEST_FREE_LIMIT)
-  const isStudent                          = studentMode || salary === 0
-  const roi                                = useROICalc({ currentSalary: salary, certCost, hikePercent })
+  const isStudent                          = studentMode || mode === 'student'
+  const roi                                = useROICalc({ currentSalary: isStudent ? 0 : salary, certCost, hikePercent })
 
+  // Sync student mode with mode prop from ModeSelector
   useEffect(() => {
-    const update = () => {}
-    window.addEventListener('scroll', update, { passive: true })
-    return () => window.removeEventListener('scroll', update)
-  }, [])
+    if (mode === 'student') setStudentMode(true)
+    else if (mode === 'professional' || mode === 'switcher') setStudentMode(false)
+  }, [mode])
 
   useEffect(() => { setRippleKey(k => k + 1) }, [salary, certCost, hikePercent])
 
+  // Auto-select cert from Step 1
   useEffect(() => {
     if (prefilledCert && prefilledCert.trim()) setCertName(prefilledCert)
   }, [prefilledCert])
@@ -394,16 +428,18 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
     setAiLoading(true); setAiResponse(null); setError(null)
     const t0 = Date.now()
     try {
-      const result = await analyzeROI({ certName, currentSalary: salary, certCost, hikePercent, isStudent })
+      const result = await analyzeROI({ certName, currentSalary: isStudent ? 0 : salary, certCost, hikePercent, isStudent })
       setAiResponse(result); setLastResult(result)
       setLatency(Date.now() - t0)
       if (!user) increment()
     } catch (e) {
       if (e.message?.includes('not configured') || e.message?.includes('500') || e.message?.includes('404') || e.message === 'GROQ_NOT_CONFIGURED') {
-        const mock = getMockResponse({ certName, currentSalary: salary, certCost, hikePercent, isStudent })
+        const mock = getMockResponse({ certName, currentSalary: isStudent ? 0 : salary, certCost, hikePercent, isStudent })
         setAiResponse(mock); setLastResult(mock)
         if (!user) increment()
-      } else { setError(e.message || 'Analysis failed') }
+      } else {
+        setError(e.message || 'Analysis failed — check console')
+      }
     } finally { setAiLoading(false) }
   }
 
@@ -423,29 +459,49 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
   const dragStart = useCallback(() => setDragging(true),  [])
   const dragEnd   = useCallback(() => setDragging(false), [])
 
-  const recommendedCert = useMemo(() =>
-    CERTIFICATIONS.slice().sort((a, b) => {
+  // FIX: Student recommendation uses demand score, not salary-based ROI
+  const recommendedCert = useMemo(() => {
+    if (isStudent) {
+      return CERTIFICATIONS.slice().sort((a, b) => {
+        const demandScore = (d) => d === 'Very High' ? 4 : d === 'High' ? 3 : d === 'Medium' ? 2 : 1
+        const scoreA = demandScore(a.demand) * a.avgHike - (a.avgCost / 10000)
+        const scoreB = demandScore(b.demand) * b.avgHike - (b.avgCost / 10000)
+        return scoreB - scoreA
+      })[0]
+    }
+    return CERTIFICATIONS.slice().sort((a, b) => {
       const ra = (salary * 100000 * a.avgHike / 100) * 5 - a.avgCost
       const rb = (salary * 100000 * b.avgHike / 100) * 5 - b.avgCost
       return rb - ra
     })[0]
-  , [salary])
+  }, [salary, isStudent])
 
   const fmtSalary = v => v === 0 ? 'Student (₹0)' : `₹${v}L`
   const fmtCost   = v => `₹${v}L`
   const fmtHike   = v => `+${v}%`
 
   const statCards = isStudent ? [
-    { icon: GraduationCap, label: 'TARGET OFFER',  value: '₹4.8L',                                  color: '#6366F1', index: 0 },
-    { icon: Clock,         label: 'TIME TO OFFER', value: certCost < 0.1 ? '4-6mo' : '5-8mo',       color: AMBER,     index: 1 },
+    { icon: GraduationCap, label: 'TARGET OFFER',  value: '₹4.8L',                            color: '#6366F1', index: 0 },
+    { icon: Clock,         label: 'TIME TO OFFER', value: certCost < 0.1 ? '4-6mo' : '5-8mo', color: AMBER,     index: 1 },
     { icon: DollarSign,    label: 'CERT COST',     value: certCost, prefix: '₹', suffix: 'L', decimals: 2, color: PICTON, index: 2 },
-    { icon: Sparkles,      label: 'MODE',          value: 'STUDENT',                                  color: '#818CF8', index: 3 },
+    { icon: Sparkles,      label: 'MODE',          value: 'STUDENT',                            color: '#818CF8', index: 3 },
   ] : [
     { icon: Clock,      label: 'BREAK-EVEN', value: roi.breakEvenMonths,       suffix: 'mo',             sub: 'months to recover',   color: AMBER,     index: 0 },
     { icon: TrendingUp, label: '5-YR GAIN',  value: Number(roi.fiveYearGainL), prefix: '₹', suffix: 'L', decimals: 1, sub: roi.anchor, color: EMERALD, index: 1 },
     { icon: DollarSign, label: 'NEW SALARY', value: Number(roi.newSalaryL),    prefix: '₹', suffix: 'L', decimals: 1,                 color: PICTON,    index: 2 },
     { icon: Sparkles,   label: '5-YR ROI',   value: roi.roiPercent,            suffix: '%',                                            color: '#818CF8', index: 3 },
   ]
+
+  // FIX: Filter affiliate links by selected cert domain
+  const selectedCertDomain = CERTIFICATIONS.find(c => c.name === certName)?.domain
+  const affiliateCerts = CERTIFICATIONS.filter(c => {
+    if (selectedCertDomain) return c.affiliate && c.domain === selectedCertDomain
+    return c.affiliate
+  }).slice(0, 4)
+  // Fallback: if no affiliates match domain, show all affiliates
+  const displayAffiliates = affiliateCerts.length > 0
+    ? affiliateCerts
+    : CERTIFICATIONS.filter(c => c.affiliate).slice(0, 3)
 
   const firstName = resumeName ? resumeName.split(' ')[0] : ''
 
@@ -476,7 +532,10 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
               }
             </h1>
             <p style={{ fontSize: '15px', color: 'var(--text-3)', maxWidth: '420px', margin: '0 auto', lineHeight: '1.7', fontFamily: 'Inter, sans-serif' }}>
-              Live ROI for Indian tech professionals. Break-even, 5-year gain, AI verdict — before you spend a rupee.
+              {isStudent
+                ? 'Find the right cert, build your portfolio, land your first ₹4.8L+ offer in India.'
+                : 'Live ROI for Indian tech professionals. Break-even, 5-year gain, AI verdict — before you spend a rupee.'
+              }
             </p>
           </motion.div>
 
@@ -512,16 +571,29 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                 {recommendedCert && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px', padding: '7px 10px', borderRadius: '7px', background: `${EMERALD}0c`, border: `1px solid ${EMERALD}20` }}>
                     <Star size={10} color={EMERALD} fill={EMERALD} />
-                    <span style={{ fontSize: '11px', color: EMERALD, fontWeight: '700', fontFamily: 'Inter, sans-serif' }}>Best ROI:</span>
+                    <span style={{ fontSize: '11px', color: EMERALD, fontWeight: '700', fontFamily: 'Inter, sans-serif' }}>
+                      {isStudent ? 'Best for freshers:' : 'Best ROI:'}
+                    </span>
                     <span style={{ fontSize: '11px', color: 'var(--text-3)', fontFamily: 'Inter, sans-serif' }}>{recommendedCert.name}</span>
                   </div>
                 )}
 
-                <input type="text" value={certName} onChange={e => setCertName(e.target.value)} placeholder="Or type any certification..."
-                  style={{ width: '100%', padding: '9px 12px', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)', fontSize: '12px', outline: 'none', fontFamily: 'Inter, sans-serif', transition: 'border-color 0.2s' }}
-                  onFocus={e => e.target.style.borderColor = `${PICTON}55`}
-                  onBlur={e  => e.target.style.borderColor = 'var(--border)'}
-                />
+                {/* FIX: Show locked badge when cert comes from Step 1 */}
+                {prefilledCert && prefilledCert === certName ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 12px', background: `${EMERALD}08`, border: `1px solid ${EMERALD}28`, borderRadius: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                      <span style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '5px', background: `${EMERALD}18`, color: EMERALD, fontFamily: 'JetBrains Mono, monospace', fontWeight: '700', whiteSpace: 'nowrap' }}>FROM STEP 1</span>
+                      <span style={{ fontSize: '12px', color: 'var(--text)', fontFamily: 'Inter, sans-serif', fontWeight: '600' }}>{certName}</span>
+                    </div>
+                    <button onClick={() => setCertName('')} style={{ background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer', fontSize: '11px', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap' }}>change</button>
+                  </div>
+                ) : (
+                  <input type="text" value={certName} onChange={e => setCertName(e.target.value)} placeholder="Or type any certification..."
+                    style={{ width: '100%', padding: '9px 12px', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)', fontSize: '12px', outline: 'none', fontFamily: 'Inter, sans-serif', transition: 'border-color 0.2s' }}
+                    onFocus={e => e.target.style.borderColor = `${PICTON}55`}
+                    onBlur={e  => e.target.style.borderColor = 'var(--border)'}
+                  />
+                )}
               </SpotlightCard>
 
               {/* Sliders */}
@@ -532,10 +604,10 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                 </div>
 
                 {/* Student toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', padding: '10px 12px', borderRadius: '9px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', padding: '10px 12px', borderRadius: '9px', background: 'var(--bg)', border: `1px solid ${isStudent ? '#6366F144' : 'var(--border)'}`, transition: 'border-color 0.2s' }}>
                   <div>
                     <div style={{ fontSize: '12px', color: 'var(--text)', fontWeight: '600', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>🎓 Student Mode</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '1px', fontFamily: 'Inter, sans-serif' }}>No job yet → first-offer path</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '1px', fontFamily: 'Inter, sans-serif' }}>No job yet → optimise for first offer</div>
                   </div>
                   <button onClick={() => setStudentMode(v => !v)}
                     style={{ width: 40, height: 22, borderRadius: '11px', border: 'none', cursor: 'pointer', background: isStudent ? '#6366F1' : 'var(--border)', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
@@ -543,14 +615,29 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                   </button>
                 </div>
 
-                <SliderEl label="Current Salary"    value={salary}      min={0}   max={40}  step={1}    onChange={makeSalaryChange} format={fmtSalary} color={PICTON}  shaking={shakeSalary} onDragStart={dragStart} onDragEnd={dragEnd} />
-                <SliderEl label="Cert Cost"         value={certCost}   min={0}   max={2}   step={0.05} onChange={setCertCost}      format={fmtCost}   color={AMBER}   onDragStart={dragStart} onDragEnd={dragEnd} />
-                {!isStudent && <SliderEl label="Expected Hike" value={hikePercent} min={5}   max={80}  step={5}    onChange={makeHikeChange}   format={fmtHike}   color={EMERALD} shaking={shakeHike} onDragStart={dragStart} onDragEnd={dragEnd} />}
+                {/* FIX: Hide salary slider in student mode, show info banner instead */}
+                {isStudent ? (
+                  <div style={{ padding: '10px 12px', borderRadius: '9px', background: 'var(--indigo-dim)', border: '1px solid var(--border-accent)', marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '16px' }}>🎓</span>
+                    <div>
+                      <div style={{ fontSize: '12px', color: 'var(--indigo-light)', fontWeight: '700', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Student Mode Active</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif', marginTop: '2px' }}>Optimising for ₹4.8L+ first offer — no salary needed</div>
+                    </div>
+                  </div>
+                ) : (
+                  <SliderEl label="Current Salary" value={salary} min={0} max={40} step={1} onChange={makeSalaryChange} format={fmtSalary} color={PICTON} shaking={shakeSalary} onDragStart={dragStart} onDragEnd={dragEnd} />
+                )}
+
+                <SliderEl label="Cert Cost" value={certCost} min={0} max={2} step={0.05} onChange={setCertCost} format={fmtCost} color={AMBER} onDragStart={dragStart} onDragEnd={dragEnd} />
+                {!isStudent && <SliderEl label="Expected Hike" value={hikePercent} min={5} max={80} step={5} onChange={makeHikeChange} format={fmtHike} color={EMERALD} shaking={shakeHike} onDragStart={dragStart} onDragEnd={dragEnd} />}
               </SpotlightCard>
 
-              {/* Affiliate links */}
+              {/* FIX: Affiliate links filtered by cert domain */}
               <SpotlightCard accent="var(--border)">
-                {CERTIFICATIONS.filter(c => c.affiliate).map((cert, i) => (
+                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px' }}>
+                  {selectedCertDomain ? `LEARN ${selectedCertDomain.toUpperCase()} CERTS` : 'RECOMMENDED COURSES'}
+                </div>
+                {displayAffiliates.map((cert, i) => (
                   <motion.a key={cert.id} href={cert.link} target="_blank" rel="noopener noreferrer"
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.07 }}
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 10px', borderRadius: '8px', background: 'var(--bg)', border: '1px solid var(--border)', textDecoration: 'none', marginBottom: '7px', transition: 'all 0.18s' }}
@@ -559,9 +646,13 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                     <div>
                       <div style={{ fontSize: '12px', color: 'var(--text)', fontWeight: '600', fontFamily: 'Plus Jakarta Sans, sans-serif', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         {cert.name}
+                        {cert.name === certName && <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px', background: `${PICTON}14`, color: PICTON, fontFamily: 'JetBrains Mono, monospace' }}>SELECTED</span>}
                         {recommendedCert?.id === cert.id && <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px', background: `${EMERALD}14`, color: EMERALD, fontFamily: 'JetBrains Mono, monospace' }}>ROI★</span>}
                       </div>
-                      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '10px', color: 'var(--text-4)', marginTop: '2px' }}>₹{cert.avgCost/1000}K · +{cert.avgHike}% · {cert.demand}</div>
+                      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '10px', color: 'var(--text-4)', marginTop: '2px' }}>
+                        ₹{cert.avgCost / 1000}K · +{cert.avgHike}% · {cert.demand}
+                        {cert.avgCost === 0 && <span style={{ color: EMERALD, marginLeft: '4px' }}>FREE</span>}
+                      </div>
                     </div>
                     <ExternalLink size={11} color="var(--text-4)" />
                   </motion.a>
@@ -577,7 +668,7 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                 {statCards.map(s => <BentoStat key={s.label} {...s} rippleKey={rippleKey} />)}
               </div>
 
-              {/* Life anchor */}
+              {/* Life anchor — professionals only */}
               {!isStudent && roi.fiveYearGainINR > 0 && (
                 <motion.div key={`anchor-${rippleKey}`} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ ...SPRING, delay: 0.22 }}
                   style={{ padding: '11px 16px', borderRadius: '10px', background: `${EMERALD}0a`, border: `1px solid ${EMERALD}18`, display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -590,52 +681,56 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                 </motion.div>
               )}
 
-              {/* Chart */}
-              <SpotlightCard accent={EMERALD}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                  <div>
-                    <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '12px', color: 'var(--text-2)', letterSpacing: '-0.01em' }}>ROI VS GHOST OF INACTION</div>
-                    <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '10px', color: 'var(--text-4)', marginTop: '2px' }}>Cumulative gain (₹K) · 24 months</div>
+              {/* FIX: Chart only for professionals, student gets roadmap */}
+              {isStudent ? (
+                <StudentRoadmap certName={certName} />
+              ) : (
+                <SpotlightCard accent={EMERALD}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                    <div>
+                      <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '12px', color: 'var(--text-2)', letterSpacing: '-0.01em' }}>ROI VS GHOST OF INACTION</div>
+                      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '10px', color: 'var(--text-4)', marginTop: '2px' }}>Cumulative gain (₹K) · 24 months</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: 10, height: 2, background: EMERALD }} /><span style={{ color: 'var(--text-4)' }}>Action</span></div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: 10, height: 2, background: 'var(--border)' }} /><span style={{ color: 'var(--text-4)' }}>👻</span></div>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '12px', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: 10, height: 2, background: EMERALD }} /><span style={{ color: 'var(--text-4)' }}>Action</span></div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: 10, height: 2, background: 'var(--border)' }} /><span style={{ color: 'var(--text-4)' }}>👻</span></div>
-                  </div>
-                </div>
 
-                <ResponsiveContainer width="100%" height={155}>
-                  <AreaChart data={roi.chartData} margin={{ top: 4, right: 4, bottom: 0, left: -18 }}>
-                    <defs>
-                      <linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor={EMERALD} stopOpacity={0.18} />
-                        <stop offset="95%" stopColor={EMERALD} stopOpacity={0}    />
-                      </linearGradient>
-                      <linearGradient id="ig2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#64748B" stopOpacity={0.12} />
-                        <stop offset="95%" stopColor="#64748B" stopOpacity={0}    />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-4)', fontFamily: 'JetBrains Mono, monospace' }} tickLine={false} axisLine={false} interval={5} />
-                    <YAxis tick={{ fontSize: 9, fill: 'var(--text-4)', fontFamily: 'JetBrains Mono, monospace' }} tickLine={false} axisLine={false} />
-                    <Tooltip content={<ChartTooltip />} />
-                    <ReferenceLine y={0} stroke="var(--border)" />
-                    <Area type="monotone" dataKey="action"   name="Action"   stroke={EMERALD}      strokeWidth={2}   fill="url(#ag2)" dot={false} />
-                    <Area type="monotone" dataKey="inaction" name="Inaction" stroke="var(--text-4)" strokeWidth={1.5} fill="url(#ig2)" dot={false} strokeDasharray="4 3" />
-                  </AreaChart>
-                </ResponsiveContainer>
+                  <ResponsiveContainer width="100%" height={155}>
+                    <AreaChart data={roi.chartData} margin={{ top: 4, right: 4, bottom: 0, left: -18 }}>
+                      <defs>
+                        <linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%"  stopColor={EMERALD} stopOpacity={0.18} />
+                          <stop offset="95%" stopColor={EMERALD} stopOpacity={0}    />
+                        </linearGradient>
+                        <linearGradient id="ig2" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%"  stopColor="#64748B" stopOpacity={0.12} />
+                          <stop offset="95%" stopColor="#64748B" stopOpacity={0}    />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-4)', fontFamily: 'JetBrains Mono, monospace' }} tickLine={false} axisLine={false} interval={5} />
+                      <YAxis tick={{ fontSize: 9, fill: 'var(--text-4)', fontFamily: 'JetBrains Mono, monospace' }} tickLine={false} axisLine={false} />
+                      <Tooltip content={<ChartTooltip />} />
+                      <ReferenceLine y={0} stroke="var(--border)" />
+                      <Area type="monotone" dataKey="action"   name="Action"   stroke={EMERALD}       strokeWidth={2}   fill="url(#ag2)" dot={false} />
+                      <Area type="monotone" dataKey="inaction" name="Inaction" stroke="var(--text-4)"  strokeWidth={1.5} fill="url(#ig2)" dot={false} strokeDasharray="4 3" />
+                    </AreaChart>
+                  </ResponsiveContainer>
 
-                {roi.fiveYearGainINR > 0 && (
-                  <div style={{ marginTop: '10px', padding: '8px 10px', borderRadius: '7px', background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.12)', display: 'flex', alignItems: 'center', gap: '7px' }}>
-                    <span style={{ fontSize: '12px' }}>👻</span>
-                    <span style={{ fontSize: '12px', color: 'var(--text-3)', fontFamily: 'Inter, sans-serif' }}>
-                      Inaction costs{' '}
-                      <span style={{ fontFamily: 'JetBrains Mono, monospace', color: '#EF4444', fontWeight: '700' }}>₹{roi.fiveYearGainL}L</span>
-                      {' '}over 5 years.
-                    </span>
-                  </div>
-                )}
-              </SpotlightCard>
+                  {roi.fiveYearGainINR > 0 && (
+                    <div style={{ marginTop: '10px', padding: '8px 10px', borderRadius: '7px', background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.12)', display: 'flex', alignItems: 'center', gap: '7px' }}>
+                      <span style={{ fontSize: '12px' }}>👻</span>
+                      <span style={{ fontSize: '12px', color: 'var(--text-3)', fontFamily: 'Inter, sans-serif' }}>
+                        Inaction costs{' '}
+                        <span style={{ fontFamily: 'JetBrains Mono, monospace', color: '#EF4444', fontWeight: '700' }}>₹{roi.fiveYearGainL}L</span>
+                        {' '}over 5 years.
+                      </span>
+                    </div>
+                  )}
+                </SpotlightCard>
+              )}
 
               {/* CTA */}
               <AnimatePresence mode="wait">
@@ -650,19 +745,23 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                         ? <><div className="pulse-dot" />Processing...</>
                         : <>
                             <Sparkles size={15} />
-                            Analyse with AI
+                            {isStudent ? 'Get My Cert Plan with AI' : 'Analyse with AI'}
                             {!user && remaining > 0 && <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '8px', background: 'rgba(255,255,255,0.15)', marginLeft: '4px', fontFamily: 'JetBrains Mono, monospace' }}>{remaining} free</span>}
                           </>
                       }
                     </MagneticButton>
 
+                    {/* FIX: Show only relevant action buttons based on mode */}
                     {aiResponse && (
                       <div style={{ display: 'flex', gap: '7px', marginBottom: '12px' }}>
                         {[
-                          { icon: Mail,        label: 'Pitch Boss',  onClick: () => setShowPitch(v => !v),   active: showPitch     },
-                          { icon: Flame,       label: 'Track',       onClick: () => setShowBurnRate(v => !v), active: showBurnRate  },
-                          { icon: CheckCircle, label: 'Verify Hike', onClick: () => setShowHikeV(v => !v),   active: showHikeV     },
-                        ].map(({ icon: Icon, label, onClick, active }, i) => (
+                          // Pitch Boss — professionals and switchers only
+                          !isStudent && { icon: Mail, label: 'Pitch Boss', onClick: () => setShowPitch(v => !v), active: showPitch },
+                          // Track — everyone
+                          { icon: Flame, label: 'Track Progress', onClick: () => setShowBurnRate(v => !v), active: showBurnRate },
+                          // Verify Hike — professionals and switchers only (students have no hike to verify)
+                          !isStudent && { icon: CheckCircle, label: 'Verify Hike', onClick: () => setShowHikeV(v => !v), active: showHikeV },
+                        ].filter(Boolean).map(({ icon: Icon, label, onClick, active }, i) => (
                           <button key={i} onClick={onClick} className="btn-ghost"
                             style={{ flex: 1, padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', fontSize: '12px', borderColor: active ? `${PICTON}44` : undefined, color: active ? PICTON : undefined, fontFamily: 'Inter, sans-serif' }}>
                             <Icon size={12} />{label}
@@ -677,10 +776,11 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                       </div>
                     )}
 
-                    <AIPanel response={aiResponse} loading={aiLoading} certName={certName} latency={latency} />
+                    <AIPanel response={aiResponse} loading={aiLoading} certName={certName} latency={latency} isStudent={isStudent} />
 
+                    {/* Pitch Boss — hidden for students */}
                     <AnimatePresence>
-                      {showPitch && aiResponse && (
+                      {showPitch && aiResponse && !isStudent && (
                         <PitchGenerator certName={certName} certCost={certCost} currentSalary={salary} hikePercent={hikePercent} onClose={() => setShowPitch(false)} />
                       )}
                     </AnimatePresence>
@@ -689,13 +789,16 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                       {showBurnRate && (
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                           style={{ background: 'var(--surface)', border: `1px solid ${AMBER}22`, borderRadius: '14px', padding: '22px', marginTop: '12px' }}>
-                          <BurnRate certName={certName} breakEvenMonths={roi.breakEvenMonths} />
+                          <BurnRate certName={certName} breakEvenMonths={isStudent ? 0 : roi.breakEvenMonths} />
                         </motion.div>
                       )}
                     </AnimatePresence>
 
+                    {/* Verify Hike — hidden for students */}
                     <AnimatePresence>
-                      {showHikeV && <HikeVerifier certName={certName} projectedHike={hikePercent} onClose={() => setShowHikeV(false)} />}
+                      {showHikeV && !isStudent && (
+                        <HikeVerifier certName={certName} projectedHike={hikePercent} onClose={() => setShowHikeV(false)} />
+                      )}
                     </AnimatePresence>
                   </motion.div>
                 )}

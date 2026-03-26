@@ -232,10 +232,14 @@ Under 380 words. India-specific. Be specific to their resume, not generic.`
 const parseResponse = (text) => {
   const get = (pattern) => { const m = text.match(pattern); return m ? m[1].trim() : '' }
   const getBullets = (pattern) => {
-    const m = text.match(pattern)
-    if (!m) return []
-    return m[1].split('\n').filter(l => l.trim().startsWith('•')).map(l => l.replace('•', '').trim()).filter(Boolean)
-  }
+  const m = text.match(pattern)
+  if (!m) return []
+  return m[1]
+    .split('\n')
+    .filter(l => l.trim().match(/^[•\-\*]/))
+    .map(l => l.replace(/^[•\-\*]\s*/, '').trim())
+    .filter(Boolean)
+}
   const certs = []
   for (let i = 1; i <= 3; i++) {
     const block = text.match(new RegExp(`\\*\\*TOP CERT #${i}.*?\\*\\*([\\s\\S]+?)(?=\\*\\*TOP CERT #${i+1}|\\*\\*IMMEDIATE|$)`))

@@ -398,9 +398,10 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                   </>
                 ) : (
                   <button
-                    onClick={handleSignIn}
-                    disabled={signingIn}
-                    style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 14px', background: 'linear-gradient(135deg, var(--indigo), #4338CA)', border: 'none', borderRadius: '8px', color: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer', opacity: signingIn ? 0.7 : 1, fontFamily: 'Inter, sans-serif' }}
+  onClick={handleSignIn}
+  disabled={signingIn}
+  title={!import.meta.env.VITE_FIREBASE_API_KEY ? 'Sign-in requires Firebase setup' : ''}
+  style={{ display: 'flex', opacity: !import.meta.env.VITE_FIREBASE_API_KEY ? 0.4 : 1, background: 'var(--indigo)', border: 'none', borderRadius: '7px', padding: '6px 10px', cursor: !import.meta.env.VITE_FIREBASE_API_KEY ? 'not-allowed' : 'pointer', color: 'white', alignItems: 'center', gap: '4px', fontFamily: 'Inter, sans-serif' }}
                   >
                     <LogIn size={12} />{signingIn ? '...' : 'Sign in'}
                   </button>
@@ -600,7 +601,10 @@ const AppPage = ({ activeTab, onTabChange, mode, onModeChange, onCertSelected, p
   return (
     <div style={{ paddingTop: '110px', minHeight: '100vh' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '20px 20px 0' }}>
-        <ModeSelector activeMode={mode} onChange={onModeChange} />
+        <ModeSelector activeMode={mode} onChange={(newMode) => {
+  onModeChange(newMode)
+  // Switching to student mode auto-sets context
+}} />
       </div>
 
       <AnimatePresence mode="wait">
