@@ -506,9 +506,8 @@ const ResumeAnalyzer = ({ mode = 'professional', onCertSelected }) => {
 
     setLoading(true); setResult(null); setError(null); setRejection(null)
     try {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY
-      if (!apiKey || apiKey === 'your_groq_key_here') throw new Error('NO_KEY')
-
+      const safeText = text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').slice(0, 2200).trim()
+const raw = await callGroqForResume(null, buildPrompt(safeText, mode, goal, domain))
       const safeText = text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').slice(0, 2200).trim()
       const raw      = await callGroqForResume(apiKey, buildPrompt(safeText, mode, goal, domain))
       if (!raw || raw.length < 30) throw new Error('Empty response — try again')
@@ -519,7 +518,7 @@ const ResumeAnalyzer = ({ mode = 'professional', onCertSelected }) => {
 
     } catch (e) {
       console.error('Resume AI error:', e)
-      if (e.message === 'NO_KEY') {
+      if (e.message?.includes('not configured') || e.message?.includes('500') || e.message === 'NO_KEY') {
         const demo = {
           name: 'Demo User', summary: 'Demo mode active. In live mode this shows a 2-3 sentence specific analysis of your background, current role, experience level, and the single biggest career opportunity available to you right now in the India 2026 market.', city: 'Bangalore', domain: 'tech',
           gaps: ['No hands-on cloud portfolio projects', 'Missing architecture-level certifications', 'Limited exposure to DevOps toolchain'],
