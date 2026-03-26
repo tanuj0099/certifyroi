@@ -399,8 +399,7 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
   const [showPitch,    setShowPitch]    = useState(false)
   const [showBurnRate, setShowBurnRate] = useState(false)
   const [showHikeV,    setShowHikeV]    = useState(false)
-  const [dragging,     setDragging]     = useState(false)
-  const [shakeSalary,  setShakeSalary]  = useState(false)
+   const [shakeSalary,  setShakeSalary]  = useState(false)
   const [shakeHike,    setShakeHike]    = useState(false)
   const [rippleKey,    setRippleKey]    = useState(0)
   const [latency,      setLatency]      = useState(42)
@@ -456,9 +455,6 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
     setHikePercent(v)
   }
 
-  const dragStart = useCallback(() => setDragging(true),  [])
-  const dragEnd   = useCallback(() => setDragging(false), [])
-
   // FIX: Student recommendation uses demand score, not salary-based ROI
   const recommendedCert = useMemo(() => {
     if (isStudent) {
@@ -507,12 +503,6 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
 
   return (
     <>
-      <AnimatePresence>
-        {dragging && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 50, pointerEvents: 'none' }} />
-        )}
-      </AnimatePresence>
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} style={{ minHeight: '100vh', paddingTop: '80px', paddingBottom: '64px' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 20px' }}>
@@ -625,11 +615,11 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
                     </div>
                   </div>
                 ) : (
-                  <SliderEl label="Current Salary" value={salary} min={0} max={40} step={1} onChange={makeSalaryChange} format={fmtSalary} color={PICTON} shaking={shakeSalary} onDragStart={dragStart} onDragEnd={dragEnd} />
+                  <SliderEl label="Current Salary" value={salary} min={0} max={40} step={1} onChange={makeSalaryChange} format={fmtSalary} color={PICTON} shaking={shakeSalary} } />
                 )}
 
-                <SliderEl label="Cert Cost" value={certCost} min={0} max={2} step={0.05} onChange={setCertCost} format={fmtCost} color={AMBER} onDragStart={dragStart} onDragEnd={dragEnd} />
-                {!isStudent && <SliderEl label="Expected Hike" value={hikePercent} min={5} max={80} step={5} onChange={makeHikeChange} format={fmtHike} color={EMERALD} shaking={shakeHike} onDragStart={dragStart} onDragEnd={dragEnd} />}
+                <SliderEl label="Cert Cost" value={certCost} min={0} max={2} step={0.05} onChange={setCertCost} format={fmtCost} color={AMBER} } />
+                {!isStudent && <SliderEl label="Expected Hike" value={hikePercent} min={5} max={80} step={5} onChange={makeHikeChange} format={fmtHike} color={EMERALD} shaking={shakeHike} } />}
               </SpotlightCard>
 
               {/* FIX: Affiliate links filtered by cert domain */}
