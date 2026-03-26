@@ -140,6 +140,31 @@
 
 @layer components {
 
+  /* ── Gradient text ───────────────────────────────────── */
+  .gradient-text {
+    background: linear-gradient(135deg, #51B1E7 0%, #818CF8 50%, #10B981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline;
+  }
+
+  .gradient-text-gold {
+    background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline;
+  }
+
+  .gradient-text-purple {
+    background: linear-gradient(135deg, #6366F1 0%, #818CF8 50%, #A78BFA 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline;
+  }
+
   /* ── Glass card — solid, no blur ─────────────────────── */
   .glass {
     background: var(--glass-bg);
