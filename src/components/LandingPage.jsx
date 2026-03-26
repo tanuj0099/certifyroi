@@ -1,13 +1,13 @@
 import {
   motion, useAnimationFrame, useScroll, useTransform,
   useSpring, useMotionValue, useVelocity, useMotionValueEvent,
-  animate, AnimatePresence
+  AnimatePresence
 } from 'framer-motion'
 import { useRef, useState, useCallback, useEffect } from 'react'
 import {
-  TrendingUp, FileText, Map, Sparkles, ArrowRight,
+  TrendingUp, FileText, Sparkles, ArrowRight,
   GraduationCap, Repeat, Briefcase, Star, Zap, Award,
-  Brain, ChevronRight, CheckCircle
+  Brain, ChevronRight, CheckCircle, Map
 } from 'lucide-react'
 
 const F_HEAD = "'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif"
@@ -23,14 +23,15 @@ const GGreen  = ({ c }) => <G colors={['#10B981','#34D399','#51B1E7']}>{c}</G>
 const GRed    = ({ c }) => <G colors={['#EF4444','#F59E0B']}>{c}</G>
 
 const ScanlineOverlay = () => (
-  <div style={{ position: 'fixed', inset: 0, zIndex: 2, pointerEvents: 'none', backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.018) 2px, rgba(0,0,0,0.018) 4px)`, mixBlendMode: 'multiply' }} />
+  <div style={{ position: 'fixed', inset: 0, zIndex: 2, pointerEvents: 'none',
+    backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.018) 2px, rgba(0,0,0,0.018) 4px)`,
+    mixBlendMode: 'multiply' }} />
 )
 
 const GhostNumber = ({ value, style = {} }) => (
   <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(180px, 30vw, 320px)', lineHeight: 1, letterSpacing: '-0.05em', color: 'transparent', WebkitTextStroke: '1.5px rgba(99,102,241,0.12)', userSelect: 'none', pointerEvents: 'none', position: 'absolute', whiteSpace: 'nowrap', ...style }}>{value}</div>
 )
 
-// ── Theme-aware Machined Card ─────────────────────────────
 const MachinedCard = ({ children, style = {}, glowColor = '#6366F1', intensity = 10, onClick, draggable = false }) => {
   const ref = useRef(null)
   const x   = useMotionValue(0)
@@ -76,7 +77,6 @@ const MachinedCard = ({ children, style = {}, glowColor = '#6366F1', intensity =
       whileHover={{ scale: 1.015, transition: { duration: 0.2 } }}
     >
       <div style={{ position: 'absolute', inset: 0, borderRadius: '18px', pointerEvents: 'none', zIndex: 0, background: `radial-gradient(circle 200px at ${glow.x}% ${glow.y}%, ${glowColor}14 0%, transparent 70%)`, opacity: glow.op, transition: 'opacity 0.3s' }} />
-      <div style={{ position: 'absolute', inset: 0, borderRadius: '18px', pointerEvents: 'none', zIndex: 0, background: `radial-gradient(circle 60px at ${glow.x}% ${glow.y}%, rgba(255,255,255,0.04) 0%, transparent 55%)`, opacity: glow.op }} />
       <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
     </motion.div>
   )
@@ -114,7 +114,7 @@ const Ticker = () => {
     'Hyderabad cloud demand up 38% YoY',
   ]
   return (
-    <div style={{ overflow: 'hidden', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '11px 0', background: 'var(--surface)', marginBottom: '0' }}>
+    <div style={{ overflow: 'hidden', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '11px 0', background: 'var(--surface)' }}>
       <motion.div animate={{ x: ['0%', '-50%'] }} transition={{ duration: 32, repeat: Infinity, ease: 'linear' }}
         style={{ display: 'flex', gap: '80px', whiteSpace: 'nowrap', width: 'max-content' }}>
         {[...items, ...items].map((item, i) => (
@@ -128,172 +128,257 @@ const Ticker = () => {
 }
 
 // ─────────────────────────────────────────────────────────
-// CERT ASSEMBLY — Royal Enfield sticky scroll
+// CERT ASSEMBLY
+// Royal Enfield style: layers VISIBLE from start, spread in 3D,
+// scroll assembles them together. sticky 220vh section.
 // ─────────────────────────────────────────────────────────
 const CertAssembly = () => {
   const containerRef = useRef(null)
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end end'] })
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
+  })
+
   const scrollVel = useVelocity(scrollYProgress)
   const [ca, setCa] = useState(0)
 
   useEffect(() => {
-    const unsub = scrollVel.on('change', v => { setCa(Math.min(Math.abs(v) * 400, 9)) })
-    const decay = setInterval(() => setCa(p => Math.max(0, p - 0.8)), 80)
+    const unsub = scrollVel.on('change', v => setCa(Math.min(Math.abs(v) * 500, 10)))
+    const decay = setInterval(() => setCa(p => Math.max(0, p - 0.6)), 60)
     return () => { unsub(); clearInterval(decay) }
   }, [scrollVel])
 
-  const l1Z  = useTransform(scrollYProgress, [0, 0.65], [-320, 0])
-  const l2Z  = useTransform(scrollYProgress, [0, 0.65], [ 320, 0])
-  const l3Z  = useTransform(scrollYProgress, [0, 0.65], [-160, 0])
-  const l1RY = useTransform(scrollYProgress, [0, 0.65], [ 35, 0])
-  const l2RY = useTransform(scrollYProgress, [0, 0.65], [-28, 0])
-  const l3RY = useTransform(scrollYProgress, [0, 0.65], [ 18, 0])
-  const l1RX = useTransform(scrollYProgress, [0, 0.65], [ 18, 0])
-  const l2RX = useTransform(scrollYProgress, [0, 0.65], [-12, 0])
-  const l3RX = useTransform(scrollYProgress, [0, 0.65], [  8, 0])
-  const l1Y  = useTransform(scrollYProgress, [0, 0.65], [-90, 0])
-  const l2Y  = useTransform(scrollYProgress, [0, 0.65], [ 90, 0])
-  const l3Y  = useTransform(scrollYProgress, [0, 0.65], [  0, 0])
-  const l1Op = useTransform(scrollYProgress, [0.02, 0.28], [0, 1])
-  const l2Op = useTransform(scrollYProgress, [0.06, 0.36], [0, 1])
-  const l3Op = useTransform(scrollYProgress, [0.10, 0.45], [0, 1])
-  const certSc     = useTransform(scrollYProgress, [0, 0.12, 0.65, 1], [0.4, 0.75, 1, 1.04])
-  const overlayOp  = useTransform(scrollYProgress, [0, 0.06, 0.94, 1], [0, 0.95, 0.95, 0])
-  const gridOp     = useTransform(scrollYProgress, [0.04, 0.14], [0, 1])
-  const hintOp     = useTransform(scrollYProgress, [0, 0.06, 0.14], [1, 1, 0])
-  const assembledOp = useTransform(scrollYProgress, [0.64, 0.74], [0, 1])
-  const assemblyVal = useTransform(scrollYProgress, [0.62, 0.70], [0, 1])
+  const p = scrollYProgress
 
-  const [flare, setFlare] = useState(false)
+  // Layer 1 — Border: starts rotated & far back in Z
+  const l1Z  = useTransform(p, [0, 0.65], [-260, 0])
+  const l1RY = useTransform(p, [0, 0.65], [32, 0])
+  const l1RX = useTransform(p, [0, 0.65], [16, 0])
+  const l1Y  = useTransform(p, [0, 0.65], [-80, 0])
+  const l1Op = useTransform(p, [0, 0.05], [0, 1])
+
+  // Layer 2 — Content: starts in front, opposite direction
+  const l2Z  = useTransform(p, [0, 0.65], [260, 0])
+  const l2RY = useTransform(p, [0, 0.65], [-26, 0])
+  const l2RX = useTransform(p, [0, 0.65], [-10, 0])
+  const l2Y  = useTransform(p, [0, 0.65], [80, 0])
+  const l2Op = useTransform(p, [0, 0.08], [0, 1])
+
+  // Layer 3 — Hologram: floats mid-Z
+  const l3Z  = useTransform(p, [0, 0.65], [-130, 0])
+  const l3RY = useTransform(p, [0, 0.65], [16, 0])
+  const l3RX = useTransform(p, [0, 0.65], [6, 0])
+  const l3Y  = useTransform(p, [0, 0.65], [0, 0])
+  const l3Op = useTransform(p, [0, 0.12], [0, 1])
+
+  const certSc     = useTransform(p, [0, 0.65], [0.65, 1])
+  const overlayOp  = useTransform(p, [0, 0.08, 0.92, 1], [0, 0.93, 0.93, 0])
+  const gridOp     = useTransform(p, [0.04, 0.14], [0, 1])
+  const hintOp     = useTransform(p, [0, 0.05, 0.15], [1, 1, 0])
+  const assembledOp = useTransform(p, [0.65, 0.75], [0, 1])
+  const assembled   = useTransform(p, [0.60, 0.68], [0, 1])
+
+  const [flare,   setFlare]   = useState(false)
   const [shaking, setShaking] = useState(false)
+  const firedRef = useRef(false)
 
-  useMotionValueEvent(assemblyVal, 'change', v => {
-    if (v > 0.97 && !shaking) {
+  useMotionValueEvent(assembled, 'change', v => {
+    if (v > 0.95 && !firedRef.current) {
+      firedRef.current = true
       setShaking(true); setFlare(true)
       setTimeout(() => setFlare(false), 800)
-      setTimeout(() => setShaking(false), 600)
-    } else if (v < 0.3) { setShaking(false) }
+      setTimeout(() => setShaking(false), 550)
+    }
+    if (v < 0.2) firedRef.current = false
   })
 
-  const chromatic = ca > 0.8
-    ? `drop-shadow(${(ca * 0.7).toFixed(1)}px 0 0 rgba(255,30,80,0.65)) drop-shadow(-${(ca * 0.7).toFixed(1)}px 0 0 rgba(0,210,255,0.65))`
+  const chromatic = ca > 1
+    ? `drop-shadow(${(ca * 0.6).toFixed(1)}px 0 0 rgba(255,30,80,0.6)) drop-shadow(-${(ca * 0.6).toFixed(1)}px 0 0 rgba(0,210,255,0.6))`
     : 'none'
 
   return (
     <div ref={containerRef} style={{ height: '220vh', position: 'relative' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
-        {/* Full blackout */}
-        <motion.div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: 'radial-gradient(ellipse 90% 70% at 50% 50%, #04060f 0%, #000000 100%)', opacity: overlayOp }} />
-
-        {/* Same dot-grid background as rest of site */}
         <motion.div style={{
           position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+          background: 'radial-gradient(ellipse 100% 100% at 50% 50%, #05080f 0%, #000000 100%)',
+          opacity: overlayOp,
+        }} />
+
+        <motion.div style={{
+          position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none',
           backgroundImage: `
-            linear-gradient(rgba(99,102,241,0.07) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(99,102,241,0.07) 1px, transparent 1px)
+            linear-gradient(rgba(99,102,241,0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99,102,241,0.08) 1px, transparent 1px)
           `,
           backgroundSize: '48px 48px',
           opacity: gridOp,
         }} />
 
-        {/* Crosshair */}
-        <motion.div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', opacity: gridOp }}>
-          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'rgba(99,102,241,0.1)' }} />
-          <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(99,102,241,0.1)' }} />
+        <motion.div style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none', opacity: gridOp }}>
+          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'rgba(99,102,241,0.12)' }} />
+          <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(99,102,241,0.12)' }} />
         </motion.div>
 
-        {/* 3D Scene */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', perspective: '1400px', perspectiveOrigin: '50% 50%' }}>
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 4,
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          perspective: '1200px',
+          perspectiveOrigin: '50% 50%',
+        }}>
+          <motion.div
+            animate={shaking ? { x: [0, -6, 6, -4, 4, -2, 2, 0] } : { x: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          >
+            <motion.div style={{
+              position: 'relative',
+              width: 'min(500px, 88vw)',
+              aspectRatio: '1.41 / 1',
+              transformStyle: 'preserve-3d',
+              scale: certSc,
+            }}>
 
-          <motion.div animate={shaking ? { x: [0, -5, 5, -4, 4, -2, 2, 0] } : { x: 0 }} transition={{ duration: 0.45, ease: 'easeOut' }}>
-            <motion.div style={{ position: 'relative', width: 'min(480px, 86vw)', aspectRatio: '1.41 / 1', transformStyle: 'preserve-3d', scale: certSc }}>
-
-              {/* Lens flare */}
               <AnimatePresence>
                 {flare && (
-                  <motion.div initial={{ x: '-120%', opacity: 1 }} animate={{ x: '220%', opacity: 0 }} exit={{}} transition={{ duration: 0.6, ease: 'easeOut' }}
-                    style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'none', borderRadius: '14px', background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 25%, rgba(180,160,255,0.3) 50%, rgba(255,255,255,0.08) 75%, transparent 100%)' }} />
+                  <motion.div
+                    initial={{ x: '-130%', opacity: 1 }}
+                    animate={{ x: '230%', opacity: 0 }}
+                    transition={{ duration: 0.65, ease: 'easeOut' }}
+                    style={{
+                      position: 'absolute', inset: 0, zIndex: 20,
+                      pointerEvents: 'none', borderRadius: '14px',
+                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.08) 30%, rgba(160,140,255,0.28) 50%, rgba(255,255,255,0.06) 70%, transparent)',
+                    }}
+                  />
                 )}
               </AnimatePresence>
 
-              {/* LAYER 1 — Border */}
-              <motion.div style={{ position: 'absolute', inset: 0, z: l1Z, y: l1Y, rotateY: l1RY, rotateX: l1RX, opacity: l1Op, filter: chromatic, transformStyle: 'preserve-3d' }}>
-                <svg viewBox="0 0 480 340" width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
+              {/* LAYER 1 — BORDER FRAME */}
+              <motion.div style={{
+                position: 'absolute', inset: 0,
+                translateZ: l1Z,
+                translateY: l1Y,
+                rotateY: l1RY,
+                rotateX: l1RX,
+                opacity: l1Op,
+                filter: chromatic,
+              }}>
+                <svg viewBox="0 0 480 340" width="100%" height="100%" style={{ position: 'absolute', inset: 0, display: 'block' }}>
                   <defs>
-                    <linearGradient id="bgrad" x1="0" y1="0" x2="1" y2="1">
+                    <linearGradient id="bgrad2" x1="0" y1="0" x2="1" y2="1">
                       <stop offset="0%"   stopColor="#6366F1" />
-                      <stop offset="30%"  stopColor="#818CF8" />
-                      <stop offset="65%"  stopColor="#10B981" />
+                      <stop offset="35%"  stopColor="#818CF8" />
+                      <stop offset="68%"  stopColor="#10B981" />
                       <stop offset="100%" stopColor="#51B1E7" />
                     </linearGradient>
-                    <filter id="bglow"><feGaussianBlur stdDeviation="2.5" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+                    <filter id="glow2">
+                      <feGaussianBlur stdDeviation="3" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
                   </defs>
-                  <rect x="2" y="2" width="476" height="336" rx="14" fill="#04060f" />
-                  <rect x="2" y="2" width="476" height="336" rx="14" fill="none" stroke="url(#bgrad)" strokeWidth="2.5" filter="url(#bglow)" />
-                  <rect x="10" y="10" width="460" height="320" rx="10" fill="none" stroke="rgba(99,102,241,0.18)" strokeWidth="0.5" />
+                  <rect x="1" y="1" width="478" height="338" rx="15" fill="#050811" fillOpacity="0.96"/>
+                  <rect x="1" y="1" width="478" height="338" rx="15" fill="none" stroke="url(#bgrad2)" strokeWidth="2.5" filter="url(#glow2)"/>
+                  <rect x="11" y="11" width="458" height="318" rx="10" fill="none" stroke="rgba(99,102,241,0.2)" strokeWidth="0.6"/>
                   {[[22,22],[458,22],[22,318],[458,318]].map(([cx,cy],i) => (
                     <g key={i}>
-                      <circle cx={cx} cy={cy} r="5" fill="none" stroke="#6366F1" strokeWidth="1.5" />
-                      <circle cx={cx} cy={cy} r="9" fill="none" stroke="rgba(99,102,241,0.25)" strokeWidth="0.5" />
-                      <line x1={cx-12} y1={cy} x2={cx+12} y2={cy} stroke="rgba(99,102,241,0.4)" strokeWidth="0.6" />
-                      <line x1={cx} y1={cy-12} x2={cx} y2={cy+12} stroke="rgba(99,102,241,0.4)" strokeWidth="0.6" />
+                      <circle cx={cx} cy={cy} r="5" fill="none" stroke="#6366F1" strokeWidth="1.5"/>
+                      <circle cx={cx} cy={cy} r="9.5" fill="none" stroke="rgba(99,102,241,0.28)" strokeWidth="0.6"/>
+                      <line x1={cx-13} y1={cy} x2={cx+13} y2={cy} stroke="rgba(99,102,241,0.45)" strokeWidth="0.7"/>
+                      <line x1={cx} y1={cy-13} x2={cx} y2={cy+13} stroke="rgba(99,102,241,0.45)" strokeWidth="0.7"/>
                     </g>
                   ))}
-                  <line x1="44"  y1="2.5"   x2="90"  y2="2.5"   stroke="#818CF8" strokeWidth="2.5" />
-                  <line x1="390" y1="2.5"   x2="436" y2="2.5"   stroke="#10B981" strokeWidth="2.5" />
-                  <line x1="44"  y1="337.5" x2="90"  y2="337.5" stroke="#10B981" strokeWidth="2.5" />
-                  <line x1="390" y1="337.5" x2="436" y2="337.5" stroke="#818CF8" strokeWidth="2.5" />
+                  <line x1="46"  y1="1.5"   x2="94"  y2="1.5"   stroke="#818CF8" strokeWidth="3"/>
+                  <line x1="386" y1="1.5"   x2="434" y2="1.5"   stroke="#10B981" strokeWidth="3"/>
+                  <line x1="46"  y1="338.5" x2="94"  y2="338.5" stroke="#10B981" strokeWidth="3"/>
+                  <line x1="386" y1="338.5" x2="434" y2="338.5" stroke="#818CF8" strokeWidth="3"/>
                 </svg>
               </motion.div>
 
-              {/* LAYER 2 — Content */}
-              <motion.div style={{ position: 'absolute', inset: 0, z: l2Z, y: l2Y, rotateY: l2RY, rotateX: l2RX, opacity: l2Op, filter: chromatic, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(20px,4vw,36px)' }}>
-                <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'rgba(99,102,241,0.65)', letterSpacing: '0.24em', marginBottom: '10px', textTransform: 'uppercase' }}>CERTIFYROI · INDIA 2026</div>
-                <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1rem,3.2vw,1.6rem)', letterSpacing: '-0.04em', color: '#F8FAFC', marginBottom: '5px', textAlign: 'center', lineHeight: 1.1 }}>Your Certification</div>
-                <div style={{ fontFamily: F_BODY, fontSize: '11px', color: 'rgba(255,255,255,0.38)', marginBottom: '22px', textAlign: 'center' }}>Personalised ROI Analysis · Your City</div>
-                <div style={{ display: 'flex', gap: 'clamp(16px,4vw,32px)', marginBottom: '18px' }}>
-                  {[{ label: 'BREAK-EVEN', value: '6 mo', color: '#F59E0B' }, { label: '5-YR GAIN', value: '₹14.2L', color: '#10B981' }, { label: 'HIKE', value: '+35%', color: '#818CF8' }].map((s, i) => (
+              {/* LAYER 2 — CONTENT */}
+              <motion.div style={{
+                position: 'absolute', inset: 0,
+                translateZ: l2Z,
+                translateY: l2Y,
+                rotateY: l2RY,
+                rotateX: l2RX,
+                opacity: l2Op,
+                filter: chromatic,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                padding: 'clamp(20px,4vw,38px)',
+              }}>
+                <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'rgba(99,102,241,0.7)', letterSpacing: '0.24em', marginBottom: '10px', textTransform: 'uppercase' }}>
+                  CERTIFYROI · INDIA 2026
+                </div>
+                <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1rem,3.4vw,1.65rem)', letterSpacing: '-0.04em', color: '#F8FAFC', marginBottom: '5px', textAlign: 'center', lineHeight: 1.1 }}>
+                  Your Certification
+                </div>
+                <div style={{ fontFamily: F_BODY, fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginBottom: '24px', textAlign: 'center' }}>
+                  Personalised ROI Analysis · Your City
+                </div>
+                <div style={{ display: 'flex', gap: 'clamp(14px,4vw,34px)', marginBottom: '20px' }}>
+                  {[
+                    { label: 'BREAK-EVEN', value: '6 mo',   color: '#F59E0B' },
+                    { label: '5-YR GAIN',  value: '₹14.2L', color: '#10B981' },
+                    { label: 'HIKE',        value: '+35%',   color: '#818CF8' },
+                  ].map((s, i) => (
                     <div key={i} style={{ textAlign: 'center' }}>
-                      <div style={{ fontFamily: F_MONO, fontSize: '7px', color: 'rgba(255,255,255,0.28)', letterSpacing: '0.12em', marginBottom: '4px' }}>{s.label}</div>
-                      <div style={{ fontFamily: F_MONO, fontSize: 'clamp(0.9rem,2.5vw,1.4rem)', color: s.color, fontWeight: '700', letterSpacing: '-0.03em' }}>{s.value}</div>
+                      <div style={{ fontFamily: F_MONO, fontSize: '7px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.14em', marginBottom: '4px' }}>{s.label}</div>
+                      <div style={{ fontFamily: F_MONO, fontSize: 'clamp(0.9rem,2.6vw,1.45rem)', color: s.color, fontWeight: '700', letterSpacing: '-0.03em' }}>{s.value}</div>
                     </div>
                   ))}
                 </div>
-                <div style={{ width: '75%', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.45), transparent)', marginBottom: '12px' }} />
-                <div style={{ fontFamily: F_MONO, fontSize: '7px', color: 'rgba(255,255,255,0.22)', letterSpacing: '0.16em', textAlign: 'center' }}>VERIFIED BY AI · DATA: NAUKRI MARCH 2026</div>
+                <div style={{ width: '72%', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.5), transparent)', marginBottom: '13px' }} />
+                <div style={{ fontFamily: F_MONO, fontSize: '7px', color: 'rgba(255,255,255,0.24)', letterSpacing: '0.16em', textAlign: 'center' }}>
+                  VERIFIED BY AI · DATA: NAUKRI MARCH 2026
+                </div>
               </motion.div>
 
-              {/* LAYER 3 — Hologram seal */}
-              <motion.div style={{ position: 'absolute', right: '6%', bottom: '8%', z: l3Z, y: l3Y, rotateY: l3RY, rotateX: l3RX, opacity: l3Op }}>
-                <svg viewBox="0 0 72 72" width="clamp(48px,10vw,72px)" height="clamp(48px,10vw,72px)">
+              {/* LAYER 3 — HOLOGRAM SEAL */}
+              <motion.div style={{
+                position: 'absolute',
+                right: '6%', bottom: '8%',
+                translateZ: l3Z,
+                translateY: l3Y,
+                rotateY: l3RY,
+                rotateX: l3RX,
+                opacity: l3Op,
+              }}>
+                <svg viewBox="0 0 72 72" width="clamp(46px,9vw,68px)" height="clamp(46px,9vw,68px)">
                   <defs>
-                    <linearGradient id="sg" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%"   stopColor="#6366F1" stopOpacity="0.9" />
-                      <stop offset="50%"  stopColor="#10B981" stopOpacity="0.7" />
-                      <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.9" />
+                    <linearGradient id="sg2" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%"   stopColor="#6366F1" stopOpacity="0.9"/>
+                      <stop offset="50%"  stopColor="#10B981" stopOpacity="0.7"/>
+                      <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.9"/>
                     </linearGradient>
                   </defs>
-                  <polygon points="36,4 43,22 62,22 48,35 54,54 36,43 18,54 24,35 10,22 29,22" fill="none" stroke="url(#sg)" strokeWidth="1.5" />
-                  <circle cx="36" cy="36" r="10" fill="none" stroke="rgba(99,102,241,0.45)" strokeWidth="1" />
-                  <circle cx="36" cy="36" r="4.5" fill="rgba(99,102,241,0.18)" />
-                  <text x="36" y="40" textAnchor="middle" fontSize="7" fill="#818CF8" fontFamily={F_MONO} fontWeight="700">AI</text>
+                  <polygon points="36,4 43,22 62,22 48,35 54,54 36,43 18,54 24,35 10,22 29,22" fill="none" stroke="url(#sg2)" strokeWidth="1.5"/>
+                  <circle cx="36" cy="36" r="10" fill="none" stroke="rgba(99,102,241,0.5)" strokeWidth="1"/>
+                  <circle cx="36" cy="36" r="4.5" fill="rgba(99,102,241,0.2)"/>
+                  <text x="36" y="40" textAnchor="middle" fontSize="7" fill="#818CF8" fontFamily="monospace" fontWeight="700">AI</text>
                 </svg>
               </motion.div>
+
             </motion.div>
           </motion.div>
 
-          {/* Scroll hint */}
-          <motion.div style={{ opacity: hintOp, marginTop: '36px', textAlign: 'center', pointerEvents: 'none' }}>
-            <motion.div animate={{ y: [0, 9, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
-              <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'rgba(99,102,241,0.55)', letterSpacing: '0.22em', textTransform: 'uppercase' }}>↓  scroll to assemble  ↓</div>
+          <motion.div style={{ opacity: hintOp, marginTop: '40px', textAlign: 'center', pointerEvents: 'none', position: 'absolute', bottom: '8%' }}>
+            <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}>
+              <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'rgba(99,102,241,0.6)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+                ↓  scroll to assemble  ↓
+              </div>
             </motion.div>
           </motion.div>
 
-          {/* Assembled label */}
-          <motion.div style={{ opacity: assembledOp, position: 'absolute', bottom: '9%', textAlign: 'center', pointerEvents: 'none' }}>
-            <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'rgba(16,185,129,0.85)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>✓  YOUR ROI CERTIFICATE · ASSEMBLED</div>
+          <motion.div style={{ opacity: assembledOp, position: 'absolute', bottom: '8%', textAlign: 'center', pointerEvents: 'none' }}>
+            <div style={{ fontFamily: F_MONO, fontSize: '12px', color: 'rgba(16,185,129,0.9)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+              ✓  YOUR ROI CERTIFICATE · ASSEMBLED
+            </div>
           </motion.div>
+
         </div>
       </div>
     </div>
@@ -316,9 +401,6 @@ const MoneyCounter = () => {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// MAIN
-// ─────────────────────────────────────────────────────────
 const LandingPage = ({ onEnter }) => {
   const heroRef = useRef(null)
   const { scrollYProgress: heroSP } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
@@ -339,7 +421,7 @@ const LandingPage = ({ onEnter }) => {
 
       <div style={{ position: 'relative', zIndex: 1 }}>
 
-        {/* ── HERO ─────────────────────────────────────────── */}
+        {/* HERO */}
         <div ref={heroRef} style={{ maxWidth: '960px', margin: '0 auto', padding: '124px 24px 80px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <motion.div style={{ y: ghostY, position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', zIndex: 0, pointerEvents: 'none' }}>
             <GhostNumber value="ROI" />
@@ -355,7 +437,7 @@ const LandingPage = ({ onEnter }) => {
               IS EITHER A <GGold c="GOLDMINE" /><br />
               OR A <GRed c="MISTAKE." />
             </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.5 }}
+            <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
               style={{ fontSize: 'clamp(15px, 2.5vw, 19px)', color: 'var(--text-2)', maxWidth: '560px', margin: '0 auto 14px', lineHeight: '1.75', fontFamily: F_BODY }}>
               We tell you which — in under 2 seconds — before you spend ₹50K and 6 months finding out the hard way.
             </motion.p>
@@ -381,32 +463,32 @@ const LandingPage = ({ onEnter }) => {
           </motion.div>
         </div>
 
-        {/* ── TICKER ───────────────────────────────────────── */}
+        {/* TICKER */}
         <Ticker />
 
-        {/* ── CERT ASSEMBLY ────────────────────────────────── */}
+        {/* CERT ASSEMBLY */}
         <CertAssembly />
 
-        {/* ── WHAT WE GIVE YOU ─────────────────────────────── */}
+        {/* NOT CAREER ADVICE */}
         <div style={{ maxWidth: '860px', margin: '0 auto 120px', padding: '0 24px' }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--indigo-light)', letterSpacing: '0.15em', marginBottom: '16px', textTransform: 'uppercase', textAlign: 'center' }}>What that certificate means for you</div>
             <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text)', letterSpacing: '-0.05em', marginBottom: '20px', lineHeight: 0.95, textAlign: 'center' }}>
               NOT "CAREER ADVICE."<br /><GPurple c="ACTUAL NUMBERS." />
             </h2>
-            <p style={{ fontSize: '15px', color: 'var(--text-3)', lineHeight: '1.75', fontFamily: F_BODY, marginBottom: '32px', textAlign: 'center', maxWidth: '540px', margin: '0 auto 32px' }}>
+            <p style={{ fontSize: '15px', color: 'var(--text-3)', lineHeight: '1.75', fontFamily: F_BODY, textAlign: 'center', maxWidth: '540px', margin: '0 auto 32px' }}>
               Every analysis generates a personal ROI certificate — break-even date, 5-year gain, salary delta — anchored to real rupee amounts.
             </p>
-            {/* 2x2 grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px' }}>
               {[
-                { icon: CheckCircle, color: '#10B981', title: 'Break-even to the month', desc: 'Not "a few months." Exactly month 6. Exactly ₹23,600 extra per month.' },
-                { icon: CheckCircle, color: '#6366F1', title: '5-year gain in rupees', desc: 'Not "career growth." ₹14.2L over 5 years = Honda City + 18 months rent.' },
-                { icon: CheckCircle, color: '#F59E0B', title: 'India city-specific data', desc: 'Bangalore numbers are not Hyderabad numbers. We know the difference.' },
-                { icon: CheckCircle, color: '#51B1E7', title: 'Personalised to your resume', desc: 'A DevOps engineer and a data analyst need completely different certs.' },
+                { icon: CheckCircle, color: '#10B981', title: 'Break-even to the month', desc: 'Not "a few months." Exactly month 6. Exactly ₹23,600 extra per month from day one.' },
+                { icon: CheckCircle, color: '#6366F1', title: '5-year gain in rupees',   desc: 'Not "career growth." ₹14.2L over 5 years. Honda City + 18 months Bangalore rent.' },
+                { icon: CheckCircle, color: '#F59E0B', title: 'India city-specific',      desc: 'Bangalore numbers are not Hyderabad numbers. Not Pune numbers. We know the difference.' },
+                { icon: CheckCircle, color: '#51B1E7', title: 'Reads YOUR resume',        desc: 'A DevOps engineer and a data analyst need completely different certs. We know that too.' },
               ].map((item, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08 + i * 0.08 }}
-                  style={{ padding: '20px 22px', borderRadius: '14px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', boxShadow: 'inset 0 1px 0 var(--card-highlight)' }}>
+                <motion.div key={i}
+                  initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08 + i * 0.08 }}
+                  style={{ padding: '22px', borderRadius: '14px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', boxShadow: 'inset 0 1px 0 var(--card-highlight)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                     <item.icon size={16} color={item.color} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text)', fontFamily: F_HEAD, letterSpacing: '-0.02em' }}>{item.title}</span>
@@ -424,7 +506,7 @@ const LandingPage = ({ onEnter }) => {
           </motion.div>
         </div>
 
-        {/* ── THREE TOOLS BENTO ────────────────────────────── */}
+        {/* THREE TOOLS BENTO */}
         <div style={{ maxWidth: '1100px', margin: '0 auto 120px', padding: '0 24px', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '-40px', right: '-20px', pointerEvents: 'none', zIndex: 0 }}>
             <GhostNumber value="35%" style={{ WebkitTextStroke: '1.5px rgba(16,185,129,0.1)' }} />
@@ -435,10 +517,7 @@ const LandingPage = ({ onEnter }) => {
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--text-4)', fontFamily: F_MONO, letterSpacing: '0.05em' }}>MACHINED FOR INDIAN TECH PROFESSIONALS</p>
           </motion.div>
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gridTemplateRows: 'auto auto', gap: '14px', position: 'relative', zIndex: 1 }}>
-
-            {/* ROI big card */}
             <MachinedCard glowColor="#6366F1" draggable style={{ gridColumn: '1 / 3', minHeight: '260px' }}>
               <div style={{ padding: '34px' }}>
                 <div style={{ display: 'flex', gap: '14px', marginBottom: '18px', alignItems: 'flex-start' }}>
@@ -461,11 +540,9 @@ const LandingPage = ({ onEnter }) => {
                     </div>
                   ))}
                 </div>
-                <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--indigo-light)', letterSpacing: '0.08em', opacity: 0.6 }}>⊕ DRAG THIS CARD</div>
+                <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--indigo-light)', letterSpacing: '0.08em', opacity: 0.55 }}>⊕ DRAG THIS CARD</div>
               </div>
             </MachinedCard>
-
-            {/* Resume AI tall card */}
             <MachinedCard glowColor="#10B981" draggable style={{ gridColumn: '3 / 4', gridRow: '1 / 3', minHeight: '540px' }}>
               <div style={{ padding: '30px', height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
@@ -488,13 +565,9 @@ const LandingPage = ({ onEnter }) => {
                 </motion.button>
               </div>
             </MachinedCard>
-
-            {/* Money counter */}
             <MachinedCard glowColor="#EF4444">
               <div style={{ padding: '26px' }}><MoneyCounter /></div>
             </MachinedCard>
-
-            {/* Stats */}
             <MachinedCard glowColor="#51B1E7">
               <div style={{ padding: '26px' }}>
                 <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '20px' }}>BY THE NUMBERS</div>
@@ -508,11 +581,10 @@ const LandingPage = ({ onEnter }) => {
                 </div>
               </div>
             </MachinedCard>
-
           </div>
         </div>
 
-        {/* ── 11PM MOMENTS ─────────────────────────────────── */}
+        {/* 11PM MOMENTS */}
         <div style={{ maxWidth: '1060px', margin: '0 auto 120px', padding: '0 24px', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '-60px', left: '-30px', pointerEvents: 'none', zIndex: 0 }}>
             <GhostNumber value="11PM" style={{ WebkitTextStroke: '1px rgba(245,158,11,0.08)' }} />
@@ -551,7 +623,7 @@ const LandingPage = ({ onEnter }) => {
           </div>
         </div>
 
-        {/* ── VS OTHER SITES ────────────────────────────────── */}
+        {/* VS OTHER SITES */}
         <div style={{ maxWidth: '900px', margin: '0 auto 120px', padding: '0 24px' }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '48px' }}>
             <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text)', marginBottom: '12px', letterSpacing: '-0.05em' }}>
@@ -578,7 +650,7 @@ const LandingPage = ({ onEnter }) => {
           </div>
         </div>
 
-        {/* ── MODES ────────────────────────────────────────── */}
+        {/* MODES */}
         <div style={{ maxWidth: '720px', margin: '0 auto 120px', padding: '0 24px' }}>
           <NeonCard color="#6366F1">
             <div style={{ padding: '44px 36px', textAlign: 'center' }}>
@@ -610,7 +682,7 @@ const LandingPage = ({ onEnter }) => {
           </NeonCard>
         </div>
 
-        {/* ── SOCIAL PROOF ─────────────────────────────────── */}
+        {/* SOCIAL PROOF */}
         <div style={{ maxWidth: '1060px', margin: '0 auto 120px', padding: '0 24px' }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '48px' }}>
             <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text)', marginBottom: '10px', letterSpacing: '-0.05em' }}>
@@ -642,7 +714,7 @@ const LandingPage = ({ onEnter }) => {
           </div>
         </div>
 
-        {/* ── FINAL CTA ─────────────────────────────────────── */}
+        {/* FINAL CTA */}
         <div style={{ maxWidth: '760px', margin: '0 auto 80px', padding: '0 24px' }}>
           <MachinedCard glowColor="#6366F1" intensity={4} style={{ textAlign: 'center' }}>
             <div style={{ padding: '64px 48px', position: 'relative', overflow: 'hidden' }}>
@@ -655,7 +727,7 @@ const LandingPage = ({ onEnter }) => {
                   2 MINUTES FROM NOW<br />
                   <GPurple c="YOU'LL KNOW THE ANSWER" />
                 </h2>
-                <p style={{ fontSize: '16px', color: 'var(--text-3)', marginBottom: '38px', lineHeight: '1.8', fontFamily: F_BODY, maxWidth: '440px', margin: '0 auto 38px' }}>
+                <p style={{ fontSize: '16px', color: 'var(--text-3)', lineHeight: '1.8', fontFamily: F_BODY, maxWidth: '440px', margin: '0 auto 38px' }}>
                   Stop reading about certs. Stop asking Reddit. Stop letting family pressure decide.{' '}
                   <strong style={{ color: 'var(--text)', fontFamily: F_HEAD }}>Run the numbers.</strong>
                 </p>
@@ -663,15 +735,13 @@ const LandingPage = ({ onEnter }) => {
                   className="btn-primary" style={{ fontSize: '19px', padding: '22px 56px', display: 'inline-flex', alignItems: 'center', gap: '12px', borderRadius: '16px', fontFamily: F_HEAD, letterSpacing: '-0.03em' }}>
                   Run My Numbers <ArrowRight size={20} />
                 </motion.button>
-                <div style={{ fontSize: '12px', color: 'var(--text-4)', marginTop: '18px', fontFamily: F_MONO, letterSpacing: '0.06em' }}>
-                  FREE · NO CARD · NO SIGNUP · NO PAYWALLS
-                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-4)', marginTop: '18px', fontFamily: F_MONO, letterSpacing: '0.06em' }}>FREE · NO CARD · NO SIGNUP · NO PAYWALLS</div>
               </div>
             </div>
           </MachinedCard>
         </div>
 
-        {/* ── FOOTER ───────────────────────────────────────── */}
+        {/* FOOTER */}
         <div style={{ borderTop: '1px solid var(--border)', padding: '32px 24px', textAlign: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '12px' }}>
             <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #6366F1, #4338CA)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
