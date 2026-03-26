@@ -220,6 +220,27 @@ const FAQPage = () => {
 
 const ContactPage = () => {
   const [sent, setSent] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '', email: '', subject: 'General feedback', message: ''
+  })
+
+  const handleSubmit = async () => {
+    if (!formData.name || !formData.email || !formData.message) {
+      alert('Please fill in name, email and message')
+      return
+    }
+    try {
+      await fetch('https://formspree.io/f/xdapopeg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      setSent(true)
+    } catch {
+      alert('Failed to send. Email us directly at hello@certifyroi.in')
+    }
+  }
+
   const inputStyle = {
     width: '100%', padding: '11px 14px',
     background: 'var(--surface)', border: '1px solid var(--border)',
@@ -232,13 +253,16 @@ const ContactPage = () => {
     marginBottom: '6px', textTransform: 'uppercase',
     letterSpacing: '0.08em', fontFamily: 'JetBrains Mono, monospace',
   }
+
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', padding: '100px 24px 60px' }}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={T}>
         <h1 style={{ ...headingStyle, fontSize: 'clamp(2.5rem,6vw,4rem)' }}>
           CONTACT<br /><span style={{ color: 'var(--indigo)' }}>US</span>
         </h1>
-        <p style={{ fontSize: '15px', color: 'var(--text-3)', marginBottom: '28px', fontFamily: 'Inter, sans-serif' }}>Feedback, partnerships, bug reports, or just saying hi.</p>
+        <p style={{ fontSize: '15px', color: 'var(--text-3)', marginBottom: '28px', fontFamily: 'Inter, sans-serif' }}>
+          Feedback, partnerships, bug reports, or just saying hi.
+        </p>
         {sent ? (
           <div className="glass" style={{ padding: '40px', textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: '12px' }}>✅</div>
@@ -247,17 +271,27 @@ const ContactPage = () => {
           </div>
         ) : (
           <div className="glass" style={{ padding: '28px' }}>
-            {[{ label: 'Name', type: 'text', placeholder: 'Your name' }, { label: 'Email', type: 'email', placeholder: 'you@email.com' }].map((f, i) => (
-              <div key={i} style={{ marginBottom: '14px' }}>
-                <label style={labelStyle}>{f.label}</label>
-                <input type={f.type} placeholder={f.placeholder} style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = 'var(--border-accent)'}
-                  onBlur={e  => e.target.style.borderColor = 'var(--border)'} />
-              </div>
-            ))}
+            <div style={{ marginBottom: '14px' }}>
+              <label style={labelStyle}>Name</label>
+              <input type="text" placeholder="Your name" value={formData.name}
+                onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+                style={inputStyle}
+                onFocus={e => e.target.style.borderColor = 'var(--border-accent)'}
+                onBlur={e  => e.target.style.borderColor = 'var(--border)'} />
+            </div>
+            <div style={{ marginBottom: '14px' }}>
+              <label style={labelStyle}>Email</label>
+              <input type="email" placeholder="you@email.com" value={formData.email}
+                onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                style={inputStyle}
+                onFocus={e => e.target.style.borderColor = 'var(--border-accent)'}
+                onBlur={e  => e.target.style.borderColor = 'var(--border)'} />
+            </div>
             <div style={{ marginBottom: '14px' }}>
               <label style={labelStyle}>Subject</label>
-              <select style={{ ...inputStyle, background: 'var(--surface)' }}>
+              <select value={formData.subject}
+                onChange={e => setFormData(p => ({ ...p, subject: e.target.value }))}
+                style={{ ...inputStyle, background: 'var(--surface)' }}>
                 <option>General feedback</option>
                 <option>Bug report</option>
                 <option>Partnership / B2B</option>
@@ -268,18 +302,21 @@ const ContactPage = () => {
             <div style={{ marginBottom: '20px' }}>
               <label style={labelStyle}>Message</label>
               <textarea rows={4} placeholder="Tell us what's on your mind..."
+                value={formData.message}
+                onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
                 style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' }}
                 onFocus={e => e.target.style.borderColor = 'var(--border-accent)'}
                 onBlur={e  => e.target.style.borderColor = 'var(--border)'} />
             </div>
-            <button className="btn-primary" style={{ width: '100%' }} onClick={() => setSent(true)}>Send Message</button>
+            <button className="btn-primary" style={{ width: '100%' }} onClick={handleSubmit}>
+              Send Message
+            </button>
           </div>
         )}
       </motion.div>
     </div>
   )
 }
-
 // ─────────────────────────────────────────────────────────
 // NAV CONFIG
 // ─────────────────────────────────────────────────────────
