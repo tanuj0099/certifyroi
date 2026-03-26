@@ -43,7 +43,7 @@ const ModeSelector = ({ activeMode, onChange }) => (
       Who are you?
     </div>
 
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }} className="mode-selector-grid">
       {MODES.map((m, i) => {
         const active = activeMode === m.id
         return (

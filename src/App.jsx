@@ -418,7 +418,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
             </nav>
 
             {/* Right side */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0, marginLeft: 'auto' }} className="right-nav">
               {!loading && (
                 user ? (
                   <>
@@ -426,12 +426,9 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                       ? <img src={user.photoURL} alt="" style={{ width: '26px', height: '26px', borderRadius: '50%', border: '2px solid var(--border-accent)' }} />
                       : <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--indigo), var(--emerald))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={12} color="white" /></div>
                     }
-                    <button
-                      onClick={signOut}
-                      style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '7px', color: '#EF4444', fontSize: '11px', padding: '4px 9px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'Inter, sans-serif' }}
-                    >
-                      <LogOut size={11} />Sign out
-                    </button>
+                    <button onClick={signOut} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '7px', color: '#EF4444', fontSize: '11px', padding: '4px 9px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'Inter, sans-serif' }}>
+  <LogOut size={11} /><span className="signout-text">Sign out</span>
+</button>
                   </>
                 ) : (
                   <button
@@ -460,7 +457,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
         {/* Sub-tabs for app page */}
         {currentPage === 'app' && (
           <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg)' }}>
-            <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 20px', display: 'flex', justifyContent: 'center', height: '48px', alignItems: 'stretch', overflowX: 'auto', gap: '2px' }}>
+            <div className="subtabs" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 12px', display: 'flex', justifyContent: 'center', height: '48px', alignItems: 'stretch', overflowX: 'auto', gap: '2px' }}>
               {APP_TABS.map(tab => {
                 const active = activeTab === tab.id
                 return (
@@ -655,7 +652,7 @@ const AppPage = ({ activeTab, onTabChange, mode, onModeChange, onCertSelected, p
           <div style={{ maxWidth, margin: '0 auto', padding: '0 20px 60px' }}>
 
             {b && (
-              <div style={{ marginBottom: '20px', padding: '16px 20px', borderRadius: '12px', background: b.bg, border: `1px solid ${b.border}`, transition: 'background 0.3s' }}>
+  <div className="app-banner" style={{ marginBottom: '20px', padding: '14px 16px', borderRadius: '12px', background: b.bg, border: `1px solid ${b.border}`, transition: 'background 0.3s' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <b.icon size={15} color={b.color} />
                   <span style={{ fontSize: '14px', fontWeight: '700', color: b.color, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{b.title}</span>

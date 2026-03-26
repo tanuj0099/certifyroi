@@ -210,7 +210,7 @@ const LandingPage = ({ onEnter }) => (
           <p style={{ fontSize: '14px', color: 'var(--text-4)' }}>Pick the one that's you at 11pm</p>
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
           {[
             { icon: '😰', color: '#10B981', label: 'The Anxious 26-year-old', scenario: '3 years in. Salary is okay. LinkedIn shows people earning 2x.', question: '"Am I falling behind?"',    answer: 'ROI Calculator shows exactly what one cert does to your 5-year trajectory.' },
             { icon: '🔄', color: '#F59E0B', label: 'The Career Switcher',     scenario: 'Mid-30s. Fell into ops/finance. Wants to move into data or product.', question: '"Is the switch possible?"',  answer: 'Resume AI maps your skills to cert bridges. No generic blog posts.' },

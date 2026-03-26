@@ -356,3 +356,71 @@
     .desktop-nav { display: none !important; }
   }
 }
+/* ── Mobile fixes ────────────────────────────────────── */
+  @media (max-width: 768px) {
+
+    /* Nav */
+    .desktop-nav { display: none !important; }
+
+    /* Header right side — compress */
+    header .right-nav {
+      gap: 4px !important;
+    }
+
+    /* Hide sign out text on mobile */
+    .signout-text { display: none; }
+
+    /* Hero heading size */
+    h1 { font-size: clamp(1.8rem, 7vw, 2.8rem) !important; }
+
+    /* Mode selector — stack on mobile */
+    .mode-selector-grid {
+      grid-template-columns: 1fr !important;
+      gap: 8px !important;
+    }
+
+    /* Glass card padding */
+    .glass { padding: 16px !important; }
+
+    /* Bento grid full width */
+    .bento-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Stat cards 2 col always */
+    .stat-grid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Landing page sections */
+    .landing-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Sub-tabs scroll */
+    .subtabs {
+      justify-content: flex-start !important;
+      overflow-x: auto !important;
+      padding-bottom: 4px !important;
+    }
+
+    /* Cert buttons wrap properly */
+    .cert-pill-grid {
+      max-height: 120px !important;
+    }
+
+    /* Footer grid */
+    footer .footer-grid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Banner text size */
+    .app-banner p {
+      font-size: 13px !important;
+    }
+
+    /* Hide hamburger features on very small screens */
+    @media (max-width: 380px) {
+      .hamburger-features { display: none !important; }
+    }
+  }
