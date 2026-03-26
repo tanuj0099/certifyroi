@@ -399,7 +399,7 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) =>
       setLatency(Date.now() - t0)
       if (!user) increment()
     } catch (e) {
-      if (e.message === 'GROQ_NOT_CONFIGURED') {
+      if (e.message?.includes('not configured') || e.message?.includes('500') || e.message?.includes('404') || e.message === 'GROQ_NOT_CONFIGURED') {
         const mock = getMockResponse({ certName, currentSalary: salary, certCost, hikePercent, isStudent })
         setAiResponse(mock); setLastResult(mock)
         if (!user) increment()

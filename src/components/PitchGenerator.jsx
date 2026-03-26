@@ -42,14 +42,12 @@ const PitchGenerator = ({ certName, certCost, currentSalary, hikePercent, onClos
   const generate = async () => {
     setLoading(true); setResult(null); setError(null)
     try {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY
-      if (!apiKey || apiKey === 'your_groq_key_here') throw new Error('NO_KEY')
-      const text = await callGroqForPitch(apiKey, buildPrompt({ certName, certCost, currentSalary, hikePercent, recipientType: type }))
+      const text = await callGroqForPitch(null, buildPrompt({ certName, certCost, currentSalary, hikePercent, recipientType: type }))
       if (!text) throw new Error('Empty response')
       setResult(text)
     } catch (e) {
       console.error('PitchGenerator error:', e)
-      if (e.message === 'NO_KEY') {
+      if (e.message?.includes('not configured') || e.message?.includes('500') || e.message?.includes('404') || e.message === 'NO_KEY') {
         const breakEven = currentSalary > 0 ? Math.ceil((certCost * 100000) / (currentSalary * 100000 * hikePercent / 100 / 12)) : 8
         setResult(type === 'email'
           ? `Subject: Training Sponsorship Request - ${certName}\n\nHi [Manager's Name],\n\nI'd like to request company sponsorship for the ${certName} certification (Rs.${certCost}L).\n\nHere's why this makes sense for the team:\n\n1. We can handle ${certName.includes('AWS') ? 'cloud infrastructure' : certName.includes('Data') ? 'data analytics' : 'this domain'} in-house, reducing external consulting costs\n2. Certified professionals deliver 30-40% faster on relevant projects per industry benchmarks\n3. Keeps our skills current with what clients are actively requesting in 2026\n\nThe investment pays for itself within ${breakEven} months. Total ask: Rs.${certCost}L.\n\nWould you be open to sponsoring Rs.${certCost}L?\n\nThanks,\n[Your Name]`

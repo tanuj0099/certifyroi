@@ -51,8 +51,6 @@ const NeonCard = ({ children, style = {}, color = '#6366F1', delay = 0 }) => {
       <div style={{
         position: 'relative', zIndex: 1,
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
         borderRadius: '15px',
         height: '100%',
       }}>
