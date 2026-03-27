@@ -11,7 +11,7 @@ import {
 import { CERTIFICATIONS, CERT_DOMAINS, INDIA_CONTEXT, GUEST_FREE_LIMIT } from '../tokens.js'
 import { useROICalc, useGuestCounter } from '../hooks/hooks.jsx'
 import { useAuth } from '../hooks/useAuth.jsx'
-import { analyzeROI } from '../aiService.jsx'
+import { analyzeROI } from '../services/aiService.jsx'
 import AILoadingState from './AILoadingState.jsx'
 import BurnRate from './BurnRate.jsx'
 import HikeVerifier from './HikeVerifier.jsx'

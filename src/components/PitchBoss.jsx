@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Copy, Check, Zap, ChevronDown } from 'lucide-react'
-import { callGroqForPitch } from '../aiService.jsx'
+import { callGroqForPitch } from '../services/aiService.jsx'
 
 const F_HEAD = "'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif"
 const F_MONO = "'Commit Mono', 'JetBrains Mono', monospace"
