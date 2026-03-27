@@ -434,7 +434,7 @@ const LandingPage = ({ onEnter }) => {
   const ghostY = useTransform(heroSP, [0, 1], [0, 180])
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <ScanlineOverlay />
 
       {/* Fixed ambient orbs */}
