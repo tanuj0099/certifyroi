@@ -5,7 +5,7 @@ import {
   TrendingUp, FileText, Map, LogIn, LogOut, User,
   Menu, X, Home, Info, Phone, BookOpen,
   Shield, ChevronRight, Sparkles, Mail, FileCheck,
-  GraduationCap, Flame, CheckCircle, Brain
+  GraduationCap, Flame, CheckCircle, Brain, Award
 } from 'lucide-react'
 import { AuthProvider, useAuth } from './hooks/useAuth.jsx'
 import { ThemeProvider } from './hooks/useTheme.jsx'
