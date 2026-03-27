@@ -23,13 +23,23 @@ const GGreen  = ({ c }) => <G colors={['#10B981','#34D399','#51B1E7']}>{c}</G>
 const GRed    = ({ c }) => <G colors={['#EF4444','#F59E0B']}>{c}</G>
 
 const ScanlineOverlay = () => (
-  <div style={{ position: 'fixed', inset: 0, zIndex: 2, pointerEvents: 'none',
+  <div style={{
+    position: 'fixed', inset: 0, zIndex: 2, pointerEvents: 'none',
     backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.018) 2px, rgba(0,0,0,0.018) 4px)',
-    mixBlendMode: 'multiply' }} />
+    mixBlendMode: 'multiply'
+  }} />
 )
 
 const GhostNumber = ({ value, style = {} }) => (
-  <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(180px, 30vw, 320px)', lineHeight: 1, letterSpacing: '-0.05em', color: 'transparent', WebkitTextStroke: '1.5px rgba(99,102,241,0.12)', userSelect: 'none', pointerEvents: 'none', position: 'absolute', whiteSpace: 'nowrap', ...style }}>{value}</div>
+  <div style={{
+    fontFamily: F_HEAD, fontWeight: '800',
+    fontSize: 'clamp(180px, 30vw, 320px)',
+    lineHeight: 1, letterSpacing: '-0.05em',
+    color: 'transparent',
+    WebkitTextStroke: '1.5px rgba(99,102,241,0.12)',
+    userSelect: 'none', pointerEvents: 'none',
+    position: 'absolute', whiteSpace: 'nowrap', ...style
+  }}>{value}</div>
 )
 
 const MachinedCard = ({ children, style = {}, glowColor = '#6366F1', intensity = 10, onClick, draggable = false }) => {
@@ -64,18 +74,27 @@ const MachinedCard = ({ children, style = {}, glowColor = '#6366F1', intensity =
     <motion.div ref={ref} onClick={onClick} onMouseMove={onMove} onMouseLeave={onLeave}
       {...dragProps}
       style={{
-        rotateX: rx, rotateY: ry, perspective: 800, transformStyle: 'preserve-3d',
+        rotateX: rx, rotateY: ry, perspective: 800,
+        transformStyle: 'preserve-3d',
         position: 'relative', borderRadius: '18px',
-        background: 'var(--glass-bg)', border: '1px solid var(--glass-border)',
+        background: 'var(--glass-bg)',
+        border: '1px solid var(--glass-border)',
         boxShadow: 'inset 0 1px 0 var(--card-highlight), 0 2px 8px rgba(0,0,0,0.06)',
         overflow: 'hidden', willChange: 'transform',
         cursor: onClick ? 'pointer' : draggable ? 'grab' : 'default', ...style,
       }}
-      initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
       transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
       whileHover={{ scale: 1.015, transition: { duration: 0.2 } }}
     >
-      <div style={{ position: 'absolute', inset: 0, borderRadius: '18px', pointerEvents: 'none', zIndex: 0, background: `radial-gradient(circle 200px at ${glow.x}% ${glow.y}%, ${glowColor}14 0%, transparent 70%)`, opacity: glow.op, transition: 'opacity 0.3s' }} />
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: '18px',
+        pointerEvents: 'none', zIndex: 0,
+        background: `radial-gradient(circle 200px at ${glow.x}% ${glow.y}%, ${glowColor}14 0%, transparent 70%)`,
+        opacity: glow.op, transition: 'opacity 0.3s'
+      }} />
       <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
     </motion.div>
   )
@@ -90,17 +109,36 @@ const NeonCard = ({ children, style = {}, color = '#6366F1', delay = 0 }) => {
     setPos({ x: 50 + 55 * Math.cos(a), y: 50 + 55 * Math.sin(a) })
   })
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -3 }}
-      style={{ position: 'relative', borderRadius: '18px', padding: '1.5px', background: `radial-gradient(circle at ${pos.x}% ${pos.y}%, ${color}cc 0%, ${color}44 30%, transparent 65%)`, ...style }}>
-      <div style={{ position: 'absolute', inset: '-1px', borderRadius: '19px', background: `radial-gradient(circle at ${pos.x}% ${pos.y}%, ${color}22 0%, transparent 60%)`, filter: 'blur(10px)', zIndex: 0, pointerEvents: 'none' }} />
-      <div style={{ position: 'relative', zIndex: 1, background: 'var(--glass-bg)', borderRadius: '17px', height: '100%' }}>{children}</div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -3 }}
+      style={{
+        position: 'relative', borderRadius: '18px', padding: '1.5px',
+        background: `radial-gradient(circle at ${pos.x}% ${pos.y}%, ${color}cc 0%, ${color}44 30%, transparent 65%)`,
+        ...style
+      }}
+    >
+      <div style={{
+        position: 'absolute', inset: '-1px', borderRadius: '19px',
+        background: `radial-gradient(circle at ${pos.x}% ${pos.y}%, ${color}22 0%, transparent 60%)`,
+        filter: 'blur(10px)', zIndex: 0, pointerEvents: 'none'
+      }} />
+      <div style={{ position: 'relative', zIndex: 1, background: 'var(--glass-bg)', borderRadius: '17px', height: '100%' }}>
+        {children}
+      </div>
     </motion.div>
   )
 }
 
 const Orb = ({ color, size, style, delay = 0 }) => (
-  <motion.div animate={{ y: [0, -24, 0], scale: [1, 1.06, 1] }} transition={{ duration: 7 + delay, repeat: Infinity, ease: 'easeInOut', delay }}
-    style={{ position: 'absolute', width: size, height: size, borderRadius: '50%', background: `radial-gradient(circle, ${color} 0%, transparent 70%)`, pointerEvents: 'none', ...style }} />
+  <motion.div
+    animate={{ y: [0, -24, 0], scale: [1, 1.06, 1] }}
+    transition={{ duration: 7 + delay, repeat: Infinity, ease: 'easeInOut', delay }}
+    style={{ position: 'absolute', width: size, height: size, borderRadius: '50%', background: `radial-gradient(circle, ${color} 0%, transparent 70%)`, pointerEvents: 'none', ...style }}
+  />
 )
 
 const Ticker = () => {
@@ -113,267 +151,24 @@ const Ticker = () => {
     'Hyderabad cloud demand up 38% YoY',
   ]
   return (
-    <div style={{ overflow: 'hidden', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '11px 0', background: 'var(--surface)' }}>
-      <motion.div animate={{ x: ['0%', '-50%'] }} transition={{ duration: 32, repeat: Infinity, ease: 'linear' }}
-        style={{ display: 'flex', gap: '80px', whiteSpace: 'nowrap', width: 'max-content' }}>
+    <div style={{
+      overflow: 'hidden',
+      borderTop: '1px solid var(--border)',
+      borderBottom: '1px solid var(--border)',
+      padding: '11px 0',
+      background: 'var(--surface)'
+    }}>
+      <motion.div
+        animate={{ x: ['0%', '-50%'] }}
+        transition={{ duration: 32, repeat: Infinity, ease: 'linear' }}
+        style={{ display: 'flex', gap: '80px', whiteSpace: 'nowrap', width: 'max-content' }}
+      >
         {[...items, ...items].map((item, i) => (
           <span key={i} style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: F_MONO, flexShrink: 0 }}>
             <span style={{ color: 'var(--indigo-light)', marginRight: '12px' }}>◆</span>{item}
           </span>
         ))}
       </motion.div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────
-// CERT ASSEMBLY
-// Uses native Framer Motion z/rotateY/rotateX/y props.
-// NO useMotionTemplate. NO filter on 3D layers (kills preserve-3d).
-// NO overflow:hidden on sticky wrapper.
-// Parent has perspective + preserve-3d.
-// Layers start VISIBLE and spread in 3D from scroll=0.
-// ─────────────────────────────────────────────────────────
-const CertAssembly = () => {
-  const containerRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  })
-  const p = scrollYProgress
-
-  // Layer 1 — Border: starts far behind, tilted right-up
-  const l1z  = useTransform(p, [0, 0.65], [-260, 0])
-  const l1ry = useTransform(p, [0, 0.65], [32, 0])
-  const l1rx = useTransform(p, [0, 0.65], [14, 0])
-  const l1y  = useTransform(p, [0, 0.65], [-80, 0])
-
-  // Layer 2 — Content: starts far in front, tilted left-down
-  const l2z  = useTransform(p, [0, 0.65], [260, 0])
-  const l2ry = useTransform(p, [0, 0.65], [-26, 0])
-  const l2rx = useTransform(p, [0, 0.65], [-10, 0])
-  const l2y  = useTransform(p, [0, 0.65], [80, 0])
-
-  // Layer 3 — Seal: mid depth, slight tilt
-  const l3z  = useTransform(p, [0, 0.65], [-130, 0])
-  const l3ry = useTransform(p, [0, 0.65], [14, 0])
-  const l3rx = useTransform(p, [0, 0.65], [5, 0])
-
-  // Overall cert scale
-  const certScale = useTransform(p, [0, 0.65], [0.65, 1])
-
-  // Dark overlay
-  const overlayOp  = useTransform(p, [0, 0.07, 0.93, 1], [0, 0.94, 0.94, 0])
-  const gridOp     = useTransform(p, [0.03, 0.13], [0, 1])
-  const hintOp     = useTransform(p, [0, 0.06, 0.16], [1, 1, 0])
-  const assembledOp = useTransform(p, [0.65, 0.74], [0, 1])
-
-  // Lens flare + shake on assembly
-  const assembled = useTransform(p, [0.60, 0.67], [0, 1])
-  const [flare, setFlare] = useState(false)
-  const [shake, setShake] = useState(false)
-  const fired = useRef(false)
-
-  useMotionValueEvent(assembled, 'change', v => {
-    if (v > 0.96 && !fired.current) {
-      fired.current = true
-      setShake(true); setFlare(true)
-      setTimeout(() => setFlare(false), 700)
-      setTimeout(() => setShake(false), 450)
-    }
-    if (v < 0.1) fired.current = false
-  })
-
-  return (
-    <div ref={containerRef} style={{ height: '220vh', position: 'relative' }}>
-      {/* CRITICAL: NO overflow:hidden — it kills preserve-3d */}
-      <div style={{ position: 'sticky', top: 0, height: '100vh' }}>
-
-        {/* Dark overlay */}
-        <motion.div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: '#020408', opacity: overlayOp }} />
-
-        {/* Dot grid */}
-        <motion.div style={{
-          position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none', opacity: gridOp,
-          backgroundImage: 'linear-gradient(rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.08) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-        }} />
-
-        {/* Crosshair */}
-        <motion.div style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none', opacity: gridOp }}>
-          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'rgba(99,102,241,0.14)' }} />
-          <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(99,102,241,0.14)' }} />
-        </motion.div>
-
-        {/* Main scene */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-
-          {/* Shake wrapper — simple div, no Framer transform that could interfere */}
-          <motion.div
-            animate={shake ? { x: [0, -7, 7, -5, 5, -2, 2, 0] } : { x: 0 }}
-            transition={{ duration: 0.38, ease: 'easeOut' }}
-          >
-            {/* Scale wrapper */}
-            <motion.div style={{ scale: certScale }}>
-
-              {/*
-                CERT BOUNDS
-                perspective + preserve-3d lives HERE.
-                All 3 layer divs are direct children — they participate in the 3D scene.
-                Width + explicit height (no aspectRatio — it can cause height=0 in some browsers).
-                NO overflow:hidden.
-              */}
-              <div style={{
-                position: 'relative',
-                width: 'min(480px, 86vw)',
-                height: 'calc(min(480px, 86vw) / 1.414)',
-                perspective: '1200px',
-                perspectiveOrigin: '50% 50%',
-                transformStyle: 'preserve-3d',
-              }}>
-
-                {/* Lens flare */}
-                <AnimatePresence>
-                  {flare && (
-                    <motion.div key="flare"
-                      initial={{ x: '-120%', opacity: 1 }}
-                      animate={{ x: '220%', opacity: 0 }}
-                      transition={{ duration: 0.6, ease: 'easeOut' }}
-                      style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'none', borderRadius: '14px', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.09) 30%, rgba(180,150,255,0.28) 50%, rgba(255,255,255,0.06) 70%, transparent)' }}
-                    />
-                  )}
-                </AnimatePresence>
-
-                {/*
-                  LAYER 1 — BORDER FRAME
-                  z/rotateY/rotateX/y are native Framer Motion props.
-                  NO filter — filter would flatten preserve-3d.
-                */}
-                <motion.div style={{
-                  position: 'absolute', inset: 0,
-                  z: l1z, rotateY: l1ry, rotateX: l1rx, y: l1y,
-                }}>
-                  <svg viewBox="0 0 480 340" width="100%" height="100%" style={{ position: 'absolute', inset: 0, display: 'block' }}>
-                    <defs>
-                      <linearGradient id="certBorder" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%"   stopColor="#6366F1" />
-                        <stop offset="32%"  stopColor="#818CF8" />
-                        <stop offset="66%"  stopColor="#10B981" />
-                        <stop offset="100%" stopColor="#51B1E7" />
-                      </linearGradient>
-                      <filter id="bGlow">
-                        <feGaussianBlur stdDeviation="2.5" result="b"/>
-                        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-                      </filter>
-                    </defs>
-                    {/* Dark fill so layer is visible when spread apart */}
-                    <rect x="0" y="0" width="480" height="340" rx="15" fill="#04060e" fillOpacity="0.97"/>
-                    {/* Glowing gradient border */}
-                    <rect x="1.5" y="1.5" width="477" height="337" rx="14" fill="none" stroke="url(#certBorder)" strokeWidth="2.5" filter="url(#bGlow)"/>
-                    {/* Inner border */}
-                    <rect x="10" y="10" width="460" height="320" rx="10" fill="none" stroke="rgba(99,102,241,0.2)" strokeWidth="0.6"/>
-                    {/* Corner ornaments */}
-                    {[[22,22],[458,22],[22,318],[458,318]].map(([cx,cy],i) => (
-                      <g key={i}>
-                        <circle cx={cx} cy={cy} r="5" fill="none" stroke="#6366F1" strokeWidth="1.6"/>
-                        <circle cx={cx} cy={cy} r="9" fill="none" stroke="rgba(99,102,241,0.3)" strokeWidth="0.6"/>
-                        <line x1={cx-13} y1={cy} x2={cx+13} y2={cy} stroke="rgba(99,102,241,0.5)" strokeWidth="0.7"/>
-                        <line x1={cx} y1={cy-13} x2={cx} y2={cy+13} stroke="rgba(99,102,241,0.5)" strokeWidth="0.7"/>
-                      </g>
-                    ))}
-                    {/* Edge accents */}
-                    <line x1="46"  y1="1.5"   x2="96"  y2="1.5"   stroke="#818CF8" strokeWidth="3"/>
-                    <line x1="384" y1="1.5"   x2="434" y2="1.5"   stroke="#10B981" strokeWidth="3"/>
-                    <line x1="46"  y1="338.5" x2="96"  y2="338.5" stroke="#10B981" strokeWidth="3"/>
-                    <line x1="384" y1="338.5" x2="434" y2="338.5" stroke="#818CF8" strokeWidth="3"/>
-                  </svg>
-                </motion.div>
-
-                {/*
-                  LAYER 2 — CONTENT
-                  Starts in front (+260 z), tilted left.
-                  NO filter.
-                */}
-                <motion.div style={{
-                  position: 'absolute', inset: 0,
-                  z: l2z, rotateY: l2ry, rotateX: l2rx, y: l2y,
-                  display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'center',
-                  padding: 'clamp(18px, 4vw, 36px)',
-                }}>
-                  <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'rgba(99,102,241,0.72)', letterSpacing: '0.24em', marginBottom: '10px', textTransform: 'uppercase' }}>
-                    CERTIFYROI · INDIA 2026
-                  </div>
-                  <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1rem, 3.4vw, 1.65rem)', letterSpacing: '-0.04em', color: '#F0F2FF', marginBottom: '5px', textAlign: 'center', lineHeight: 1.1 }}>
-                    Your Certification
-                  </div>
-                  <div style={{ fontFamily: F_BODY, fontSize: '11px', color: 'rgba(255,255,255,0.38)', marginBottom: '22px', textAlign: 'center' }}>
-                    Personalised ROI Analysis · Your City
-                  </div>
-                  <div style={{ display: 'flex', gap: 'clamp(12px, 4vw, 32px)', marginBottom: '18px' }}>
-                    {[
-                      { label: 'BREAK-EVEN', value: '6 mo',   color: '#F59E0B' },
-                      { label: '5-YR GAIN',  value: '₹14.2L', color: '#10B981' },
-                      { label: 'HIKE',        value: '+35%',   color: '#818CF8' },
-                    ].map((s, i) => (
-                      <div key={i} style={{ textAlign: 'center' }}>
-                        <div style={{ fontFamily: F_MONO, fontSize: '7px', color: 'rgba(255,255,255,0.28)', letterSpacing: '0.14em', marginBottom: '4px' }}>{s.label}</div>
-                        <div style={{ fontFamily: F_MONO, fontSize: 'clamp(0.85rem, 2.6vw, 1.4rem)', color: s.color, fontWeight: '700', letterSpacing: '-0.03em' }}>{s.value}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ width: '74%', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.55), transparent)', marginBottom: '12px' }} />
-                  <div style={{ fontFamily: F_MONO, fontSize: '7px', color: 'rgba(255,255,255,0.22)', letterSpacing: '0.16em', textAlign: 'center' }}>
-                    VERIFIED BY AI · DATA: NAUKRI MARCH 2026
-                  </div>
-                </motion.div>
-
-                {/*
-                  LAYER 3 — HOLOGRAM SEAL
-                  Mid depth. NO filter.
-                */}
-                <motion.div style={{
-                  position: 'absolute', right: '6%', bottom: '8%',
-                  z: l3z, rotateY: l3ry, rotateX: l3rx,
-                }}>
-                  <svg viewBox="0 0 72 72" width="clamp(44px, 9vw, 66px)" height="clamp(44px, 9vw, 66px)">
-                    <defs>
-                      <linearGradient id="sealG" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%"   stopColor="#6366F1" stopOpacity="0.9"/>
-                        <stop offset="50%"  stopColor="#10B981" stopOpacity="0.7"/>
-                        <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.9"/>
-                      </linearGradient>
-                    </defs>
-                    <polygon points="36,4 43,22 62,22 48,35 54,54 36,43 18,54 24,35 10,22 29,22" fill="none" stroke="url(#sealG)" strokeWidth="1.5"/>
-                    <circle cx="36" cy="36" r="10" fill="none" stroke="rgba(99,102,241,0.5)" strokeWidth="1"/>
-                    <circle cx="36" cy="36" r="4.5" fill="rgba(99,102,241,0.2)"/>
-                    <text x="36" y="40" textAnchor="middle" fontSize="7" fill="#818CF8" fontFamily="monospace" fontWeight="700">AI</text>
-                  </svg>
-                </motion.div>
-
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Scroll hint */}
-          <motion.div style={{ opacity: hintOp, marginTop: '44px', textAlign: 'center', pointerEvents: 'none' }}>
-            <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}>
-              <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'rgba(99,102,241,0.65)', letterSpacing: '0.22em', textTransform: 'uppercase' }}>
-                ↓  scroll to assemble  ↓
-              </div>
-            </motion.div>
-          </motion.div>
-
-        </div>
-
-        {/* Assembled label */}
-        <motion.div style={{ opacity: assembledOp, position: 'absolute', bottom: '8%', left: 0, right: 0, textAlign: 'center', pointerEvents: 'none', zIndex: 5 }}>
-          <div style={{ fontFamily: F_MONO, fontSize: '12px', color: 'rgba(16,185,129,0.9)', letterSpacing: '0.22em', textTransform: 'uppercase' }}>
-            ✓  YOUR ROI CERTIFICATE · ASSEMBLED
-          </div>
-        </motion.div>
-
-      </div>
     </div>
   )
 }
@@ -387,16 +182,382 @@ const MoneyCounter = () => {
   }, [])
   return (
     <div style={{ padding: '22px', borderRadius: '14px', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)' }}>
-      <div style={{ fontSize: '10px', color: '#EF4444', fontFamily: F_MONO, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '10px' }}>₹ SLIPPING AWAY WHILE YOU READ THIS</div>
-      <div style={{ fontFamily: F_MONO, fontSize: '2.4rem', color: '#EF4444', fontWeight: '700', letterSpacing: '-0.03em' }}>₹{r.toFixed(2)}</div>
-      <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '7px', fontFamily: F_BODY, lineHeight: '1.5' }}>avg ₹3.2L/yr salary gap for uncertified professionals</div>
+      <div style={{ fontSize: '10px', color: '#EF4444', fontFamily: F_MONO, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '10px' }}>
+        ₹ SLIPPING AWAY WHILE YOU READ THIS
+      </div>
+      <div style={{ fontFamily: F_MONO, fontSize: '2.4rem', color: '#EF4444', fontWeight: '700', letterSpacing: '-0.03em' }}>
+        ₹{r.toFixed(2)}
+      </div>
+      <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '7px', fontFamily: F_BODY, lineHeight: '1.5' }}>
+        avg ₹3.2L/yr salary gap for uncertified professionals
+      </div>
     </div>
   )
 }
 
+// ─────────────────────────────────────────────────────────
+// CERT ASSEMBLY
+//
+// ARCHITECTURE (exactly as requested):
+// 1. trackRef  →  300vh scroll track, useScroll tied to it
+// 2. Sticky viewport camera  →  sticky top-0 h-screen, cert stays centered
+// 3. 3 layers animate via scrollYProgress 0→0.8 (spread→assembled)
+//    Then 0.8→1.0 cert scales down slightly, ready to flow into bento
+//
+// KEY TECHNICAL DECISIONS:
+// • Uses Framer Motion native `z`, `rotateY`, `rotateX`, `y` props
+//   (NOT translateZ / useMotionTemplate — those break preserve-3d)
+// • NO filter on 3D layer divs (filter flattens preserve-3d in browsers)
+// • NO overflow:hidden on sticky wrapper (same reason)
+// • perspective + preserve-3d lives on the direct parent of layers
+// ─────────────────────────────────────────────────────────
+const CertAssembly = () => {
+  // ── 1. SCROLL TRACK ──────────────────────────────────
+  const trackRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: trackRef,
+    offset: ['start start', 'end end'],
+  })
+  const p = scrollYProgress
+
+  // ── LAYER TRANSFORMS (spread → assembled at 0.8) ─────
+  // Layer 1 — Border frame: starts deep behind, tilted right-up
+  const l1z   = useTransform(p, [0, 0.8], [-280, 0])
+  const l1ry  = useTransform(p, [0, 0.8], [32, 0])
+  const l1rx  = useTransform(p, [0, 0.8], [15, 0])
+  const l1y   = useTransform(p, [0, 0.8], [-120, 0])
+
+  // Layer 2 — Content: starts far in front, tilted left-down
+  const l2z   = useTransform(p, [0, 0.8], [280, 0])
+  const l2ry  = useTransform(p, [0, 0.8], [-26, 0])
+  const l2rx  = useTransform(p, [0, 0.8], [-12, 0])
+  const l2y   = useTransform(p, [0, 0.8], [120, 0])
+
+  // Layer 3 — Seal: mid depth, slight float
+  const l3z   = useTransform(p, [0, 0.8], [-140, 0])
+  const l3ry  = useTransform(p, [0, 0.8], [15, 0])
+  const l3rx  = useTransform(p, [0, 0.8], [6, 0])
+  const l3y   = useTransform(p, [0, 0.8], [-40, 0])
+
+  // ── CERT SCALE: 0→0.8 grow from small, 0.8→1.0 shrink out ──
+  const certScale = useTransform(p, [0, 0.8, 1.0], [0.62, 1.0, 0.82])
+
+  // ── CERT OPACITY: fade out at very end ──────────────
+  const certOpacity = useTransform(p, [0, 0.05, 0.85, 1.0], [0, 1, 1, 0])
+
+  // ── PAGE OVERLAY: blackout + grid ───────────────────
+  const overlayOp = useTransform(p, [0, 0.08, 0.88, 1], [0, 0.94, 0.94, 0])
+  const gridOp    = useTransform(p, [0.04, 0.14], [0, 1])
+
+  // ── LABELS ───────────────────────────────────────────
+  const hintOp      = useTransform(p, [0, 0.06, 0.16], [1, 1, 0])
+  const assembledOp = useTransform(p, [0.78, 0.88], [0, 1])
+
+  // ── ASSEMBLY EFFECTS: shake + flare ─────────────────
+  const slamProgress = useTransform(p, [0.74, 0.82], [0, 1])
+  const [flare, setFlare] = useState(false)
+  const [shake, setShake] = useState(false)
+  const fired = useRef(false)
+
+  useMotionValueEvent(slamProgress, 'change', v => {
+    if (v > 0.96 && !fired.current) {
+      fired.current = true
+      setShake(true); setFlare(true)
+      setTimeout(() => setFlare(false), 700)
+      setTimeout(() => setShake(false), 440)
+    }
+    if (v < 0.05) fired.current = false
+  })
+
+  return (
+    // ── 1. SCROLL TRACK: 300vh, position relative ──────
+    <div
+      ref={trackRef}
+      style={{ height: '300vh', position: 'relative' }}
+    >
+      {/* ── 2. VIEWPORT CAMERA: sticky, fills screen ──── */}
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        // CRITICAL: no overflow:hidden — kills preserve-3d
+      }}>
+
+        {/* Dark overlay */}
+        <motion.div style={{
+          position: 'absolute', inset: 0, zIndex: 2,
+          pointerEvents: 'none',
+          background: '#020408',
+          opacity: overlayOp,
+        }} />
+
+        {/* Dot grid */}
+        <motion.div style={{
+          position: 'absolute', inset: 0, zIndex: 3,
+          pointerEvents: 'none',
+          opacity: gridOp,
+          backgroundImage: [
+            'linear-gradient(rgba(99,102,241,0.08) 1px, transparent 1px)',
+            'linear-gradient(90deg, rgba(99,102,241,0.08) 1px, transparent 1px)'
+          ].join(', '),
+          backgroundSize: '48px 48px',
+        }} />
+
+        {/* Crosshair */}
+        <motion.div style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none', opacity: gridOp }}>
+          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'rgba(99,102,241,0.14)' }} />
+          <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(99,102,241,0.14)' }} />
+        </motion.div>
+
+        {/* ── 3. ASSEMBLY SCENE ─────────────────────────── */}
+        <motion.div
+          style={{ position: 'relative', zIndex: 4 }}
+          animate={shake ? { x: [0, -7, 7, -5, 5, -2, 2, 0] } : { x: 0 }}
+          transition={{ duration: 0.38, ease: 'easeOut' }}
+        >
+          {/* Scale + opacity wrapper */}
+          <motion.div style={{ scale: certScale, opacity: certOpacity }}>
+
+            {/*
+              THE 3D STAGE
+              perspective + preserve-3d must be on the DIRECT parent of layers.
+              NO overflow:hidden. NO filter on children.
+              Width + explicit height (not aspectRatio — unreliable with absolute children).
+            */}
+            <div style={{
+              position: 'relative',
+              width: 'min(500px, 88vw)',
+              height: 'calc(min(500px, 88vw) / 1.414)',
+              perspective: '1200px',
+              perspectiveOrigin: '50% 50%',
+              transformStyle: 'preserve-3d',
+            }}>
+
+              {/* Lens flare on slam */}
+              <AnimatePresence>
+                {flare && (
+                  <motion.div
+                    key="flare"
+                    initial={{ x: '-120%', opacity: 1 }}
+                    animate={{ x: '230%', opacity: 0 }}
+                    transition={{ duration: 0.65, ease: 'easeOut' }}
+                    style={{
+                      position: 'absolute', inset: 0, zIndex: 20,
+                      pointerEvents: 'none', borderRadius: '14px',
+                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.09) 30%, rgba(180,150,255,0.28) 50%, rgba(255,255,255,0.06) 70%, transparent)',
+                    }}
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* ── LAYER 1: BORDER FRAME ─────────────────
+                  z/rotateY/rotateX/y are native Framer props.
+                  NO filter — kills preserve-3d.
+              */}
+              <motion.div style={{
+                position: 'absolute', inset: 0,
+                z: l1z, rotateY: l1ry, rotateX: l1rx, y: l1y,
+              }}>
+                <svg viewBox="0 0 500 354" width="100%" height="100%"
+                  style={{ position: 'absolute', inset: 0, display: 'block' }}>
+                  <defs>
+                    <linearGradient id="cBorder" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%"   stopColor="#6366F1" />
+                      <stop offset="32%"  stopColor="#818CF8" />
+                      <stop offset="66%"  stopColor="#10B981" />
+                      <stop offset="100%" stopColor="#51B1E7" />
+                    </linearGradient>
+                    <filter id="cGlow">
+                      <feGaussianBlur stdDeviation="2.5" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                  </defs>
+                  {/* Dark bg — makes layer visible when spread */}
+                  <rect x="0" y="0" width="500" height="354" rx="16" fill="#04060e" fillOpacity="0.97"/>
+                  {/* Glowing border */}
+                  <rect x="1.5" y="1.5" width="497" height="351" rx="15" fill="none"
+                    stroke="url(#cBorder)" strokeWidth="2.5" filter="url(#cGlow)"/>
+                  {/* Inner border */}
+                  <rect x="10" y="10" width="480" height="334" rx="11" fill="none"
+                    stroke="rgba(99,102,241,0.2)" strokeWidth="0.6"/>
+                  {/* Corner ornaments */}
+                  {[[22,22],[478,22],[22,332],[478,332]].map(([cx,cy],i) => (
+                    <g key={i}>
+                      <circle cx={cx} cy={cy} r="5.5" fill="none" stroke="#6366F1" strokeWidth="1.6"/>
+                      <circle cx={cx} cy={cy} r="10" fill="none" stroke="rgba(99,102,241,0.28)" strokeWidth="0.6"/>
+                      <line x1={cx-14} y1={cy} x2={cx+14} y2={cy} stroke="rgba(99,102,241,0.5)" strokeWidth="0.7"/>
+                      <line x1={cx} y1={cy-14} x2={cx} y2={cy+14} stroke="rgba(99,102,241,0.5)" strokeWidth="0.7"/>
+                    </g>
+                  ))}
+                  {/* Edge colour accents */}
+                  <line x1="48"  y1="1.5"   x2="100" y2="1.5"   stroke="#818CF8" strokeWidth="3.5"/>
+                  <line x1="400" y1="1.5"   x2="452" y2="1.5"   stroke="#10B981" strokeWidth="3.5"/>
+                  <line x1="48"  y1="352.5" x2="100" y2="352.5" stroke="#10B981" strokeWidth="3.5"/>
+                  <line x1="400" y1="352.5" x2="452" y2="352.5" stroke="#818CF8" strokeWidth="3.5"/>
+                </svg>
+              </motion.div>
+
+              {/* ── LAYER 2: CONTENT ──────────────────────
+                  Starts in front (+280z), tilts left-down.
+                  NO filter.
+              */}
+              <motion.div style={{
+                position: 'absolute', inset: 0,
+                z: l2z, rotateY: l2ry, rotateX: l2rx, y: l2y,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                padding: 'clamp(20px, 4vw, 40px)',
+              }}>
+                <div style={{
+                  fontFamily: F_MONO, fontSize: '9px',
+                  color: 'rgba(99,102,241,0.72)',
+                  letterSpacing: '0.26em', marginBottom: '11px',
+                  textTransform: 'uppercase'
+                }}>
+                  CERTIFYROI · INDIA 2026
+                </div>
+                <div style={{
+                  fontFamily: F_HEAD, fontWeight: '800',
+                  fontSize: 'clamp(1.1rem, 3.6vw, 1.75rem)',
+                  letterSpacing: '-0.04em', color: '#F0F2FF',
+                  marginBottom: '6px', textAlign: 'center', lineHeight: 1.1
+                }}>
+                  Your Certification
+                </div>
+                <div style={{
+                  fontFamily: F_BODY, fontSize: '12px',
+                  color: 'rgba(255,255,255,0.38)',
+                  marginBottom: '26px', textAlign: 'center'
+                }}>
+                  Personalised ROI Analysis · Your City
+                </div>
+                <div style={{ display: 'flex', gap: 'clamp(14px, 5vw, 40px)', marginBottom: '22px' }}>
+                  {[
+                    { label: 'BREAK-EVEN', value: '6 mo',   color: '#F59E0B' },
+                    { label: '5-YR GAIN',  value: '₹14.2L', color: '#10B981' },
+                    { label: 'HIKE',        value: '+35%',   color: '#818CF8' },
+                  ].map((s, i) => (
+                    <div key={i} style={{ textAlign: 'center' }}>
+                      <div style={{
+                        fontFamily: F_MONO, fontSize: '7.5px',
+                        color: 'rgba(255,255,255,0.28)',
+                        letterSpacing: '0.14em', marginBottom: '5px'
+                      }}>{s.label}</div>
+                      <div style={{
+                        fontFamily: F_MONO,
+                        fontSize: 'clamp(0.95rem, 2.8vw, 1.5rem)',
+                        color: s.color, fontWeight: '700',
+                        letterSpacing: '-0.03em'
+                      }}>{s.value}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{
+                  width: '74%', height: '1px',
+                  background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.55), transparent)',
+                  marginBottom: '14px'
+                }} />
+                <div style={{
+                  fontFamily: F_MONO, fontSize: '7.5px',
+                  color: 'rgba(255,255,255,0.22)',
+                  letterSpacing: '0.16em', textAlign: 'center'
+                }}>
+                  VERIFIED BY AI · DATA: NAUKRI MARCH 2026
+                </div>
+              </motion.div>
+
+              {/* ── LAYER 3: HOLOGRAM SEAL ────────────────
+                  Mid depth. NO filter.
+              */}
+              <motion.div style={{
+                position: 'absolute', right: '6%', bottom: '8%',
+                z: l3z, rotateY: l3ry, rotateX: l3rx, y: l3y,
+              }}>
+                <svg viewBox="0 0 72 72"
+                  width="clamp(48px, 10vw, 72px)"
+                  height="clamp(48px, 10vw, 72px)">
+                  <defs>
+                    <linearGradient id="sealG" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%"   stopColor="#6366F1" stopOpacity="0.9"/>
+                      <stop offset="50%"  stopColor="#10B981" stopOpacity="0.7"/>
+                      <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.9"/>
+                    </linearGradient>
+                  </defs>
+                  <polygon
+                    points="36,4 43,22 62,22 48,35 54,54 36,43 18,54 24,35 10,22 29,22"
+                    fill="none" stroke="url(#sealG)" strokeWidth="1.5"
+                  />
+                  <circle cx="36" cy="36" r="10" fill="none" stroke="rgba(99,102,241,0.5)" strokeWidth="1"/>
+                  <circle cx="36" cy="36" r="4.5" fill="rgba(99,102,241,0.2)"/>
+                  <text x="36" y="40" textAnchor="middle" fontSize="7"
+                    fill="#818CF8" fontFamily="monospace" fontWeight="700">AI</text>
+                </svg>
+              </motion.div>
+
+            </div>{/* end 3D stage */}
+          </motion.div>{/* end scale/opacity wrapper */}
+
+          {/* Scroll hint — fades out as scroll begins */}
+          <motion.div style={{
+            opacity: hintOp,
+            position: 'absolute',
+            bottom: 'calc(-1 * (clamp(48px, 10vw, 72px) + 56px))',
+            left: 0, right: 0,
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}>
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <div style={{
+                fontFamily: F_MONO, fontSize: '11px',
+                color: 'rgba(99,102,241,0.65)',
+                letterSpacing: '0.22em', textTransform: 'uppercase'
+              }}>
+                ↓  scroll to assemble  ↓
+              </div>
+            </motion.div>
+          </motion.div>
+
+        </motion.div>{/* end shake wrapper */}
+
+        {/* Assembled label */}
+        <motion.div style={{
+          opacity: assembledOp,
+          position: 'absolute',
+          bottom: '8%', left: 0, right: 0,
+          textAlign: 'center',
+          pointerEvents: 'none',
+          zIndex: 5,
+        }}>
+          <div style={{
+            fontFamily: F_MONO, fontSize: '12px',
+            color: 'rgba(16,185,129,0.9)',
+            letterSpacing: '0.22em', textTransform: 'uppercase'
+          }}>
+            ✓  YOUR ROI CERTIFICATE · ASSEMBLED
+          </div>
+        </motion.div>
+
+      </div>{/* end sticky camera */}
+    </div>  /* end 300vh track */
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// MAIN LANDING PAGE
+// ─────────────────────────────────────────────────────────
 const LandingPage = ({ onEnter }) => {
   const heroRef = useRef(null)
-  const { scrollYProgress: heroSP } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const { scrollYProgress: heroSP } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start']
+  })
   const heroY  = useTransform(heroSP, [0, 1], [0, 100])
   const heroOp = useTransform(heroSP, [0, 0.55], [1, 0])
   const heroSc = useTransform(heroSP, [0, 0.55], [1, 0.93])
@@ -405,6 +566,8 @@ const LandingPage = ({ onEnter }) => {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
       <ScanlineOverlay />
+
+      {/* Fixed ambient orbs */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
         <Orb color="rgba(99,102,241,0.09)"  size={700} style={{ top: '-20%', left: '5%' }}   delay={0} />
         <Orb color="rgba(16,185,129,0.05)"  size={500} style={{ bottom: '5%', right: '0%' }} delay={2} />
@@ -413,58 +576,122 @@ const LandingPage = ({ onEnter }) => {
 
       <div style={{ position: 'relative', zIndex: 1 }}>
 
-        {/* HERO */}
-        <div ref={heroRef} style={{ maxWidth: '960px', margin: '0 auto', padding: '124px 24px 80px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-          <motion.div style={{ y: ghostY, position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', zIndex: 0, pointerEvents: 'none' }}>
+        {/* ── HERO ────────────────────────────────────── */}
+        <div ref={heroRef} style={{
+          maxWidth: '960px', margin: '0 auto',
+          padding: '124px 24px 80px',
+          textAlign: 'center',
+          position: 'relative', overflow: 'hidden'
+        }}>
+          <motion.div style={{
+            y: ghostY,
+            position: 'absolute', top: '40px',
+            left: '50%', transform: 'translateX(-50%)',
+            zIndex: 0, pointerEvents: 'none'
+          }}>
             <GhostNumber value="ROI" />
           </motion.div>
+
           <motion.div style={{ y: heroY, opacity: heroOp, scale: heroSc, position: 'relative', zIndex: 1 }}>
-            <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 18px', borderRadius: '20px', background: 'var(--indigo-dim)', border: '1px solid var(--border-accent)', fontSize: '11px', color: 'var(--indigo-light)', marginBottom: '32px', letterSpacing: '0.08em', fontFamily: F_MONO }}>
+
+            <motion.div
+              initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '8px 18px', borderRadius: '20px',
+                background: 'var(--indigo-dim)', border: '1px solid var(--border-accent)',
+                fontSize: '11px', color: 'var(--indigo-light)',
+                marginBottom: '32px', letterSpacing: '0.08em', fontFamily: F_MONO
+              }}
+            >
               <Award size={12} /> INDIA'S FIRST AI-POWERED CERT ROI CALCULATOR
             </motion.div>
-            <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }}
-              style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(3rem, 9vw, 7rem)', lineHeight: 0.9, letterSpacing: '-0.05em', color: 'var(--text)', marginBottom: '28px' }}>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              style={{
+                fontFamily: F_HEAD, fontWeight: '800',
+                fontSize: 'clamp(3rem, 9vw, 7rem)',
+                lineHeight: 0.9, letterSpacing: '-0.05em',
+                color: 'var(--text)', marginBottom: '28px'
+              }}
+            >
               YOUR NEXT CERT<br />
               IS EITHER A <GGold c="GOLDMINE" /><br />
               OR A <GRed c="MISTAKE." />
             </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-              style={{ fontSize: 'clamp(15px, 2.5vw, 19px)', color: 'var(--text-2)', maxWidth: '560px', margin: '0 auto 14px', lineHeight: '1.75', fontFamily: F_BODY }}>
+
+            <motion.p
+              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              style={{
+                fontSize: 'clamp(15px, 2.5vw, 19px)',
+                color: 'var(--text-2)', maxWidth: '560px',
+                margin: '0 auto 14px', lineHeight: '1.75', fontFamily: F_BODY
+              }}
+            >
               We tell you which — in under 2 seconds — before you spend ₹50K and 6 months finding out the hard way.
             </motion.p>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
-              style={{ fontSize: '12px', color: 'var(--text-4)', marginBottom: '44px', fontFamily: F_MONO, letterSpacing: '0.1em' }}>
+
+            <motion.p
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              transition={{ delay: 0.45 }}
+              style={{
+                fontSize: '12px', color: 'var(--text-4)',
+                marginBottom: '44px', fontFamily: F_MONO, letterSpacing: '0.1em'
+              }}
+            >
               INDIA-SPECIFIC · AI-POWERED · FREE · NO NONSENSE
             </motion.p>
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
-              style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
-              <motion.button onClick={onEnter} whileHover={{ y: -5, scale: 1.04, boxShadow: '0 28px 56px rgba(81,177,231,0.45)' }} whileTap={{ scale: 0.95 }}
-                className="btn-primary" style={{ fontSize: '17px', padding: '18px 42px', display: 'flex', alignItems: 'center', gap: '10px', borderRadius: '14px', fontFamily: F_HEAD, letterSpacing: '-0.02em' }}>
+
+            <motion.div
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+              style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}
+            >
+              <motion.button
+                onClick={onEnter}
+                whileHover={{ y: -5, scale: 1.04, boxShadow: '0 28px 56px rgba(81,177,231,0.45)' }}
+                whileTap={{ scale: 0.95 }}
+                className="btn-primary"
+                style={{ fontSize: '17px', padding: '18px 42px', display: 'flex', alignItems: 'center', gap: '10px', borderRadius: '14px', fontFamily: F_HEAD, letterSpacing: '-0.02em' }}
+              >
                 Is My Cert Worth It? <ArrowRight size={18} />
               </motion.button>
-              <motion.button onClick={onEnter} whileHover={{ y: -4 }} whileTap={{ scale: 0.97 }}
-                className="btn-ghost" style={{ fontSize: '15px', padding: '18px 30px', display: 'flex', alignItems: 'center', gap: '7px', borderRadius: '14px', fontFamily: F_HEAD }}>
+              <motion.button
+                onClick={onEnter}
+                whileHover={{ y: -4 }} whileTap={{ scale: 0.97 }}
+                className="btn-ghost"
+                style={{ fontSize: '15px', padding: '18px 30px', display: 'flex', alignItems: 'center', gap: '7px', borderRadius: '14px', fontFamily: F_HEAD }}
+              >
                 <FileText size={15} /> Find My Cert First
               </motion.button>
             </motion.div>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-              style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: F_BODY }}>
+
+            <motion.p
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: F_BODY }}
+            >
               Free · No signup · 3 free AI analyses
             </motion.p>
           </motion.div>
         </div>
 
-        {/* TICKER */}
+        {/* ── TICKER ──────────────────────────────────── */}
         <Ticker />
 
-        {/* CERT ASSEMBLY */}
+        {/* ── CERT ASSEMBLY (300vh sticky scroll track) ─ */}
         <CertAssembly />
 
-        {/* NOT CAREER ADVICE */}
+        {/* ── NOT CAREER ADVICE ───────────────────────── */}
         <div style={{ maxWidth: '860px', margin: '0 auto 120px', padding: '0 24px' }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--indigo-light)', letterSpacing: '0.15em', marginBottom: '16px', textTransform: 'uppercase', textAlign: 'center' }}>What that certificate means for you</div>
+            <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--indigo-light)', letterSpacing: '0.15em', marginBottom: '16px', textTransform: 'uppercase', textAlign: 'center' }}>
+              What that certificate means for you
+            </div>
             <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text)', letterSpacing: '-0.05em', marginBottom: '20px', lineHeight: 0.95, textAlign: 'center' }}>
               NOT "CAREER ADVICE."<br /><GPurple c="ACTUAL NUMBERS." />
             </h2>
@@ -478,8 +705,13 @@ const LandingPage = ({ onEnter }) => {
                 { icon: CheckCircle, color: '#F59E0B', title: 'India city-specific',      desc: 'Bangalore numbers are not Hyderabad numbers. Not Pune numbers. We know the difference.' },
                 { icon: CheckCircle, color: '#51B1E7', title: 'Reads YOUR resume',        desc: 'A DevOps engineer and a data analyst need completely different certs. We know that too.' },
               ].map((item, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08 + i * 0.08 }}
-                  style={{ padding: '22px', borderRadius: '14px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', boxShadow: 'inset 0 1px 0 var(--card-highlight)' }}>
+                <motion.div key={i}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.08 + i * 0.08 }}
+                  style={{ padding: '22px', borderRadius: '14px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', boxShadow: 'inset 0 1px 0 var(--card-highlight)' }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                     <item.icon size={16} color={item.color} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text)', fontFamily: F_HEAD, letterSpacing: '-0.02em' }}>{item.title}</span>
@@ -497,7 +729,7 @@ const LandingPage = ({ onEnter }) => {
           </motion.div>
         </div>
 
-        {/* THREE TOOLS BENTO */}
+        {/* ── THREE TOOLS BENTO ───────────────────────── */}
         <div style={{ maxWidth: '1100px', margin: '0 auto 120px', padding: '0 24px', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '-40px', right: '-20px', pointerEvents: 'none', zIndex: 0 }}>
             <GhostNumber value="35%" style={{ WebkitTextStroke: '1.5px rgba(16,185,129,0.1)' }} />
@@ -508,7 +740,9 @@ const LandingPage = ({ onEnter }) => {
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--text-4)', fontFamily: F_MONO, letterSpacing: '0.05em' }}>MACHINED FOR INDIAN TECH PROFESSIONALS</p>
           </motion.div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gridTemplateRows: 'auto auto', gap: '14px', position: 'relative', zIndex: 1 }}>
+
             <MachinedCard glowColor="#6366F1" draggable style={{ gridColumn: '1 / 3', minHeight: '260px' }}>
               <div style={{ padding: '34px' }}>
                 <div style={{ display: 'flex', gap: '14px', marginBottom: '18px', alignItems: 'flex-start' }}>
@@ -534,6 +768,7 @@ const LandingPage = ({ onEnter }) => {
                 <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--indigo-light)', letterSpacing: '0.08em', opacity: 0.55 }}>⊕ DRAG THIS CARD</div>
               </div>
             </MachinedCard>
+
             <MachinedCard glowColor="#10B981" draggable style={{ gridColumn: '3 / 4', gridRow: '1 / 3', minHeight: '540px' }}>
               <div style={{ padding: '30px', height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
@@ -544,8 +779,11 @@ const LandingPage = ({ onEnter }) => {
                   Upload your resume. AI reads your actual background and maps it to India's 2026 job market.
                 </p>
                 {['Top Cert Recommendation', 'Second Best Option', 'Third Choice'].map((cert, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.15 + i * 0.1 }}
-                    style={{ padding: '10px 14px', borderRadius: '9px', background: i === 0 ? 'rgba(16,185,129,0.1)' : 'var(--bg)', border: `1px solid ${i === 0 ? 'rgba(16,185,129,0.25)' : 'var(--border)'}`, marginBottom: '7px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <motion.div key={i}
+                    initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }} transition={{ delay: 0.15 + i * 0.1 }}
+                    style={{ padding: '10px 14px', borderRadius: '9px', background: i === 0 ? 'rgba(16,185,129,0.1)' : 'var(--bg)', border: `1px solid ${i === 0 ? 'rgba(16,185,129,0.25)' : 'var(--border)'}`, marginBottom: '7px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  >
                     <span style={{ fontSize: '12px', color: i === 0 ? '#10B981' : 'var(--text-3)', fontFamily: F_HEAD, fontWeight: '700' }}>{cert}</span>
                     {i === 0 && <span style={{ fontSize: '8px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(16,185,129,0.2)', color: '#10B981', fontFamily: F_MONO }}>★ PRIMARY</span>}
                   </motion.div>
@@ -556,9 +794,11 @@ const LandingPage = ({ onEnter }) => {
                 </motion.button>
               </div>
             </MachinedCard>
+
             <MachinedCard glowColor="#EF4444">
               <div style={{ padding: '26px' }}><MoneyCounter /></div>
             </MachinedCard>
+
             <MachinedCard glowColor="#51B1E7">
               <div style={{ padding: '26px' }}>
                 <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '20px' }}>BY THE NUMBERS</div>
@@ -572,10 +812,11 @@ const LandingPage = ({ onEnter }) => {
                 </div>
               </div>
             </MachinedCard>
+
           </div>
         </div>
 
-        {/* 11PM MOMENTS */}
+        {/* ── 11PM MOMENTS ────────────────────────────── */}
         <div style={{ maxWidth: '1060px', margin: '0 auto 120px', padding: '0 24px', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '-60px', left: '-30px', pointerEvents: 'none', zIndex: 0 }}>
             <GhostNumber value="11PM" style={{ WebkitTextStroke: '1px rgba(245,158,11,0.08)' }} />
@@ -587,7 +828,7 @@ const LandingPage = ({ onEnter }) => {
           </motion.div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', position: 'relative', zIndex: 1 }}>
             {[
-              { time: '11:47 PM', name: 'Rohan, 27 · Pune',       color: '#10B981', msg: "Ex-classmate just got promoted to Senior Cloud Architect. ₹28L CTC. You're at ₹9L. Same college, same year.", thought: '"Should I do AWS? Or is it too late?"', answer: 'AWS SAA break-even at ₹9L salary: 6 months. 5-year gain: ₹14.2L. Not too late.' },
+              { time: '11:47 PM', name: 'Rohan, 27 · Pune',       color: '#10B981', msg: "Ex-classmate just got promoted to Senior Cloud Architect. ₹28L CTC. You're at ₹9L. Same college, same year.", thought: '"Should I do AWS? Or is it too late?"',     answer: 'AWS SAA break-even at ₹9L salary: 6 months. 5-year gain: ₹14.2L. Not too late.' },
               { time: '11:12 PM', name: 'Sneha, 31 · Bangalore',  color: '#F59E0B', msg: "Ops manager for 6 years. Every data job says '3 years experience in data science required.'", thought: '"Is the switch even possible without an MBA?"', answer: 'Google Data Analytics + 2 GitHub projects. 5 months. ₹8L → ₹12L first switch.' },
               { time: '12:03 AM', name: 'Arjun, 22 · Fresh grad', color: '#818CF8', msg: 'Opened 3 cert comparison articles. All recommend AWS. All written by Americans. All show USD.', thought: '"Which cert actually gets me placed in India?"', answer: 'Student Mode. India-specific. GCP got 47 Pune freshers placed in Q1 2026.' },
             ].map((card, i) => (
@@ -614,7 +855,7 @@ const LandingPage = ({ onEnter }) => {
           </div>
         </div>
 
-        {/* VS OTHER SITES */}
+        {/* ── VS OTHER SITES ───────────────────────────── */}
         <div style={{ maxWidth: '900px', margin: '0 auto 120px', padding: '0 24px' }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '48px' }}>
             <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text)', marginBottom: '12px', letterSpacing: '-0.05em' }}>
@@ -627,9 +868,9 @@ const LandingPage = ({ onEnter }) => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '14px' }}>
             {[
               { bad: '❌ "AWS is good for cloud engineers"', good: '✅ AWS SAA at ₹9L salary: break-even 6 months, ₹14.2L gain', color: '#10B981' },
-              { bad: '❌ "Upskill for career growth"', good: '✅ ₹23,600 extra per month starting month 7', color: '#6366F1' },
-              { bad: '❌ US salary data converted to rupees', good: '✅ Naukri + AmbitionBox + LinkedIn India 2026', color: '#F59E0B' },
-              { bad: '❌ Same advice for everyone', good: '✅ AI reads YOUR resume, YOUR city, YOUR background', color: '#51B1E7' },
+              { bad: '❌ "Upskill for career growth"',        good: '✅ ₹23,600 extra per month starting month 7',               color: '#6366F1' },
+              { bad: '❌ US salary data converted to rupees', good: '✅ Naukri + AmbitionBox + LinkedIn India 2026',             color: '#F59E0B' },
+              { bad: '❌ Same advice for everyone',           good: '✅ AI reads YOUR resume, YOUR city, YOUR background',       color: '#51B1E7' },
             ].map((item, i) => (
               <MachinedCard key={i} glowColor={item.color} intensity={6}>
                 <div style={{ padding: '22px' }}>
@@ -641,7 +882,7 @@ const LandingPage = ({ onEnter }) => {
           </div>
         </div>
 
-        {/* MODES */}
+        {/* ── MODES ───────────────────────────────────── */}
         <div style={{ maxWidth: '720px', margin: '0 auto 120px', padding: '0 24px' }}>
           <NeonCard color="#6366F1">
             <div style={{ padding: '44px 36px', textAlign: 'center' }}>
@@ -655,9 +896,12 @@ const LandingPage = ({ onEnter }) => {
                   { icon: Repeat,        color: '#F59E0B', label: 'Switcher',     sub: 'Changing fields', desc: 'Bridge the skill gap' },
                   { icon: Briefcase,     color: '#10B981', label: 'Professional', sub: 'Levelling up',    desc: 'Max ROI on next cert' },
                 ].map((m, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                  <motion.div key={i}
+                    initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                     whileHover={{ y: -6, scale: 1.04 }}
-                    style={{ padding: '20px 14px', borderRadius: '14px', background: `${m.color}0e`, border: `1px solid ${m.color}28`, cursor: 'pointer' }}>
+                    style={{ padding: '20px 14px', borderRadius: '14px', background: `${m.color}0e`, border: `1px solid ${m.color}28`, cursor: 'pointer' }}
+                  >
                     <m.icon size={24} color={m.color} style={{ margin: '0 auto 10px', display: 'block' }} />
                     <div style={{ fontSize: '14px', fontWeight: '800', color: m.color, marginBottom: '2px', fontFamily: F_HEAD, letterSpacing: '-0.03em' }}>{m.label}</div>
                     <div style={{ fontSize: '10px', color: 'var(--text-4)', marginBottom: '5px', fontFamily: F_MONO }}>{m.sub}</div>
@@ -665,15 +909,19 @@ const LandingPage = ({ onEnter }) => {
                   </motion.div>
                 ))}
               </div>
-              <motion.button onClick={onEnter} whileHover={{ y: -5, scale: 1.03, boxShadow: '0 24px 48px rgba(81,177,231,0.4)' }} whileTap={{ scale: 0.97 }}
-                className="btn-primary" style={{ fontSize: '16px', padding: '17px 40px', display: 'inline-flex', alignItems: 'center', gap: '9px', borderRadius: '14px', fontFamily: F_HEAD, letterSpacing: '-0.02em' }}>
+              <motion.button onClick={onEnter}
+                whileHover={{ y: -5, scale: 1.03, boxShadow: '0 24px 48px rgba(81,177,231,0.4)' }}
+                whileTap={{ scale: 0.97 }}
+                className="btn-primary"
+                style={{ fontSize: '16px', padding: '17px 40px', display: 'inline-flex', alignItems: 'center', gap: '9px', borderRadius: '14px', fontFamily: F_HEAD, letterSpacing: '-0.02em' }}
+              >
                 <Zap size={16} /> Pick My Mode
               </motion.button>
             </div>
           </NeonCard>
         </div>
 
-        {/* SOCIAL PROOF */}
+        {/* ── SOCIAL PROOF ────────────────────────────── */}
         <div style={{ maxWidth: '1060px', margin: '0 auto 120px', padding: '0 24px' }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '48px' }}>
             <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text)', marginBottom: '10px', letterSpacing: '-0.05em' }}>
@@ -705,7 +953,7 @@ const LandingPage = ({ onEnter }) => {
           </div>
         </div>
 
-        {/* FINAL CTA */}
+        {/* ── FINAL CTA ────────────────────────────────── */}
         <div style={{ maxWidth: '760px', margin: '0 auto 80px', padding: '0 24px' }}>
           <MachinedCard glowColor="#6366F1" intensity={4} style={{ textAlign: 'center' }}>
             <div style={{ padding: '64px 48px', position: 'relative', overflow: 'hidden' }}>
@@ -722,17 +970,23 @@ const LandingPage = ({ onEnter }) => {
                   Stop reading about certs. Stop asking Reddit. Stop letting family pressure decide.{' '}
                   <strong style={{ color: 'var(--text)', fontFamily: F_HEAD }}>Run the numbers.</strong>
                 </p>
-                <motion.button onClick={onEnter} whileHover={{ y: -6, scale: 1.05, boxShadow: '0 32px 64px rgba(81,177,231,0.5)' }} whileTap={{ scale: 0.95 }}
-                  className="btn-primary" style={{ fontSize: '19px', padding: '22px 56px', display: 'inline-flex', alignItems: 'center', gap: '12px', borderRadius: '16px', fontFamily: F_HEAD, letterSpacing: '-0.03em' }}>
+                <motion.button onClick={onEnter}
+                  whileHover={{ y: -6, scale: 1.05, boxShadow: '0 32px 64px rgba(81,177,231,0.5)' }}
+                  whileTap={{ scale: 0.95 }}
+                  className="btn-primary"
+                  style={{ fontSize: '19px', padding: '22px 56px', display: 'inline-flex', alignItems: 'center', gap: '12px', borderRadius: '16px', fontFamily: F_HEAD, letterSpacing: '-0.03em' }}
+                >
                   Run My Numbers <ArrowRight size={20} />
                 </motion.button>
-                <div style={{ fontSize: '12px', color: 'var(--text-4)', marginTop: '18px', fontFamily: F_MONO, letterSpacing: '0.06em' }}>FREE · NO CARD · NO SIGNUP · NO PAYWALLS</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-4)', marginTop: '18px', fontFamily: F_MONO, letterSpacing: '0.06em' }}>
+                  FREE · NO CARD · NO SIGNUP · NO PAYWALLS
+                </div>
               </div>
             </div>
           </MachinedCard>
         </div>
 
-        {/* FOOTER */}
+        {/* ── FOOTER ──────────────────────────────────── */}
         <div style={{ borderTop: '1px solid var(--border)', padding: '32px 24px', textAlign: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '12px' }}>
             <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #6366F1, #4338CA)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -742,8 +996,12 @@ const LandingPage = ({ onEnter }) => {
               Certify<G colors={['#6366F1','#818CF8']}>ROI</G>
             </span>
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--text-4)', marginBottom: '6px', fontFamily: F_BODY }}>India's First AI-Powered Cert ROI Calculator · Powered by Groq llama-3.3-70b</p>
-          <p style={{ fontSize: '11px', color: 'var(--text-4)', opacity: 0.4, fontFamily: F_MONO, letterSpacing: '0.05em' }}>DATA: LINKEDIN · NASSCOM · AMBITIONBOX · NAUKRI · WEF 2026</p>
+          <p style={{ fontSize: '12px', color: 'var(--text-4)', marginBottom: '6px', fontFamily: F_BODY }}>
+            India's First AI-Powered Cert ROI Calculator · Powered by Groq llama-3.3-70b
+          </p>
+          <p style={{ fontSize: '11px', color: 'var(--text-4)', opacity: 0.4, fontFamily: F_MONO, letterSpacing: '0.05em' }}>
+            DATA: LINKEDIN · NASSCOM · AMBITIONBOX · NAUKRI · WEF 2026
+          </p>
         </div>
 
       </div>
