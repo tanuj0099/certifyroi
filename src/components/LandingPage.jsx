@@ -101,15 +101,30 @@ const MachinedCard = ({ children, style = {}, glowColor = '#6366F1', intensity =
 }
 
 const NeonCard = ({ children, style = {}, color = '#6366F1', delay = 0 }) => {
-  const [pos, setPos] = useState({ x: 50, y: 50 })
+  // FIX: replaced useState+setPos (60 re-renders/sec) with direct DOM mutation.
+  // useAnimationFrame now writes straight to element.style — zero React overhead.
+  const outerRef = useRef(null)
+  const glowRef  = useRef(null)
   const angleRef = useRef(delay * 60)
+
   useAnimationFrame(t => {
     angleRef.current = (delay * 60 + t * 0.04) % 360
     const a = angleRef.current * Math.PI / 180
-    setPos({ x: 50 + 55 * Math.cos(a), y: 50 + 55 * Math.sin(a) })
+    const x = 50 + 55 * Math.cos(a)
+    const y = 50 + 55 * Math.sin(a)
+    if (outerRef.current) {
+      outerRef.current.style.background =
+        `radial-gradient(circle at ${x}% ${y}%, ${color}cc 0%, ${color}44 30%, transparent 65%)`
+    }
+    if (glowRef.current) {
+      glowRef.current.style.background =
+        `radial-gradient(circle at ${x}% ${y}%, ${color}22 0%, transparent 60%)`
+    }
   })
+
   return (
     <motion.div
+      ref={outerRef}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -117,13 +132,14 @@ const NeonCard = ({ children, style = {}, color = '#6366F1', delay = 0 }) => {
       whileHover={{ y: -3 }}
       style={{
         position: 'relative', borderRadius: '18px', padding: '1.5px',
-        background: `radial-gradient(circle at ${pos.x}% ${pos.y}%, ${color}cc 0%, ${color}44 30%, transparent 65%)`,
+        // Initial gradient — frame loop overwrites this each tick
+        background: `radial-gradient(circle at 50% 50%, ${color}cc 0%, ${color}44 30%, transparent 65%)`,
         ...style
       }}
     >
-      <div style={{
+      <div ref={glowRef} style={{
         position: 'absolute', inset: '-1px', borderRadius: '19px',
-        background: `radial-gradient(circle at ${pos.x}% ${pos.y}%, ${color}22 0%, transparent 60%)`,
+        background: `radial-gradient(circle at 50% 50%, ${color}22 0%, transparent 60%)`,
         filter: 'blur(10px)', zIndex: 0, pointerEvents: 'none'
       }} />
       <div style={{ position: 'relative', zIndex: 1, background: 'var(--glass-bg)', borderRadius: '17px', height: '100%' }}>
