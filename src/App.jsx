@@ -331,9 +331,9 @@ const NAV_LINKS = [
 
 const APP_TABS = [
   { id: 'resume',     label: 'Step 1 · Find Cert',  icon: FileText,      desc: 'Upload resume → AI picks your cert'      },
-  { id: 'calculator', label: 'Step 2 · ROI',        icon: TrendingUp,    desc: 'Break-even, 5yr gain, Ghost of Inaction' },
-  { id: 'heatmap',    label: 'Step 3 · City',       icon: Map,           desc: 'Is this cert hot in your city?'          },
-  { id: 'college',    label: 'Degree vs Certs',     icon: GraduationCap, desc: 'MBA vs 4 certifications — numbers'       },
+  { id: 'calculator', label: 'Step 2 · ROI',         icon: TrendingUp,    desc: 'Break-even, 5yr gain, Ghost of Inaction' },
+  { id: 'heatmap',    label: 'Step 3 · City',        icon: Map,           desc: 'Is this cert hot in your city?'          },
+  { id: 'college',    label: 'Degree vs Certs',      icon: GraduationCap, desc: 'MBA vs 4 certifications — numbers'       },
 ]
 
 const HAMBURGER_FEATURES = [
@@ -812,13 +812,13 @@ function AppRoot() {
       <main style={{ flex: 1 }}>
         <AnimatePresence mode="wait">
           <motion.div
-            key={page + activeTab}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={T}
-            style={{ willChange: 'transform, opacity' }}
-          >
+  key={page + activeTab}
+  initial={{ opacity: 0, y: 8 }}
+  animate={{ opacity: 1, y: 0 }}
+  exit={{ opacity: 0, y: -6 }}
+  transition={T}
+  style={{ willChange: page === 'home' ? 'auto' : 'transform, opacity' }}
+>
             {renderPage()}
           </motion.div>
         </AnimatePresence>

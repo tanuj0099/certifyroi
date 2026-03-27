@@ -140,6 +140,13 @@
 
 @layer components {
 
+  @media (max-width: 768px) {
+    /* Cert assembly: prevent layers poking outside viewport */
+    .cert-track-sticky { overflow-x: clip; }
+    /* Prevent 300vh track from breaking mobile layout */
+    body { overflow-x: hidden !important; }
+  }
+
   /* ── Gradient text ───────────────────────────────────── */
   .gradient-text {
     background: linear-gradient(135deg, #51B1E7 0%, #818CF8 50%, #10B981 100%);
