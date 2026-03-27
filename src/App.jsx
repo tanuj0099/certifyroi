@@ -16,6 +16,7 @@ import Hero from './components/Hero.jsx'
 import Heatmap from './components/Heatmap.jsx'
 import ModeSelector from './components/ModeSelector.jsx'
 import CollegeVsCorporate from './components/CollegeVsCorporate.jsx'
+import WaveBg from './components/WaveBg.jsx'
 
 const T = { duration: 0.32, ease: [0.4, 0, 0.2, 1] }
 
@@ -32,7 +33,9 @@ const headingStyle = {
 // STATIC PAGES
 // ─────────────────────────────────────────────────────────
 const AboutPage = () => (
-  <div style={{ maxWidth: '800px', margin: '0 auto', padding: '100px 24px 60px' }}>
+  <div style={{ position: 'relative', minHeight: '100vh' }}>
+    <WaveBg variant="app" />
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '88px 24px 60px', position: 'relative', zIndex: 1 }}>
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={T}>
       <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '5px 14px', borderRadius: '20px', background: 'var(--indigo-dim)', border: '1px solid var(--border-accent)', fontSize: '11px', color: 'var(--indigo-light)', marginBottom: '20px', letterSpacing: '0.06em', fontFamily: 'JetBrains Mono, monospace' }}>
         <Info size={11} /> ABOUT US
@@ -73,10 +76,11 @@ const AboutPage = () => (
       </div>
     </motion.div>
   </div>
+  </div>
 )
 
 const TermsPage = () => (
-  <div style={{ maxWidth: '780px', margin: '0 auto', padding: '100px 24px 60px' }}>
+  <div style={{ maxWidth: '780px', margin: '0 auto', padding: '88px 24px 60px' }}>
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={T}>
       <h1 style={{ ...headingStyle, fontSize: 'clamp(2rem,5vw,3.5rem)' }}>
         TERMS &<br /><span style={{ color: 'var(--indigo)' }}>CONDITIONS</span>
@@ -102,7 +106,7 @@ const TermsPage = () => (
 )
 
 const PrivacyPage = () => (
-  <div style={{ maxWidth: '780px', margin: '0 auto', padding: '100px 24px 60px' }}>
+  <div style={{ maxWidth: '780px', margin: '0 auto', padding: '88px 24px 60px' }}>
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={T}>
       <h1 style={{ ...headingStyle, fontSize: 'clamp(2rem,5vw,3.5rem)' }}>
         PRIVACY<br /><span style={{ color: 'var(--indigo)' }}>POLICY</span>
@@ -136,7 +140,7 @@ const BlogPage = () => {
   const [filter, setFilter] = useState('All')
   const filtered = filter === 'All' ? BLOG_POSTS : BLOG_POSTS.filter(p => p.forWho === filter)
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '100px 24px 60px' }}>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '88px 24px 60px' }}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={T}>
         <h1 style={{ ...headingStyle, fontSize: 'clamp(2.5rem,6vw,4rem)' }}>
           THE CERTIFYROI<br /><span style={{ color: 'var(--indigo)' }}>BLOG</span>
@@ -188,7 +192,7 @@ const FAQPage = () => {
     { q: 'Are the hike percentages realistic?',                         a: "These represent what's achievable with a job switch after getting certified. Switching companies typically yields 20-40% more than internal promotions." },
   ]
   return (
-    <div style={{ maxWidth: '740px', margin: '0 auto', padding: '100px 24px 60px' }}>
+    <div style={{ maxWidth: '740px', margin: '0 auto', padding: '88px 24px 60px' }}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={T}>
         <h1 style={{ ...headingStyle, fontSize: 'clamp(2.5rem,6vw,4rem)' }}>
           FREQUENTLY<br /><span style={{ color: 'var(--indigo)' }}>ASKED</span>
@@ -220,49 +224,26 @@ const FAQPage = () => {
 
 const ContactPage = () => {
   const [sent, setSent] = useState(false)
-  const [formData, setFormData] = useState({
-    name: '', email: '', subject: 'General feedback', message: ''
-  })
+  const [formData, setFormData] = useState({ name: '', email: '', subject: 'General feedback', message: '' })
 
   const handleSubmit = async () => {
-    if (!formData.name || !formData.email || !formData.message) {
-      alert('Please fill in name, email and message')
-      return
-    }
+    if (!formData.name || !formData.email || !formData.message) { alert('Please fill in name, email and message'); return }
     try {
-      await fetch('https://formspree.io/f/xdapopeg', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
+      await fetch('https://formspree.io/f/xdapopeg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) })
       setSent(true)
-    } catch {
-      alert('Failed to send. Email us directly at hello@certifyroi.in')
-    }
+    } catch { alert('Failed to send. Email us directly at hello@certifyroi.in') }
   }
 
-  const inputStyle = {
-    width: '100%', padding: '11px 14px',
-    background: 'var(--surface)', border: '1px solid var(--border)',
-    borderRadius: '10px', color: 'var(--text)',
-    fontSize: '14px', fontFamily: 'Inter, sans-serif',
-    outline: 'none', transition: 'border-color 0.2s',
-  }
-  const labelStyle = {
-    fontSize: '12px', color: 'var(--text-3)', display: 'block',
-    marginBottom: '6px', textTransform: 'uppercase',
-    letterSpacing: '0.08em', fontFamily: 'JetBrains Mono, monospace',
-  }
+  const inputStyle = { width: '100%', padding: '11px 14px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', color: 'var(--text)', fontSize: '14px', fontFamily: 'Inter, sans-serif', outline: 'none', transition: 'border-color 0.2s' }
+  const labelStyle = { fontSize: '12px', color: 'var(--text-3)', display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'JetBrains Mono, monospace' }
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '100px 24px 60px' }}>
+    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '88px 24px 60px' }}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={T}>
         <h1 style={{ ...headingStyle, fontSize: 'clamp(2.5rem,6vw,4rem)' }}>
           CONTACT<br /><span style={{ color: 'var(--indigo)' }}>US</span>
         </h1>
-        <p style={{ fontSize: '15px', color: 'var(--text-3)', marginBottom: '28px', fontFamily: 'Inter, sans-serif' }}>
-          Feedback, partnerships, bug reports, or just saying hi.
-        </p>
+        <p style={{ fontSize: '15px', color: 'var(--text-3)', marginBottom: '28px', fontFamily: 'Inter, sans-serif' }}>Feedback, partnerships, bug reports, or just saying hi.</p>
         {sent ? (
           <div className="glass" style={{ padding: '40px', textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: '12px' }}>✅</div>
@@ -273,25 +254,15 @@ const ContactPage = () => {
           <div className="glass" style={{ padding: '28px' }}>
             <div style={{ marginBottom: '14px' }}>
               <label style={labelStyle}>Name</label>
-              <input type="text" placeholder="Your name" value={formData.name}
-                onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                style={inputStyle}
-                onFocus={e => e.target.style.borderColor = 'var(--border-accent)'}
-                onBlur={e  => e.target.style.borderColor = 'var(--border)'} />
+              <input type="text" placeholder="Your name" value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))} style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--border-accent)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
             </div>
             <div style={{ marginBottom: '14px' }}>
               <label style={labelStyle}>Email</label>
-              <input type="email" placeholder="you@email.com" value={formData.email}
-                onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                style={inputStyle}
-                onFocus={e => e.target.style.borderColor = 'var(--border-accent)'}
-                onBlur={e  => e.target.style.borderColor = 'var(--border)'} />
+              <input type="email" placeholder="you@email.com" value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))} style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--border-accent)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
             </div>
             <div style={{ marginBottom: '14px' }}>
               <label style={labelStyle}>Subject</label>
-              <select value={formData.subject}
-                onChange={e => setFormData(p => ({ ...p, subject: e.target.value }))}
-                style={{ ...inputStyle, background: 'var(--surface)' }}>
+              <select value={formData.subject} onChange={e => setFormData(p => ({ ...p, subject: e.target.value }))} style={{ ...inputStyle, background: 'var(--surface)' }}>
                 <option>General feedback</option>
                 <option>Bug report</option>
                 <option>Partnership / B2B</option>
@@ -301,22 +272,16 @@ const ContactPage = () => {
             </div>
             <div style={{ marginBottom: '20px' }}>
               <label style={labelStyle}>Message</label>
-              <textarea rows={4} placeholder="Tell us what's on your mind..."
-                value={formData.message}
-                onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
-                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' }}
-                onFocus={e => e.target.style.borderColor = 'var(--border-accent)'}
-                onBlur={e  => e.target.style.borderColor = 'var(--border)'} />
+              <textarea rows={4} placeholder="Tell us what's on your mind..." value={formData.message} onChange={e => setFormData(p => ({ ...p, message: e.target.value }))} style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' }} onFocus={e => e.target.style.borderColor = 'var(--border-accent)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
             </div>
-            <button className="btn-primary" style={{ width: '100%' }} onClick={handleSubmit}>
-              Send Message
-            </button>
+            <button className="btn-primary" style={{ width: '100%' }} onClick={handleSubmit}>Send Message</button>
           </div>
         )}
       </motion.div>
     </div>
   )
 }
+
 // ─────────────────────────────────────────────────────────
 // NAV CONFIG
 // ─────────────────────────────────────────────────────────
@@ -359,6 +324,10 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
     setSigningIn(false)
   }
 
+  const navH    = 64   // px — main nav bar height
+  const tabsH   = 48   // px — sub-tabs height
+  const totalH  = currentPage === 'app' ? navH + tabsH : navH
+
   return (
     <>
       <motion.header
@@ -367,18 +336,21 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
         transition={T}
         style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-          background: 'var(--bg)',
+          background: 'rgba(11,14,20,0.92)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1px solid var(--border)',
           transition: 'background 0.3s, border-color 0.3s',
         }}
       >
-        <div className="subtabs" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 12px', display: 'flex', justifyContent: 'center', height: '48px', alignItems: 'stretch', overflowX: 'auto', gap: '2px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', height: '58px', gap: '4px' }}>
+        {/* ── Main nav row ── */}
+        <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', height: `${navH}px`, gap: '4px' }}>
 
             {/* Logo */}
             <button
               onClick={() => go('home')}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, padding: 0, marginRight: '4px' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, padding: '0 8px 0 0', marginRight: '8px' }}
             >
               <div style={{ width: '30px', height: '30px', background: 'linear-gradient(135deg, var(--indigo), #4338CA)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <TrendingUp size={15} color="white" />
@@ -388,7 +360,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
               </span>
             </button>
 
-            {/* Desktop nav — centered, hidden on mobile via CSS */}
+            {/* Desktop nav — centered */}
             <nav className="desktop-nav" style={{ display: 'flex', gap: '2px', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               {NAV_LINKS.map(link => {
                 const isActive = currentPage === link.id
@@ -398,7 +370,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                     onClick={() => go(link.id)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '5px',
-                      padding: '6px 13px', borderRadius: '8px',
+                      padding: '7px 14px', borderRadius: '8px',
                       border: `1px solid ${isActive ? 'var(--border-accent)' : 'transparent'}`,
                       background: isActive ? 'var(--indigo-dim)' : 'transparent',
                       color: isActive ? 'var(--indigo-light)' : 'var(--text-4)',
@@ -410,41 +382,39 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                     onMouseEnter={e => { if (!isActive) { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.border = '1px solid var(--border)' }}}
                     onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = 'var(--text-4)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.border = '1px solid transparent' }}}
                   >
-                    <link.icon size={12} />
-                    {link.label}
+                    <link.icon size={12} />{link.label}
                   </button>
                 )
               })}
             </nav>
 
             {/* Right side */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0, marginLeft: 'auto' }} className="right-nav">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: 'auto' }} className="right-nav">
               {!loading && (
                 user ? (
                   <>
                     {user.photoURL
-                      ? <img src={user.photoURL} alt="" style={{ width: '26px', height: '26px', borderRadius: '50%', border: '2px solid var(--border-accent)' }} />
-                      : <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--indigo), var(--emerald))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={12} color="white" /></div>
+                      ? <img src={user.photoURL} alt="" style={{ width: '28px', height: '28px', borderRadius: '50%', border: '2px solid var(--border-accent)' }} />
+                      : <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--indigo), var(--emerald))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={13} color="white" /></div>
                     }
-                    <button onClick={signOut} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '7px', color: '#EF4444', fontSize: '11px', padding: '4px 9px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'Inter, sans-serif' }}>
-  <LogOut size={11} /><span className="signout-text">Sign out</span>
-</button>
+                    <button onClick={signOut} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '7px', color: '#EF4444', fontSize: '12px', padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'Inter, sans-serif' }}>
+                      <LogOut size={12} /><span className="signout-text">Sign out</span>
+                    </button>
                   </>
                 ) : (
                   <button
-  onClick={handleSignIn}
-  disabled={signingIn}
-  title={!import.meta.env.VITE_FIREBASE_API_KEY ? 'Sign-in requires Firebase setup' : ''}
-  style={{ display: 'flex', opacity: !import.meta.env.VITE_FIREBASE_API_KEY ? 0.4 : 1, background: 'var(--indigo)', border: 'none', borderRadius: '7px', padding: '6px 10px', cursor: !import.meta.env.VITE_FIREBASE_API_KEY ? 'not-allowed' : 'pointer', color: 'white', alignItems: 'center', gap: '4px', fontFamily: 'Inter, sans-serif' }}
+                    onClick={handleSignIn}
+                    disabled={signingIn}
+                    style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'var(--indigo)', border: 'none', borderRadius: '8px', padding: '7px 14px', cursor: signingIn ? 'not-allowed' : 'pointer', color: 'white', fontSize: '13px', fontFamily: 'Inter, sans-serif', opacity: signingIn ? 0.7 : 1, fontWeight: '600', transition: 'opacity 0.2s' }}
                   >
-                    <LogIn size={12} /><span className="signin-text">{signingIn ? '...' : 'Sign in'}</span>
+                    <LogIn size={13} /><span className="signin-text">{signingIn ? '...' : 'Sign in'}</span>
                   </button>
                 )
               )}
               <ThemeToggle />
               <button
                 onClick={() => setMenuOpen(v => !v)}
-                style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '7px', padding: '6px', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', transition: 'all 0.18s' }}
+                style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '7px', padding: '7px', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', transition: 'all 0.18s' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-accent)'; e.currentTarget.style.color = 'var(--text)' }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-3)' }}
               >
@@ -454,10 +424,10 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
           </div>
         </div>
 
-        {/* Sub-tabs for app page */}
+        {/* ── Sub-tabs (app page only) ── */}
         {currentPage === 'app' && (
-          <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg)' }}>
-            <div className="subtabs" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 12px', display: 'flex', justifyContent: 'center', height: '48px', alignItems: 'stretch', overflowX: 'auto', gap: '2px' }}>
+          <div style={{ borderTop: '1px solid var(--border)', background: 'rgba(11,14,20,0.96)' }}>
+            <div className="subtabs" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 16px', display: 'flex', height: `${tabsH}px`, alignItems: 'stretch', overflowX: 'auto', gap: '2px', justifyContent: 'center' }}>
               {APP_TABS.map(tab => {
                 const active = activeTab === tab.id
                 return (
@@ -466,11 +436,11 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                     onClick={() => onTabChange(tab.id)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '7px',
-                      padding: '0 18px',
+                      padding: '0 16px',
                       background: active ? 'var(--indigo-dim)' : 'transparent',
                       border: 'none',
-                      borderBottom: `3px solid ${active ? 'var(--indigo)' : 'transparent'}`,
-                      borderRadius: active ? '8px 8px 0 0' : '0',
+                      borderBottom: `2px solid ${active ? 'var(--indigo)' : 'transparent'}`,
+                      borderRadius: active ? '6px 6px 0 0' : '0',
                       color: active ? 'var(--indigo-light)' : 'var(--text-3)',
                       fontSize: '13px', fontWeight: active ? '700' : '500',
                       cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif',
@@ -480,8 +450,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                     onMouseEnter={e => { if (!active) { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.background = 'var(--surface)' }}}
                     onMouseLeave={e => { if (!active) { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.background = 'transparent' }}}
                   >
-                    <tab.icon size={13} />
-                    {tab.label}
+                    <tab.icon size={13} />{tab.label}
                   </button>
                 )
               })}
@@ -490,7 +459,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
         )}
       </motion.header>
 
-      {/* Hamburger dropdown */}
+      {/* ── Hamburger dropdown ── */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -500,29 +469,24 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
             transition={{ duration: 0.2 }}
             style={{
               position: 'fixed',
-              top: currentPage === 'app' ? '106px' : '58px',
+              top: `${totalH}px`,
               left: 0, right: 0, zIndex: 99,
-              background: 'var(--bg)',
+              background: 'rgba(11,14,20,0.98)',
+              backdropFilter: 'blur(20px)',
               borderBottom: '1px solid var(--border)',
-              padding: '20px',
+              padding: '20px 16px',
             }}
           >
             <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
-
-              <div style={{ fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px', fontFamily: 'JetBrains Mono, monospace' }}>
-                Tools — Follow This Order
-              </div>
+              <div style={{ fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px', fontFamily: 'JetBrains Mono, monospace' }}>Tools — Follow This Order</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px,1fr))', gap: '8px', marginBottom: '20px' }}>
                 {APP_TABS.map(tab => {
                   const isActive = activeTab === tab.id && currentPage === 'app'
                   return (
-                    <button
-                      key={tab.id}
-                      onClick={() => { go('app'); onTabChange(tab.id) }}
+                    <button key={tab.id} onClick={() => { go('app'); onTabChange(tab.id) }}
                       style={{ padding: '14px 12px', borderRadius: '10px', cursor: 'pointer', textAlign: 'left', background: isActive ? 'var(--indigo-dim)' : 'var(--surface)', border: `1px solid ${isActive ? 'var(--border-accent)' : 'var(--border)'}`, transition: 'all 0.18s' }}
                       onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-accent)' }}
-                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.borderColor = 'var(--border)' }}
-                    >
+                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.borderColor = 'var(--border)' }}>
                       <tab.icon size={16} color="var(--indigo)" style={{ marginBottom: '6px', display: 'block' }} />
                       <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text)', marginBottom: '2px', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{tab.label}</div>
                       <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>{tab.desc}</div>
@@ -531,18 +495,13 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                 })}
               </div>
 
-              <div style={{ fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px', fontFamily: 'JetBrains Mono, monospace' }}>
-                ROI Calculator Features
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px,1fr))', gap: '8px', marginBottom: '20px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px', fontFamily: 'JetBrains Mono, monospace' }}>ROI Calculator Features</div>
+              <div className="hamburger-features" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px,1fr))', gap: '8px', marginBottom: '20px' }}>
                 {HAMBURGER_FEATURES.map((f, i) => (
-                  <div
-                    key={i}
-                    onClick={() => { go('app'); onTabChange('calculator') }}
+                  <div key={i} onClick={() => { go('app'); onTabChange('calculator') }}
                     style={{ padding: '14px 12px', borderRadius: '10px', background: 'var(--surface)', border: '1px solid var(--border)', cursor: 'pointer', transition: 'all 0.18s' }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-accent)' }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)' }}
-                  >
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)' }}>
                     <f.icon size={16} color={f.color} style={{ marginBottom: '6px', display: 'block' }} />
                     <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text)', marginBottom: '2px', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{f.label}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>{f.desc}</div>
@@ -550,9 +509,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                 ))}
               </div>
 
-              <div style={{ fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px', fontFamily: 'JetBrains Mono, monospace' }}>
-                Pages
-              </div>
+              <div style={{ fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px', fontFamily: 'JetBrains Mono, monospace' }}>Pages</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px,1fr))', gap: '6px' }}>
                 {[
                   { id: 'blog',    label: 'Blog',    icon: BookOpen  },
@@ -562,13 +519,10 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
                   { id: 'terms',   label: 'Terms',   icon: FileCheck },
                   { id: 'privacy', label: 'Privacy', icon: Shield    },
                 ].map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => go(item.id)}
+                  <button key={item.id} onClick={() => go(item.id)}
                     style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--surface)', border: '1px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px', color: 'var(--text-2)', fontSize: '12px', fontFamily: 'Inter, sans-serif', transition: 'all 0.18s' }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-accent)'; e.currentTarget.style.color = 'var(--indigo-light)' }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)' }}
-                  >
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)' }}>
                     <item.icon size={12} color="var(--text-4)" />{item.label}
                   </button>
                 ))}
@@ -582,122 +536,78 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
 }
 
 // ─────────────────────────────────────────────────────────
-// APP PAGE
+// APP PAGE — contrasting dark-purple bg with wave
 // ─────────────────────────────────────────────────────────
 const AppPage = ({ activeTab, onTabChange, mode, onModeChange, onCertSelected, prefilledCert, resumeCity, resumeDomain, resumeName }) => {
-
   const banners = {
-    resume: {
-      color: 'var(--indigo-light)',
-      bg: 'var(--indigo-dim)',
-      border: 'var(--border-accent)',
-      icon: FileText,
-      title: 'Step 1 — Find Your Cert',
-      body: "Don't know which cert? Upload your resume. AI reads your skills, goal, and domain — recommends top 3 with one ",
-      bold: 'Primary Move.',
-      sub: 'Click any cert to jump to Step 2 pre-filled.',
-    },
-    calculator: {
-      color: 'var(--emerald-light)',
-      bg: 'rgba(16,185,129,0.06)',
-      border: 'rgba(16,185,129,0.2)',
-      icon: TrendingUp,
-      title: 'Step 2 — Calculate ROI',
-      body: 'Know which cert you want? Enter salary, cost, hike. See your ',
-      bold: 'break-even date, 5-year gain, and Ghost of Inaction cost.',
-      sub: 'After AI analysis: Pitch My Boss, Track Progress, Verify Real Hike.',
-    },
-    heatmap: {
-      color: 'var(--amber)',
-      bg: 'rgba(245,158,11,0.06)',
-      border: 'rgba(245,158,11,0.2)',
-      icon: Map,
-      title: 'Step 3 — Check City Demand',
-      body: 'See demand across 8 Indian cities. ',
-      bold: 'High demand = more leverage negotiating your hike.',
-      sub: null,
-    },
-    college: {
-      color: 'var(--indigo-light)',
-      bg: 'var(--indigo-dim)',
-      border: 'var(--border-accent)',
-      icon: GraduationCap,
-      title: 'Degree vs Certifications',
-      body: 'MBA or 4 certs? Run the actual numbers — cost, opportunity cost, 5-year earnings. ',
-      bold: 'Data over family pressure.',
-      sub: null,
-    },
+    resume:     { color: 'var(--indigo-light)', bg: 'var(--indigo-dim)',          border: 'var(--border-accent)',         icon: FileText,      title: 'Step 1 — Find Your Cert',      body: "Don't know which cert? Upload your resume. AI reads your skills, goal, and domain — recommends top 3 with one ", bold: 'Primary Move.',                              sub: 'Click any cert to jump to Step 2 pre-filled.' },
+    calculator: { color: 'var(--emerald-light)', bg: 'rgba(16,185,129,0.06)',     border: 'rgba(16,185,129,0.2)',         icon: TrendingUp,    title: 'Step 2 — Calculate ROI',       body: 'Know which cert you want? Enter salary, cost, hike. See your ',                                              bold: 'break-even date, 5-year gain, and Ghost of Inaction cost.', sub: 'After AI analysis: Pitch My Boss, Track Progress, Verify Real Hike.' },
+    heatmap:    { color: 'var(--amber)',          bg: 'rgba(245,158,11,0.06)',     border: 'rgba(245,158,11,0.2)',         icon: Map,           title: 'Step 3 — Check City Demand',   body: 'See demand across 8 Indian cities. ',                                                                        bold: 'High demand = more leverage negotiating your hike.',         sub: null },
+    college:    { color: 'var(--indigo-light)',   bg: 'var(--indigo-dim)',         border: 'var(--border-accent)',         icon: GraduationCap, title: 'Degree vs Certifications',    body: 'MBA or 4 certs? Run the actual numbers — cost, opportunity cost, 5-year earnings. ',                          bold: 'Data over family pressure.',                                 sub: null },
   }
 
-  const b = banners[activeTab]
+  const b        = banners[activeTab]
   const maxWidth = activeTab === 'resume' ? '720px' : activeTab === 'college' ? '900px' : activeTab === 'heatmap' ? '1000px' : '1100px'
+  const NAV_H    = 64
+  const TABS_H   = 48
 
   return (
-    <div style={{ paddingTop: '110px', minHeight: '100vh' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '20px 20px 0' }}>
-        <ModeSelector activeMode={mode} onChange={(newMode) => {
-  onModeChange(newMode)
-  // Switching to student mode auto-sets context
-}} />
-      </div>
+    <div style={{ paddingTop: `${NAV_H + TABS_H}px`, minHeight: '100vh', background: 'var(--app-bg)', position: 'relative' }}>
+      {/* App-page wave background — contrasting to landing */}
+      <WaveBg variant="app" />
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={T}
-        >
-          <div style={{ maxWidth, margin: '0 auto', padding: '0 20px 60px' }}>
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '20px 20px 0' }}>
+          <ModeSelector activeMode={mode} onChange={onModeChange} />
+        </div>
 
-            {b && (
-  <div className="app-banner" style={{ marginBottom: '20px', padding: '14px 16px', borderRadius: '12px', background: b.bg, border: `1px solid ${b.border}`, transition: 'background 0.3s' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <b.icon size={15} color={b.color} />
-                  <span style={{ fontSize: '14px', fontWeight: '700', color: b.color, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{b.title}</span>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={T}
+          >
+            <div style={{ maxWidth, margin: '0 auto', padding: '0 20px 60px' }}>
+              {b && (
+                <div className="app-banner" style={{ marginBottom: '20px', padding: '14px 16px', borderRadius: '12px', background: b.bg, border: `1px solid ${b.border}`, transition: 'background 0.3s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <b.icon size={15} color={b.color} />
+                    <span style={{ fontSize: '14px', fontWeight: '700', color: b.color, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{b.title}</span>
+                  </div>
+                  <p style={{ fontSize: '14px', color: 'var(--text-2)', lineHeight: '1.65', fontFamily: 'Inter, sans-serif', margin: 0 }}>
+                    {b.body}<strong style={{ color: 'var(--text)' }}>{b.bold}</strong>
+                    {b.sub && <span style={{ color: 'var(--text-3)', display: 'block', marginTop: '4px', fontSize: '13px' }}>{b.sub}</span>}
+                  </p>
                 </div>
-                <p style={{ fontSize: '14px', color: 'var(--text-2)', lineHeight: '1.65', fontFamily: 'Inter, sans-serif', margin: 0 }}>
-                  {b.body}<strong style={{ color: 'var(--text)' }}>{b.bold}</strong>
-                  {b.sub && <span style={{ color: 'var(--text-3)', display: 'block', marginTop: '4px', fontSize: '13px' }}>{b.sub}</span>}
-                </p>
-              </div>
-            )}
+              )}
 
-            {activeTab === 'resume' && (
-              <div className="glass" style={{ padding: '28px' }}>
-                <ResumeAnalyzer
-                  mode={mode}
-                  onCertSelected={(certName, city, domain, name) => {
-                    onCertSelected(certName, city, domain, name)
-                  }}
-                />
-              </div>
-            )}
+              {activeTab === 'resume' && (
+                <div className="glass" style={{ padding: '28px' }}>
+                  <ResumeAnalyzer mode={mode} onCertSelected={(certName, city, domain, name) => { onCertSelected(certName, city, domain, name) }} />
+                </div>
+              )}
 
-            {activeTab === 'calculator' && (
-              <Hero mode={mode} prefilledCert={prefilledCert} resumeName={resumeName} />
-            )}
+              {activeTab === 'calculator' && (
+                <Hero mode={mode} prefilledCert={prefilledCert} resumeName={resumeName} />
+              )}
 
-            {activeTab === 'heatmap' && (
-              <div className="glass" style={{ padding: '28px' }}>
-                <Heatmap
-                  prefilledCity={resumeCity}
-                  prefilledDomain={resumeDomain}
-                  certName={prefilledCert}
-                  resumeName={resumeName}
-                />
-              </div>
-            )}
+              {activeTab === 'heatmap' && (
+                <div className="glass" style={{ padding: '28px' }}>
+                  <Heatmap prefilledCity={resumeCity} prefilledDomain={resumeDomain} certName={prefilledCert} resumeName={resumeName} />
+                </div>
+              )}
 
-            {activeTab === 'college' && (
-              <div className="glass" style={{ padding: '28px' }}>
-                <CollegeVsCorporate />
-              </div>
-            )}
-          </div>
-        </motion.div>
-      </AnimatePresence>
+              {activeTab === 'college' && (
+                <div className="glass" style={{ padding: '28px' }}>
+                  <CollegeVsCorporate />
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   )
 }
@@ -708,7 +618,7 @@ const AppPage = ({ activeTab, onTabChange, mode, onModeChange, onCertSelected, p
 const Footer = ({ onNavigate }) => (
   <footer style={{ borderTop: '1px solid var(--border)', padding: '36px 24px 20px', marginTop: 'auto' }}>
     <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px,1fr))', gap: '28px', marginBottom: '28px' }}>
+      <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px,1fr))', gap: '28px', marginBottom: '28px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '10px' }}>
             <div style={{ width: '26px', height: '26px', background: 'linear-gradient(135deg, var(--indigo), #4338CA)', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -722,7 +632,6 @@ const Footer = ({ onNavigate }) => (
             Data-driven cert decisions for India's tech professionals.
           </p>
         </div>
-
         {[
           { title: 'Tools',   links: [{ id: 'app', label: 'Resume AI' }, { id: 'app', label: 'ROI Calculator' }, { id: 'app', label: 'City Heatmap' }, { id: 'app', label: 'Degree vs Certs' }] },
           { title: 'Company', links: [{ id: 'about', label: 'About' }, { id: 'blog', label: 'Blog' }, { id: 'contact', label: 'Contact' }, { id: 'faq', label: 'FAQ' }] },
@@ -731,27 +640,19 @@ const Footer = ({ onNavigate }) => (
           <div key={i}>
             <div style={{ fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px', fontFamily: 'JetBrains Mono, monospace' }}>{col.title}</div>
             {col.links.map(l => (
-              <button
-                key={l.label}
-                onClick={() => onNavigate(l.id)}
+              <button key={l.label} onClick={() => onNavigate(l.id)}
                 style={{ display: 'block', background: 'none', border: 'none', color: 'var(--text-4)', fontSize: '13px', cursor: 'pointer', marginBottom: '6px', fontFamily: 'Inter, sans-serif', padding: 0, textAlign: 'left', transition: 'color 0.15s' }}
                 onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
-                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-4)'}
-              >
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-4)'}>
                 {l.label}
               </button>
             ))}
           </div>
         ))}
       </div>
-
       <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-        <p style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>
-          © 2026 CertifyROI · Powered by Advanced AI · Built for India's Tech Professionals
-        </p>
-        <p style={{ fontSize: '11px', color: 'var(--text-4)', opacity: 0.5, fontFamily: 'Inter, sans-serif' }}>
-          Data: LinkedIn · NASSCOM · AmbitionBox · Naukri · WEF 2026
-        </p>
+        <p style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>© 2026 CertifyROI · Powered by Advanced AI · Built for India's Tech Professionals</p>
+        <p style={{ fontSize: '11px', color: 'var(--text-4)', opacity: 0.5, fontFamily: 'Inter, sans-serif' }}>Data: LinkedIn · NASSCOM · AmbitionBox · Naukri · WEF 2026</p>
       </div>
     </div>
   </footer>
@@ -769,15 +670,8 @@ function AppRoot() {
   const [resumeDomain,  setResumeDomain]  = useState('')
   const [resumeName,    setResumeName]    = useState('')
 
-  const navigate = (pageId) => {
-    setPage(pageId)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const goToApp = (tab = 'resume') => {
-    setActiveTab(tab)
-    navigate('app')
-  }
+  const navigate = (pageId) => { setPage(pageId); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  const goToApp  = (tab = 'resume') => { setActiveTab(tab); navigate('app') }
 
   const handleCertSelected = (certName, city = '', domain = '', name = '') => {
     setPrefilledCert(certName)
@@ -802,22 +696,11 @@ function AppRoot() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', transition: 'color 0.3s ease' }}>
-      <NavBar
-        currentPage={page}
-        activeTab={activeTab}
-        onNavigate={navigate}
-        onTabChange={setActiveTab}
-      />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <NavBar currentPage={page} activeTab={activeTab} onNavigate={navigate} onTabChange={setActiveTab} />
       <main style={{ flex: 1 }}>
         <AnimatePresence mode="wait">
-          <motion.div
-  key={page + activeTab}
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  exit={{ opacity: 0 }}
-  transition={T}
->
+          <motion.div key={page + activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={T}>
             {renderPage()}
           </motion.div>
         </AnimatePresence>

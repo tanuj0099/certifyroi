@@ -1,567 +1,416 @@
-import { motion, useAnimationFrame, useScroll, useTransform, useSpring, useMotionValue, animate } from 'framer-motion'
-import { useRef, useState, useCallback, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
-  TrendingUp, FileText, Map, Sparkles, ArrowRight,
-  GraduationCap, Repeat, Briefcase, Star, Zap, Award,
-  Brain, ChevronRight, AlertTriangle, IndianRupee
+  Zap, Award, AlertTriangle, CheckCircle,
+  RefreshCw, Flame, TrendingUp
 } from 'lucide-react'
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, ReferenceLine, CartesianGrid
+} from 'recharts'
+import { CERTIFICATIONS, CERT_DOMAINS, INDIA_CONTEXT, GUEST_FREE_LIMIT } from '../tokens.js'
+import { useROICalc, useGuestCounter } from '../hooks/hooks.jsx'
+import { useAuth } from '../hooks/useAuth.jsx'
+import { analyzeROI } from '../aiService.jsx'
+import AILoadingState from './AILoadingState.jsx'
+import BurnRate from './BurnRate.jsx'
+import HikeVerifier from './HikeVerifier.jsx'
 
-// ── Gradient text ─────────────────────────────────────────
-const G = ({ children, colors = ['#51B1E7', '#818CF8', '#10B981'] }) => (
-  <span style={{ background: `linear-gradient(135deg, ${colors.join(', ')})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', display: 'inline' }}>{children}</span>
-)
-const GPurple = ({ children }) => <G colors={['#6366F1', '#818CF8', '#A78BFA']}>{children}</G>
-const GGold   = ({ children }) => <G colors={['#F59E0B', '#EF4444']}>{children}</G>
-const GGreen  = ({ children }) => <G colors={['#10B981', '#34D399', '#51B1E7']}>{children}</G>
-const GRed    = ({ children }) => <G colors={['#EF4444', '#F59E0B']}>{children}</G>
+const F_HEAD = "'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif"
+const F_MONO = "'Commit Mono', 'JetBrains Mono', monospace"
+const F_BODY = "'Inter', sans-serif"
+const T = { duration: 0.28, ease: [0.4, 0, 0.2, 1] }
 
-// ── 3D Tilt Card ──────────────────────────────────────────
-const TiltCard = ({ children, style = {}, intensity = 10, glowColor = '#6366F1', onClick }) => {
-  const ref = useRef(null)
-  const x   = useMotionValue(0)
-  const y   = useMotionValue(0)
-  const sx  = useSpring(x, { stiffness: 300, damping: 25 })
-  const sy  = useSpring(y, { stiffness: 300, damping: 25 })
-  const [glow, setGlow] = useState({ x: 50, y: 50, op: 0 })
-
-  const onMove = useCallback(e => {
-    if (!ref.current) return
-    const r  = ref.current.getBoundingClientRect()
-    const nx = (e.clientX - r.left) / r.width  - 0.5
-    const ny = (e.clientY - r.top)  / r.height - 0.5
-    x.set(ny * -intensity); y.set(nx * intensity)
-    setGlow({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100, op: 1 })
-  }, [x, y, intensity])
-
-  const onLeave = useCallback(() => {
-    x.set(0); y.set(0)
-    setGlow(p => ({ ...p, op: 0 }))
-  }, [x, y])
-
-  return (
-    <motion.div ref={ref} onClick={onClick} onMouseMove={onMove} onMouseLeave={onLeave}
-      style={{ rotateX: sx, rotateY: sy, perspective: 800, transformStyle: 'preserve-3d', position: 'relative', borderRadius: '20px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', boxShadow: 'inset 0 1px 0 var(--card-highlight)', overflow: 'hidden', willChange: 'transform', cursor: onClick ? 'pointer' : 'default', ...style }}
-      initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-      transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
-      whileHover={{ scale: 1.018, transition: { duration: 0.2 } }}
-    >
-      <div style={{ position: 'absolute', inset: 0, borderRadius: '20px', pointerEvents: 'none', zIndex: 0, background: `radial-gradient(circle 220px at ${glow.x}% ${glow.y}%, ${glowColor}1a 0%, transparent 70%)`, opacity: glow.op, transition: 'opacity 0.3s' }} />
-      <div style={{ position: 'absolute', inset: 0, borderRadius: '20px', pointerEvents: 'none', zIndex: 0, background: `radial-gradient(circle 80px at ${glow.x}% ${glow.y}%, rgba(255,255,255,0.05) 0%, transparent 60%)`, opacity: glow.op }} />
-      <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
-    </motion.div>
-  )
-}
-
-// ── Animated neon border ──────────────────────────────────
-const NeonCard = ({ children, style = {}, color = '#6366F1', delay = 0 }) => {
-  // FIX: zero-re-render approach — direct DOM style mutation instead of useState
-  const outerRef = useRef(null)
-  const glowRef  = useRef(null)
-  const angleRef = useRef(delay * 60)
-
-  useAnimationFrame(t => {
-    angleRef.current = (delay * 60 + t * 0.04) % 360
-    const a = angleRef.current * Math.PI / 180
-    const x = 50 + 55 * Math.cos(a)
-    const y = 50 + 55 * Math.sin(a)
-    if (outerRef.current) {
-      outerRef.current.style.background =
-        `radial-gradient(circle at ${x}% ${y}%, ${color}cc 0%, ${color}44 30%, transparent 65%)`
-    }
-    if (glowRef.current) {
-      glowRef.current.style.background =
-        `radial-gradient(circle at ${x}% ${y}%, ${color}22 0%, transparent 60%)`
-    }
-  })
-
-  return (
-    <motion.div ref={outerRef}
-      initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -3 }}
-      style={{
-        position: 'relative', borderRadius: '18px', padding: '1.5px',
-        background: `radial-gradient(circle at 50% 50%, ${color}cc 0%, ${color}44 30%, transparent 65%)`,
-        ...style
-      }}>
-      <div ref={glowRef} style={{ position: 'absolute', inset: '-1px', borderRadius: '19px', background: `radial-gradient(circle at 50% 50%, ${color}22 0%, transparent 60%)`, filter: 'blur(8px)', zIndex: 0, pointerEvents: 'none' }} />
-      <div style={{ position: 'relative', zIndex: 1, background: 'var(--glass-bg)', borderRadius: '17px', height: '100%' }}>{children}</div>
-    </motion.div>
-  )
-}
-
-// ── Floating orbs ─────────────────────────────────────────
-const Orb = ({ color, size, style, delay = 0 }) => (
-  <motion.div animate={{ y: [0, -24, 0], scale: [1, 1.06, 1] }} transition={{ duration: 7 + delay, repeat: Infinity, ease: 'easeInOut', delay }}
-    style={{ position: 'absolute', width: size, height: size, borderRadius: '50%', background: `radial-gradient(circle, ${color} 0%, transparent 70%)`, pointerEvents: 'none', ...style }} />
+// ── Slider ────────────────────────────────────────────────────
+const SliderInput = ({ label, value, min, max, step = 1, onChange, prefix = '', suffix = '', color = 'var(--indigo)', note }) => (
+  <div style={{ marginBottom: '22px' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+      <label style={{ fontSize: '11px', color: 'var(--text-3)', fontFamily: F_MONO, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</label>
+      <span style={{ fontFamily: F_MONO, fontSize: '16px', fontWeight: '700', color, letterSpacing: '-0.02em' }}>
+        {prefix}{typeof value === 'number' ? value.toLocaleString('en-IN') : value}{suffix}
+      </span>
+    </div>
+    <input type="range" min={min} max={max} step={step} value={value}
+      onChange={e => onChange(parseFloat(e.target.value))}
+      className="slider" style={{ accentColor: color }} />
+    {note && <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '5px', fontFamily: F_BODY }}>{note}</div>}
+  </div>
 )
 
-// ── Animated counter ──────────────────────────────────────
-const Counter = ({ target, suffix = '', prefix = '', duration = 2 }) => {
-  const [val, setVal] = useState(0)
-  const ref = useRef(null)
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return
-      obs.disconnect()
-      const ctrl = animate(0, target, {
-        duration,
-        ease: [0.4, 0, 0.2, 1],
-        onUpdate: v => setVal(Math.round(v))
-      })
-      return () => ctrl.stop()
-    })
-    if (ref.current) obs.observe(ref.current)
-    return () => obs.disconnect()
-  }, [target, duration])
-  return <span ref={ref}>{prefix}{val.toLocaleString('en-IN')}{suffix}</span>
-}
+// ── Stat card ─────────────────────────────────────────────────
+const StatCard = ({ label, value, sub, color, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+    transition={{ ...T, delay }}
+    style={{ padding: '16px', borderRadius: '12px', background: `${color}08`, border: `1px solid ${color}22`, textAlign: 'center' }}
+  >
+    <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>{label}</div>
+    <div style={{ fontFamily: F_MONO, fontSize: 'clamp(1rem, 2.5vw, 1.5rem)', fontWeight: '700', color, letterSpacing: '-0.03em' }}>{value}</div>
+    {sub && <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '5px', fontFamily: F_BODY, lineHeight: '1.4' }}>{sub}</div>}
+  </motion.div>
+)
 
-// ── Scrolling ticker ──────────────────────────────────────
-const Ticker = () => {
-  const items = [
-    '⚡ AWS cert holders earn ₹2.4L more/yr in Bangalore',
-    '📍 2,400+ cloud roles open on Naukri right now',
-    '🎯 Average break-even on PMP: 7 months',
-    '🚀 Google Data Analytics cert: ₹18K cost, ₹3.2L annual gain',
-    '🏆 CKA Kubernetes: highest hike % in India 2026 — +40%',
-    '📊 Hyderabad cloud demand up 38% YoY',
-    '💡 Most Indian engineers guess wrong about which cert to do first',
-  ]
+// ── Chart tooltip ─────────────────────────────────────────────
+const ChartTip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null
   return (
-    <div style={{ overflow: 'hidden', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '12px 0', background: 'var(--surface)', marginBottom: '80px' }}>
-      <motion.div
-        animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
-        style={{ display: 'flex', gap: '60px', whiteSpace: 'nowrap', width: 'max-content' }}
-      >
-        {[...items, ...items].map((item, i) => (
-          <span key={i} style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>{item}</span>
-        ))}
-      </motion.div>
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 14px' }}>
+      <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--text-4)', marginBottom: '5px' }}>{label}</div>
+      {payload.map((p, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+          <div style={{ width: 7, height: 7, borderRadius: '50%', background: p.color }} />
+          <span style={{ fontFamily: F_MONO, fontSize: '12px', color: 'var(--text-2)' }}>
+            {p.name}: {p.value >= 0 ? '+' : ''}₹{p.value}K
+          </span>
+        </div>
+      ))}
     </div>
   )
 }
 
-// ── Money burning counter ─────────────────────────────────
-const MoneyBurning = () => {
-  const [rupees, setRupees] = useState(0)
+// ── AI result ─────────────────────────────────────────────────
+const AIResult = ({ result, certName, onReset }) => {
+  const verdictColor =
+    result.verdict?.toLowerCase().includes('strong')   ? '#10B981' :
+    result.verdict?.toLowerCase().includes('moderate') ? '#F59E0B' : '#EF4444'
+  return (
+    <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={T}
+      style={{ marginTop: '16px', borderRadius: '14px', background: 'var(--surface)', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
+
+      {/* Verdict */}
+      <div style={{ padding: '14px 18px', background: `${verdictColor}0d`, borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+        <div>
+          <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '5px' }}>AI VERDICT · {certName?.toUpperCase()}</div>
+          <div style={{ fontSize: '14px', fontWeight: '700', color: verdictColor, fontFamily: F_HEAD, lineHeight: '1.4' }}>{result.verdict}</div>
+        </div>
+        <button onClick={onReset} style={{ background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer', padding: '4px' }}>
+          <RefreshCw size={14} />
+        </button>
+      </div>
+
+      <div style={{ padding: '16px 18px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+        {result.breakEven && (
+          <div style={{ padding: '12px', borderRadius: '10px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
+            <div style={{ fontFamily: F_MONO, fontSize: '9px', color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '5px' }}>⏱ BREAK-EVEN</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-2)', fontFamily: F_BODY, lineHeight: '1.6' }}>{result.breakEven}</div>
+          </div>
+        )}
+        {result.projection && (
+          <div style={{ padding: '12px', borderRadius: '10px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
+            <div style={{ fontFamily: F_MONO, fontSize: '9px', color: '#10B981', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '5px' }}>📈 5-YR PROJECTION</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-2)', fontFamily: F_BODY, lineHeight: '1.6' }}>{result.projection}</div>
+          </div>
+        )}
+      </div>
+
+      {result.demand?.length > 0 && (
+        <div style={{ padding: '0 18px 14px' }}>
+          <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--indigo-light)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>MARKET DEMAND · INDIA 2026</div>
+          {result.demand.map((d, i) => (
+            <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '5px' }}>
+              <span style={{ color: 'var(--indigo-light)', fontFamily: F_MONO, fontSize: '12px', flexShrink: 0 }}>◆</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-2)', fontFamily: F_BODY, lineHeight: '1.5' }}>{d}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {result.risks?.length > 0 && (
+        <div style={{ padding: '0 18px 14px' }}>
+          <div style={{ fontFamily: F_MONO, fontSize: '9px', color: '#EF4444', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>RISKS</div>
+          {result.risks.map((r, i) => (
+            <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '5px' }}>
+              <AlertTriangle size={12} color="#EF4444" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span style={{ fontSize: '13px', color: 'var(--text-2)', fontFamily: F_BODY, lineHeight: '1.5' }}>{r}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {result.studentTrack && (
+        <div style={{ padding: '0 18px 14px' }}>
+          <div style={{ fontFamily: F_MONO, fontSize: '9px', color: '#818CF8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>STUDENT FAST-TRACK</div>
+          <div style={{ fontSize: '13px', color: 'var(--text-2)', fontFamily: F_BODY, lineHeight: '1.6' }}>{result.studentTrack}</div>
+        </div>
+      )}
+
+      {result.bottomLine && (
+        <div style={{ margin: '0 18px 18px', padding: '12px 14px', borderRadius: '10px', background: `${verdictColor}0d`, border: `1px solid ${verdictColor}22` }}>
+          <div style={{ fontFamily: F_MONO, fontSize: '9px', color: verdictColor, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '5px' }}>BOTTOM LINE</div>
+          <div style={{ fontSize: '14px', fontWeight: '700', color: verdictColor, fontFamily: F_HEAD }}>{result.bottomLine}</div>
+        </div>
+      )}
+    </motion.div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// HERO — ROI CALCULATOR (Step 2)
+// ─────────────────────────────────────────────────────────
+const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '' }) => {
+  const isStudent = mode === 'student'
+
+  const [domain,       setDomain]       = useState('all')
+  const [certName,     setCertName]     = useState(prefilledCert || '')
+  const [selectedCert, setSelectedCert] = useState(null)
+  const [salary,       setSalary]       = useState(isStudent ? 0 : 8)
+  const [certCost,     setCertCost]     = useState(2)
+  const [hikePercent,  setHikePercent]  = useState(30)
+  const [aiResult,     setAiResult]     = useState(null)
+  const [aiLoading,    setAiLoading]    = useState(false)
+  const [aiError,      setAiError]      = useState(null)
+  const [showBurnRate, setShowBurnRate] = useState(false)
+  const [showVerifier, setShowVerifier] = useState(false)
+
+  const { user } = useAuth()
+  const guest    = useGuestCounter(GUEST_FREE_LIMIT)
+
+  // Sync prefilledCert from resume analyzer
   useEffect(() => {
-    const perSecond = 320000 / (365 * 24 * 3600)
-    const t = setInterval(() => setRupees(v => v + perSecond / 10), 100)
-    return () => clearInterval(t)
+    if (!prefilledCert) return
+    setCertName(prefilledCert)
+    const found = CERTIFICATIONS.find(c =>
+      c.name.toLowerCase().includes(prefilledCert.toLowerCase()) ||
+      prefilledCert.toLowerCase().includes(c.name.toLowerCase())
+    )
+    if (found) {
+      setSelectedCert(found)
+      setCertCost(found.avgCost / 100000)
+      setHikePercent(found.avgHike)
+    }
+  }, [prefilledCert])
+
+  // Sync salary to student mode
+  useEffect(() => { if (isStudent) setSalary(0) }, [isStudent])
+
+  const roi            = useROICalc({ currentSalary: salary, certCost, hikePercent })
+  const filteredCerts  = CERTIFICATIONS.filter(c => domain === 'all' || c.domain === domain)
+
+  const demandColor = d =>
+    d === 'Very High' ? '#10B981' : d === 'High' ? '#51B1E7' : d === 'Medium' ? '#F59E0B' : '#94A3B8'
+
+  const handleSelectCert = useCallback(cert => {
+    setSelectedCert(cert)
+    setCertName(cert.name)
+    setCertCost(cert.avgCost / 100000)
+    setHikePercent(cert.avgHike)
+    setAiResult(null)
+    setAiError(null)
   }, [])
-  return (
-    <div style={{ padding: '20px 24px', borderRadius: '14px', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', textAlign: 'center' }}>
-      <div style={{ fontSize: '11px', color: '#EF4444', fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
-        ₹ slipping away while you read this
-      </div>
-      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '2.2rem', color: '#EF4444', fontWeight: '700', letterSpacing: '-0.03em' }}>
-        ₹{rupees.toFixed(2)}
-      </div>
-      <div style={{ fontSize: '12px', color: 'var(--text-4)', marginTop: '6px', fontFamily: 'Inter, sans-serif' }}>
-        based on avg ₹3.2L/yr salary gap for uncertified professionals
-      </div>
-    </div>
-  )
-}
 
-const LandingPage = ({ onEnter }) => {
-  const heroRef = useRef(null)
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
-  const heroY   = useTransform(scrollYProgress, [0, 1], [0, 100])
-  const heroOp  = useTransform(scrollYProgress, [0, 0.55], [1, 0])
-  const heroSc  = useTransform(scrollYProgress, [0, 0.55], [1, 0.93])
+  const handleAnalyse = useCallback(async () => {
+    if (!certName.trim())           { setAiError('Select a certification first');              return }
+    if (!user && guest.exceeded)    { setAiError(`Free limit (${GUEST_FREE_LIMIT}) reached — sign in for unlimited`); return }
+    setAiLoading(true); setAiResult(null); setAiError(null)
+    try {
+      const result = await analyzeROI({ certName, currentSalary: salary, certCost, hikePercent, isStudent })
+      setAiResult(result)
+      if (!user) guest.increment()
+    } catch (e) {
+      setAiError(e.message?.includes('endpoint not found')
+        ? 'Run: vercel dev (not npm run dev) to enable the AI API'
+        : e.message || 'Analysis failed')
+    } finally { setAiLoading(false) }
+  }, [certName, salary, certCost, hikePercent, isStudent, user, guest])
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
+    <div>
+      {/* ── Guest counter banner ── */}
+      {!user && (
+        <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '10px', background: guest.exceeded ? 'rgba(239,68,68,0.07)' : 'var(--indigo-dim)', border: `1px solid ${guest.exceeded ? 'rgba(239,68,68,0.25)' : 'var(--border-accent)'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '13px', color: guest.exceeded ? '#EF4444' : 'var(--indigo-light)', fontFamily: F_BODY }}>
+            {guest.exceeded ? 'Free analyses used up — sign in for unlimited' : `${guest.remaining} free AI ${guest.remaining === 1 ? 'analysis' : 'analyses'} remaining`}
+          </span>
+          {!guest.exceeded && <span style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: F_MONO }}>Sign in → unlimited</span>}
+        </div>
+      )}
 
-      {/* Orbs */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
-        <Orb color="rgba(99,102,241,0.08)"  size={700} style={{ top: '-20%', left: '5%' }}   delay={0} />
-        <Orb color="rgba(16,185,129,0.05)"  size={500} style={{ bottom: '0%', right: '0%' }} delay={2} />
-        <Orb color="rgba(81,177,231,0.05)"  size={350} style={{ top: '45%', right: '15%' }}  delay={4} />
+      {/* ── Cert picker ── */}
+      <div style={{ marginBottom: '24px' }}>
+        <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>
+          Pick Your Certification
+        </div>
+
+        {/* Domain filter pills */}
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
+          {CERT_DOMAINS.map(d => (
+            <button key={d.id} onClick={() => setDomain(d.id)}
+              style={{ padding: '5px 12px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: F_BODY, fontWeight: '600', transition: 'all 0.18s', background: domain === d.id ? 'var(--indigo-dim)' : 'var(--surface)', border: `1px solid ${domain === d.id ? 'var(--border-accent)' : 'var(--border)'}`, color: domain === d.id ? 'var(--indigo-light)' : 'var(--text-4)', whiteSpace: 'nowrap' }}>
+              {d.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Cert pills */}
+        <div className="cert-pill-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', maxHeight: '140px', overflowY: 'auto', paddingBottom: '4px' }}>
+          {filteredCerts.map(cert => {
+            const active = certName === cert.name
+            const dc     = demandColor(cert.demand)
+            return (
+              <motion.button key={cert.id} onClick={() => handleSelectCert(cert)}
+                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                style={{ padding: '7px 14px', borderRadius: '9px', fontSize: '12px', cursor: 'pointer', fontFamily: F_BODY, fontWeight: active ? '700' : '500', transition: 'all 0.18s', background: active ? 'var(--indigo-dim)' : 'var(--surface)', border: `1px solid ${active ? 'var(--border-accent)' : 'var(--border)'}`, color: active ? 'var(--indigo-light)' : 'var(--text-2)', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: dc, flexShrink: 0 }} />
+                {cert.name}
+                {cert.avgHike >= 35 && <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px', background: 'rgba(16,185,129,0.15)', color: '#10B981', fontFamily: F_MONO }}>HOT</span>}
+              </motion.button>
+            )
+          })}
+        </div>
+
+        {/* Selected cert info */}
+        {selectedCert && (
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={T}
+            style={{ marginTop: '12px', padding: '12px 14px', borderRadius: '10px', background: 'var(--bg)', border: '1px solid var(--border)', display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <span style={{ fontFamily: F_HEAD, fontWeight: '700', fontSize: '13px', color: 'var(--indigo-light)' }}>{selectedCert.name}</span>
+            <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '5px', background: `${demandColor(selectedCert.demand)}15`, color: demandColor(selectedCert.demand), fontFamily: F_MONO }}>
+              {selectedCert.demand} Demand
+            </span>
+            <span style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: F_BODY }}>{selectedCert.forWho}</span>
+            <a href={selectedCert.link} target="_blank" rel="noopener noreferrer"
+              style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--indigo-light)', fontFamily: F_MONO, textDecoration: 'none' }}>
+              OFFICIAL ↗
+            </a>
+          </motion.div>
+        )}
       </div>
 
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      {/* ── Sliders ── */}
+      <div style={{ marginBottom: '24px', padding: '22px', borderRadius: '14px', background: 'var(--surface)', border: '1px solid var(--glass-border)' }}>
+        {isStudent ? (
+          <div style={{ marginBottom: '20px', padding: '14px', borderRadius: '10px', background: 'rgba(129,140,248,0.07)', border: '1px solid rgba(129,140,248,0.2)' }}>
+            <div style={{ fontSize: '12px', color: '#818CF8', fontFamily: F_MONO, letterSpacing: '0.08em', marginBottom: '4px' }}>STUDENT MODE — NO SALARY YET</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: F_BODY }}>Target: ₹4.8L first offer · ROI calculated from career investment</div>
+          </div>
+        ) : (
+          <SliderInput label="Current Salary (₹L/yr)" value={salary} min={2} max={40} step={0.5}
+            onChange={setSalary} prefix="₹" suffix="L" color="#51B1E7"
+            note={`${INDIA_CONTEXT.currency}${(salary * 100000).toLocaleString('en-IN')} per year`} />
+        )}
+        <SliderInput label="Cert Cost (₹L)" value={certCost} min={0} max={6} step={0.1}
+          onChange={setCertCost} prefix="₹" suffix="L" color="#6366F1"
+          note={`${INDIA_CONTEXT.currency}${(certCost * 100000).toLocaleString('en-IN')} total investment`} />
+        {!isStudent && (
+          <SliderInput label="Expected Hike %" value={hikePercent} min={5} max={80} step={5}
+            onChange={setHikePercent} suffix="%" color="#10B981"
+            note="After cert + job switch. India median: 25–40%" />
+        )}
+      </div>
 
-        {/* ── HERO ─────────────────────────────────────────── */}
-        <div ref={heroRef} style={{ maxWidth: '960px', margin: '0 auto', padding: '120px 24px 80px', textAlign: 'center' }}>
-          <motion.div style={{ y: heroY, opacity: heroOp, scale: heroSc }}>
+      {/* ── ROI output ── */}
+      <AnimatePresence mode="wait">
+        <motion.div key={`${salary}-${certCost}-${hikePercent}-${mode}`}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
 
-            {/* Badge */}
-            <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 18px', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(99,102,241,0.18), rgba(16,185,129,0.1))', border: '1px solid rgba(99,102,241,0.35)', fontSize: '12px', color: 'var(--indigo-light)', marginBottom: '32px', letterSpacing: '0.07em', fontFamily: 'JetBrains Mono, monospace' }}>
-              <Award size={13} />
-              INDIA'S FIRST AI CERT ROI CALCULATOR
+          {isStudent ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: '10px', marginBottom: '16px' }}>
+              <StatCard label="Target Offer"       value="₹4.8L+"                                              color="#818CF8" delay={0}    />
+              <StatCard label="Est. Time"          value={`${Math.ceil(certCost * 12 + 3)} mo`}                color="#10B981" delay={0.05} />
+              <StatCard label="Cert Investment"    value={`₹${certCost}L`}                                     color="#F59E0B" delay={0.1}  />
+              {roi.careerMultiplier && <StatCard label="Career Multiplier" value={`${roi.careerMultiplier}x`}  color="#51B1E7" delay={0.15} />}
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: '10px', marginBottom: '16px' }}>
+              <StatCard label="New Salary"    value={`₹${roi.newSalaryL}L`}                                                         color="#51B1E7" delay={0}    />
+              <StatCard label="Break-even"    value={roi.breakEvenMonths > 0 ? `${roi.breakEvenMonths} mo` : '—'} sub={roi.anchor}  color="#F59E0B" delay={0.05} />
+              <StatCard label="5-Yr Net Gain" value={`₹${roi.fiveYearGainL}L`}                                                      color="#10B981" delay={0.1}  />
+              <StatCard label="Monthly +"     value={`₹${roi.monthlyGainK}K`}                                                       color="#818CF8" delay={0.15} />
+            </div>
+          )}
+
+          {!isStudent && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+              style={{ marginBottom: '20px', padding: '11px 14px', borderRadius: '10px', background: roi.roiPercent > 200 ? 'rgba(16,185,129,0.07)' : roi.roiPercent > 0 ? 'var(--indigo-dim)' : 'rgba(239,68,68,0.07)', border: `1px solid ${roi.roiPercent > 200 ? 'rgba(16,185,129,0.2)' : roi.roiPercent > 0 ? 'var(--border-accent)' : 'rgba(239,68,68,0.2)'}`, display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Award size={15} color={roi.roiPercent > 200 ? '#10B981' : roi.roiPercent > 0 ? 'var(--indigo-light)' : '#EF4444'} />
+              <span style={{ fontFamily: F_MONO, fontSize: '13px', color: roi.roiPercent > 200 ? '#10B981' : roi.roiPercent > 0 ? 'var(--indigo-light)' : '#EF4444', fontWeight: '700' }}>
+                5-Year ROI: {roi.roiPercent}% · {roi.anchor}
+              </span>
             </motion.div>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
-            {/* Main headline — opinionated */}
-            <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }}
-              style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: 'clamp(3rem, 9vw, 7rem)', lineHeight: 0.9, letterSpacing: '-0.03em', color: 'var(--text)', marginBottom: '32px' }}>
-              YOUR NEXT CERT<br />
-              IS EITHER A <GGold>GOLDMINE</GGold><br />
-              OR A <GRed>WASTE OF MONEY.</GRed>
-            </motion.h1>
-
-            <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.5 }}
-              style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', color: 'var(--text-2)', maxWidth: '560px', margin: '0 auto 14px', lineHeight: '1.7', fontFamily: 'Inter, sans-serif' }}>
-              We tell you which one — in under 2 seconds — before you spend ₹50K and 6 months finding out the hard way.
-            </motion.p>
-
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
-              style={{ fontSize: '14px', color: 'var(--text-4)', marginBottom: '44px', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.05em' }}>
-              INDIA-SPECIFIC · AI-POWERED · FREE
-            </motion.p>
-
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
-              style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
-              <motion.button onClick={onEnter} whileHover={{ y: -4, scale: 1.03, boxShadow: '0 24px 48px rgba(81,177,231,0.45)' }} whileTap={{ scale: 0.96 }}
-                className="btn-primary" style={{ fontSize: '17px', padding: '18px 40px', display: 'flex', alignItems: 'center', gap: '9px', borderRadius: '14px' }}>
-                Is My Cert Worth It? <ArrowRight size={18} />
-              </motion.button>
-              <motion.button onClick={onEnter} whileHover={{ y: -4 }} whileTap={{ scale: 0.97 }}
-                className="btn-ghost" style={{ fontSize: '15px', padding: '18px 30px', display: 'flex', alignItems: 'center', gap: '7px', borderRadius: '14px' }}>
-                <FileText size={15} /> Find My Cert First
-              </motion.button>
-            </motion.div>
-
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-              style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>
-              Free · No signup · 3 free AI analyses · No "get a premium subscription to see results" nonsense
-            </motion.p>
-          </motion.div>
-        </div>
-
-        {/* ── TICKER ───────────────────────────────────────── */}
-        <Ticker />
-
-        {/* ── THE 11PM MOMENT ──────────────────────────────── */}
-        <div style={{ maxWidth: '860px', margin: '0 auto 100px', padding: '0 24px' }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', color: 'var(--text)', marginBottom: '12px', letterSpacing: '-0.02em' }}>
-              WE KNOW EXACTLY<br /><GPurple>WHAT YOU'RE GOING THROUGH</GPurple>
-            </h2>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
-            {[
-              {
-                time: '11:47 PM',
-                name: 'Rohan, 27 · Pune',
-                color: '#10B981',
-                msg: 'scrolling LinkedIn. Ex-classmate just got promoted to Senior Cloud Architect. ₹28L CTC. You\'re at ₹9L. Same college. Same year.',
-                thought: '"Should I do AWS? Or is it too late for me?"',
-                answer: 'It\'s not too late. AWS SAA break-even for you: 6 months. 5-year gain: ₹14.2L.',
-              },
-              {
-                time: '11:12 PM',
-                name: 'Sneha, 31 · Bangalore',
-                color: '#F59E0B',
-                msg: 'ops manager for 6 years. wants to move into data. every job posting says "3 years experience in data science required."',
-                thought: '"Is the switch even possible without going back to college?"',
-                answer: 'Google Data Analytics + 2 projects. 5 months. No MBA needed.',
-              },
-              {
-                time: '12:03 AM',
-                name: 'Arjun, 22 · Fresh grad',
-                color: '#818CF8',
-                msg: 'opened 3 cert comparison articles. all recommend AWS. all are written by Americans. all show salary in USD.',
-                thought: '"Which cert actually gets me placed in India?"',
-                answer: 'Student mode. India-specific. No salary field required.',
-              },
-            ].map((card, i) => (
-              <TiltCard key={i} glowColor={card.color} intensity={8}>
-                <div onClick={onEnter} style={{ padding: '26px', cursor: 'pointer' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <span style={{ fontSize: '10px', fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-4)', background: 'var(--bg)', padding: '4px 10px', borderRadius: '6px', border: '1px solid var(--border)' }}>{card.time}</span>
-                    <span style={{ fontSize: '11px', color: card.color, fontFamily: 'JetBrains Mono, monospace', fontWeight: '700' }}>{card.name}</span>
-                  </div>
-                  <p style={{ fontSize: '13px', color: 'var(--text-3)', lineHeight: '1.7', marginBottom: '14px', fontFamily: 'Inter, sans-serif' }}>{card.msg}</p>
-                  <div style={{ padding: '10px 14px', borderRadius: '10px', background: `${card.color}0c`, border: `1px solid ${card.color}22`, marginBottom: '14px' }}>
-                    <p style={{ fontSize: '14px', color: 'var(--text)', fontWeight: '700', fontFamily: 'Plus Jakarta Sans, sans-serif', fontStyle: 'italic' }}>{card.thought}</p>
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: card.color, marginTop: 5, flexShrink: 0 }} />
-                    <p style={{ fontSize: '13px', color: card.color, fontWeight: '600', fontFamily: 'Plus Jakarta Sans, sans-serif', margin: 0 }}>{card.answer}</p>
-                  </div>
-                  <motion.div whileHover={{ x: 5 }} style={{ display: 'flex', alignItems: 'center', gap: '5px', color: card.color, fontSize: '12px', fontWeight: '700', fontFamily: 'Plus Jakarta Sans, sans-serif', marginTop: '16px' }}>
-                    That's me tonight <ArrowRight size={12} />
-                  </motion.div>
-                </div>
-              </TiltCard>
-            ))}
-          </div>
-        </div>
-
-        {/* ── MONEY BURNING + BENTO ─────────────────────────── */}
-        <div style={{ maxWidth: '1060px', margin: '0 auto 100px', padding: '0 24px' }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text)', marginBottom: '10px', letterSpacing: '-0.02em' }}>
-              THE COST OF <GRed>DOING NOTHING</GRed>
-            </h2>
-            <p style={{ fontSize: '15px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>Every month you wait on the wrong decision costs real money</p>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-
-            {/* Money burning */}
-            <TiltCard glowColor="#EF4444" style={{ gridColumn: '1 / 2' }}>
-              <div style={{ padding: '28px' }}>
-                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '9px', color: '#EF4444', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '20px' }}>REAL-TIME COST OF INACTION</div>
-                <MoneyBurning />
-                <p style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif', marginTop: '16px', lineHeight: '1.6' }}>
-                  The average certified professional earns <strong style={{ color: 'var(--text)' }}>₹3.2L more per year</strong> than uncertified peers in the same role.
-                </p>
-              </div>
-            </TiltCard>
-
-            {/* ROI Calculator card */}
-            <TiltCard glowColor="#6366F1" style={{ gridColumn: '2 / 4' }}>
-              <div style={{ padding: '32px' }}>
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', alignItems: 'flex-start' }}>
-                  <div style={{ width: '50px', height: '50px', borderRadius: '14px', background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <TrendingUp size={22} color="#6366F1" />
-                  </div>
-                  <div>
-                    <h3 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '1.5rem', color: 'var(--text)', marginBottom: '4px', letterSpacing: '-0.02em' }}>
-                      <GPurple>ROI Calculator</GPurple>
-                    </h3>
-                    <p style={{ fontSize: '13px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>Not "career growth." Actual rupees.</p>
-                  </div>
-                </div>
-                <p style={{ fontSize: '14px', color: 'var(--text-3)', lineHeight: '1.7', fontFamily: 'Inter, sans-serif', marginBottom: '20px' }}>
-                  Enter your salary. Pick your cert. We calculate <strong style={{ color: 'var(--text)' }}>break-even date, 5-year gain, monthly delta</strong> — anchored to things you understand like "₹9.9L = Honda City down payment" not abstract percentages.
-                </p>
-                {/* Sample output */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '20px' }}>
-                  {[
-                    { label: 'Break-even', value: '6 months', color: '#F59E0B' },
-                    { label: '5-yr gain',  value: '₹14.2L',   color: '#10B981' },
-                    { label: 'Monthly +',  value: '₹23,600',  color: '#51B1E7' },
-                  ].map((s, i) => (
-                    <div key={i} style={{ padding: '12px', borderRadius: '10px', background: 'var(--bg)', border: '1px solid var(--border)', textAlign: 'center' }}>
-                      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '5px' }}>{s.label}</div>
-                      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.2rem', fontWeight: '700', color: s.color, letterSpacing: '-0.02em' }}>{s.value}</div>
-                    </div>
-                  ))}
-                </div>
-                <motion.button onClick={onEnter} whileHover={{ x: 4 }} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#818CF8', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-                  Calculate mine <ChevronRight size={16} />
-                </motion.button>
-              </div>
-            </TiltCard>
-
-            {/* Resume AI */}
-            <TiltCard glowColor="#10B981" style={{ gridColumn: '1 / 3' }}>
-              <div style={{ padding: '32px' }}>
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', alignItems: 'flex-start' }}>
-                  <div style={{ width: '50px', height: '50px', borderRadius: '14px', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Brain size={22} color="#10B981" />
-                  </div>
-                  <div>
-                    <h3 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '1.5rem', color: 'var(--text)', marginBottom: '4px' }}>
-                      <GGreen>Resume AI Analysis</GGreen>
-                    </h3>
-                    <p style={{ fontSize: '13px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>Reads your actual background. Not a generic quiz.</p>
-                  </div>
-                </div>
-                <p style={{ fontSize: '14px', color: 'var(--text-3)', lineHeight: '1.7', fontFamily: 'Inter, sans-serif', marginBottom: '18px' }}>
-                  Upload your resume. AI finds your skill gaps, matches them to India's 2026 job market, and gives you a <strong style={{ color: 'var(--text)' }}>personalised cert roadmap</strong> — not "everyone should do AWS."
-                </p>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
-                  {['Reads your domain', 'Detects your city', 'Ranks by YOUR salary', 'Gives a first step'].map((tag, i) => (
-                    <span key={i} style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '6px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#10B981', fontFamily: 'JetBrains Mono, monospace' }}>{tag}</span>
-                  ))}
-                </div>
-              </div>
-            </TiltCard>
-
-            {/* Heatmap */}
-            <TiltCard glowColor="#F59E0B">
-              <div style={{ padding: '28px' }}>
-                <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
-                  <Map size={20} color="#F59E0B" />
-                </div>
-                <h3 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '1.2rem', color: 'var(--text)', marginBottom: '6px' }}>
-                  <GGold>City Demand</GGold>
-                </h3>
-                <p style={{ fontSize: '13px', color: 'var(--text-3)', lineHeight: '1.6', fontFamily: 'Inter, sans-serif', marginBottom: '16px' }}>
-                  Is this cert hot in Bangalore? Saturated in Pune? 8 cities × 8 domains.
-                </p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
-                  {[0.9,0.6,0.3,0.8,0.7,0.4,0.95,0.5,0.2,0.85,0.6,0.4].map((v, i) => (
-                    <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
-                      style={{ height: '16px', borderRadius: '3px', background: `rgba(245,158,11,${v})` }} />
-                  ))}
-                </div>
-              </div>
-            </TiltCard>
-          </div>
-        </div>
-
-        {/* ── WHAT MAKES US DIFFERENT ───────────────────────── */}
-        <div style={{ maxWidth: '860px', margin: '0 auto 100px', padding: '0 24px' }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text)', marginBottom: '12px', letterSpacing: '-0.02em' }}>
-              EVERY OTHER SITE IS <GRed>LYING TO YOU</GRed>
-            </h2>
-            <p style={{ fontSize: '15px', color: 'var(--text-3)', maxWidth: '560px', margin: '0 auto', fontFamily: 'Inter, sans-serif', lineHeight: '1.7' }}>
-              They show you US salary data and call it "market research." They recommend the cert that pays them affiliate commission. They don't know what Naukri looks like today in Hyderabad.
-            </p>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '16px' }}>
-            {[
-              {
-                bad: '❌ Generic cert ranking articles',
-                good: '✅ Your cert, your salary, your city',
-                desc: 'We calculate ROI for YOUR specific numbers. Not "AWS is good for cloud engineers."',
-                color: '#10B981',
-              },
-              {
-                bad: '❌ "Upskill for career growth"',
-                good: '✅ Break-even: 6 months. Gain: ₹14.2L.',
-                desc: 'Concrete rupee amounts. Anchored to things you understand. No vague career advice.',
-                color: '#6366F1',
-              },
-              {
-                bad: '❌ US salary data dressed up as India data',
-                good: '✅ Naukri + AmbitionBox + LinkedIn India',
-                desc: 'Every number comes from actual Indian job market data. Not converted from dollars.',
-                color: '#F59E0B',
-              },
-              {
-                bad: '❌ Same advice for everyone',
-                good: '✅ AI reads YOUR resume',
-                desc: 'A data analyst and a DevOps engineer need completely different certs. We know the difference.',
-                color: '#51B1E7',
-              },
-            ].map((item, i) => (
-              <TiltCard key={i} glowColor={item.color} intensity={7}>
-                <div style={{ padding: '24px' }}>
-                  <div style={{ fontSize: '13px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif', marginBottom: '8px', textDecoration: 'line-through' }}>{item.bad}</div>
-                  <div style={{ fontSize: '15px', color: item.color, fontWeight: '700', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '10px' }}>{item.good}</div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: 'Inter, sans-serif', lineHeight: '1.65' }}>{item.desc}</div>
-                </div>
-              </TiltCard>
-            ))}
-          </div>
-        </div>
-
-        {/* ── MODES ────────────────────────────────────────── */}
-        <div style={{ maxWidth: '720px', margin: '0 auto 100px', padding: '0 24px' }}>
-          <NeonCard color="#6366F1">
-            <div style={{ padding: '44px 36px', textAlign: 'center' }}>
-              <div style={{ fontSize: '11px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px', fontFamily: 'JetBrains Mono, monospace' }}>Adapts to who you are</div>
-              <h2 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '2.2rem', color: 'var(--text)', marginBottom: '28px', letterSpacing: '-0.02em' }}>
-                <GPurple>THREE MODES.</GPurple> ONE TOOL.
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '32px' }}>
-                {[
-                  { icon: GraduationCap, color: '#818CF8', label: 'Student',      sub: 'No job yet',       desc: 'Path to ₹4.8L first offer' },
-                  { icon: Repeat,        color: '#F59E0B', label: 'Switcher',     sub: 'Changing fields',  desc: 'Bridge skills gap' },
-                  { icon: Briefcase,     color: '#10B981', label: 'Professional', sub: 'Levelling up',     desc: 'Max ROI on next cert' },
-                ].map((m, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                    whileHover={{ y: -5, scale: 1.04 }}
-                    style={{ padding: '20px 14px', borderRadius: '14px', background: `${m.color}0e`, border: `1px solid ${m.color}28`, cursor: 'pointer' }}>
-                    <m.icon size={24} color={m.color} style={{ margin: '0 auto 10px', display: 'block' }} />
-                    <div style={{ fontSize: '14px', fontWeight: '700', color: m.color, marginBottom: '2px', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{m.label}</div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-4)', marginBottom: '6px', fontFamily: 'JetBrains Mono, monospace' }}>{m.sub}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-3)', fontFamily: 'Inter, sans-serif' }}>{m.desc}</div>
-                  </motion.div>
-                ))}
-              </div>
-              <motion.button onClick={onEnter} whileHover={{ y: -4, scale: 1.03, boxShadow: '0 20px 44px rgba(81,177,231,0.4)' }} whileTap={{ scale: 0.97 }}
-                className="btn-primary" style={{ fontSize: '16px', padding: '16px 38px', display: 'inline-flex', alignItems: 'center', gap: '9px', borderRadius: '14px' }}>
-                <Zap size={16} /> Pick My Mode
-              </motion.button>
-            </div>
-          </NeonCard>
-        </div>
-
-        {/* ── SOCIAL PROOF ─────────────────────────────────── */}
-        <div style={{ maxWidth: '1060px', margin: '0 auto 100px', padding: '0 24px' }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text)', marginBottom: '10px', letterSpacing: '-0.02em' }}>
-              THEY USED THE DATA. <GGreen>IT WORKED.</GGreen>
-            </h2>
-            <p style={{ fontSize: '14px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>Numbers don't lie. Neither do these people.</p>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-            {[
-              { name: 'Priya S.',  role: 'Software Engineer → Cloud Architect', city: 'Bangalore', text: 'CertifyROI told me AWS SAA break-even was 8 months on my salary. It was actually 7. Switched companies 7 months in. ₹6L hike.', hike: '+₹6L/yr',      color: '#10B981' },
-              { name: 'Rahul M.',  role: 'Ops Manager → Data Analyst',          city: 'Hyderabad', text: 'Was about to do an MBA. Resume AI showed me Google Data Analytics + 2 projects gets me to the same place in 5 months at 1% of the cost.', hike: 'Saved ₹12L', color: '#6366F1' },
-              { name: 'Ananya K.', role: 'Fresh Graduate',                       city: 'Pune',      text: 'Every site recommended AWS. Student Mode showed GCP cert had faster placement for freshers in Pune specifically. Got ₹5.2L offer.', hike: '₹5.2L offer', color: '#818CF8' },
-            ].map((t, i) => (
-              <TiltCard key={i} glowColor={t.color} intensity={7}>
-                <div style={{ padding: '28px' }}>
-                  <div style={{ display: 'flex', gap: '3px', marginBottom: '16px' }}>
-                    {[1,2,3,4,5].map(s => <Star key={s} size={13} color="#F59E0B" fill="#F59E0B" />)}
-                  </div>
-                  <p style={{ fontSize: '14px', color: 'var(--text-2)', lineHeight: '1.75', marginBottom: '20px', fontStyle: 'italic', fontFamily: 'Inter, sans-serif' }}>"{t.text}"</p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                    <div>
-                      <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text)', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{t.name}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '2px', fontFamily: 'Inter, sans-serif' }}>{t.role}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: 'Inter, sans-serif' }}>{t.city}</div>
-                    </div>
-                    <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.3rem', fontWeight: '700', background: `linear-gradient(135deg, ${t.color}, ${t.color}77)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', letterSpacing: '-0.02em', textAlign: 'right' }}>
-                      {t.hike}
-                    </div>
-                  </div>
-                </div>
-              </TiltCard>
-            ))}
-          </div>
-        </div>
-
-        {/* ── FINAL CTA ─────────────────────────────────────── */}
-        <div style={{ maxWidth: '760px', margin: '0 auto 80px', padding: '0 24px' }}>
-          <TiltCard glowColor="#6366F1" intensity={5} style={{ textAlign: 'center' }}>
-            <div style={{ padding: '60px 44px' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🎯</div>
-              <h2 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: 'clamp(2rem, 5vw, 3.2rem)', color: 'var(--text)', marginBottom: '16px', letterSpacing: '-0.02em' }}>
-                2 MINUTES FROM NOW<br />
-                <GPurple>YOU'LL KNOW THE ANSWER</GPurple>
-              </h2>
-              <p style={{ fontSize: '16px', color: 'var(--text-3)', marginBottom: '36px', lineHeight: '1.8', fontFamily: 'Inter, sans-serif', maxWidth: '460px', margin: '0 auto 36px' }}>
-                Stop reading about certifications. Stop asking in Reddit threads. Stop letting family pressure make the decision.{' '}
-                <strong style={{ color: 'var(--text)' }}>Run the numbers.</strong>
-              </p>
-              <motion.button onClick={onEnter} whileHover={{ y: -5, scale: 1.04, boxShadow: '0 28px 56px rgba(81,177,231,0.45)' }} whileTap={{ scale: 0.96 }}
-                className="btn-primary" style={{ fontSize: '18px', padding: '22px 52px', display: 'inline-flex', alignItems: 'center', gap: '10px', borderRadius: '16px' }}>
-                Run My Numbers Now <ArrowRight size={20} />
-              </motion.button>
-              <div style={{ fontSize: '12px', color: 'var(--text-4)', marginTop: '16px', fontFamily: 'Inter, sans-serif' }}>
-                Free · No card · No signup · No "upgrade to see results"
-              </div>
-            </div>
-          </TiltCard>
-        </div>
-
-        {/* ── FOOTER ───────────────────────────────────────── */}
-        <div style={{ borderTop: '1px solid var(--border)', padding: '28px 24px', textAlign: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px', marginBottom: '10px' }}>
-            <div style={{ width: '30px', height: '30px', background: 'linear-gradient(135deg, #6366F1, #4338CA)', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <TrendingUp size={15} color="white" />
-            </div>
-            <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '19px', letterSpacing: '-0.01em', color: 'var(--text)' }}>
-              Certify<G colors={['#6366F1', '#818CF8']}>ROI</G>
+      {/* ── Chart ── */}
+      {!isStudent && roi.chartData?.length > 0 && (
+        <div style={{ marginBottom: '24px', padding: '20px', borderRadius: '14px', background: 'var(--surface)', border: '1px solid var(--glass-border)' }}>
+          <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '14px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <span>CUMULATIVE GAIN (₹K) · 24 MONTHS</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <span style={{ width: 12, height: 2, background: '#10B981', display: 'inline-block', borderRadius: 1 }} /> With Cert
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <span style={{ width: 12, height: 2, background: '#475569', display: 'inline-block', borderRadius: 1 }} /> Inaction
             </span>
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--text-4)', marginBottom: '6px', fontFamily: 'Inter, sans-serif' }}>
-            India's First AI-Powered Cert ROI Calculator · Powered by Groq llama-3.3-70b
-          </p>
-          <p style={{ fontSize: '11px', color: 'var(--text-4)', opacity: 0.5, fontFamily: 'Inter, sans-serif' }}>
-            Data: LinkedIn Economic Graph · NASSCOM · AmbitionBox · Naukri · WEF 2026
-          </p>
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={roi.chartData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'var(--text-4)', fontFamily: F_MONO }} axisLine={false} tickLine={false} interval={4} />
+              <YAxis tick={{ fontSize: 10, fill: 'var(--text-4)', fontFamily: F_MONO }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v}K`} />
+              <Tooltip content={<ChartTip />} />
+              <ReferenceLine y={0} stroke="rgba(255,255,255,0.08)" strokeDasharray="4 4" />
+              <Line type="monotone" dataKey="action"   name="With Cert" stroke="#10B981" strokeWidth={2.5} dot={false} activeDot={{ r: 4, fill: '#10B981' }} />
+              <Line type="monotone" dataKey="inaction" name="Inaction"  stroke="#475569" strokeWidth={1.5} strokeDasharray="5 4" dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
+      )}
 
+      {/* ── AI analysis button ── */}
+      <div style={{ marginBottom: '20px' }}>
+        {aiError && (
+          <div style={{ marginBottom: '12px', padding: '10px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', fontSize: '13px', color: '#EF4444', fontFamily: F_BODY }}>
+            {aiError}
+          </div>
+        )}
+        {!aiResult && !aiLoading && (
+          <motion.button
+            onClick={handleAnalyse}
+            disabled={!certName || aiLoading || (!user && guest.exceeded)}
+            whileHover={{ y: -3, scale: 1.02, boxShadow: '0 16px 36px rgba(99,102,241,0.35)' }}
+            whileTap={{ scale: 0.97 }}
+            style={{ width: '100%', padding: '16px 24px', borderRadius: '12px', background: 'linear-gradient(135deg, #6366F1, #4338CA)', border: 'none', color: 'white', fontSize: '15px', fontWeight: '700', cursor: certName && (user || !guest.exceeded) ? 'pointer' : 'not-allowed', fontFamily: F_HEAD, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', opacity: (!certName || (!user && guest.exceeded)) ? 0.45 : 1, letterSpacing: '-0.01em', transition: 'opacity 0.2s' }}
+          >
+            <Zap size={17} />
+            Get AI ROI Analysis
+            {!user && !guest.exceeded && (
+              <span style={{ fontSize: '11px', opacity: 0.75, fontFamily: F_MONO }}>({guest.remaining} free left)</span>
+            )}
+          </motion.button>
+        )}
+        {aiLoading && <AILoadingState certName={certName} />}
+        {aiResult && <AIResult result={aiResult} certName={certName} onReset={() => setAiResult(null)} />}
       </div>
+
+      {/* ── Extra tools ── */}
+      {certName && (
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+          <button onClick={() => setShowBurnRate(v => !v)}
+            style={{ padding: '8px 14px', borderRadius: '9px', background: showBurnRate ? 'rgba(245,158,11,0.1)' : 'var(--surface)', border: `1px solid ${showBurnRate ? 'rgba(245,158,11,0.3)' : 'var(--border)'}`, color: showBurnRate ? '#F59E0B' : 'var(--text-3)', fontSize: '12px', cursor: 'pointer', fontFamily: F_BODY, fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.18s' }}>
+            <Flame size={13} /> Study Tracker
+          </button>
+          <button onClick={() => setShowVerifier(v => !v)}
+            style={{ padding: '8px 14px', borderRadius: '9px', background: showVerifier ? 'rgba(16,185,129,0.1)' : 'var(--surface)', border: `1px solid ${showVerifier ? 'rgba(16,185,129,0.25)' : 'var(--border)'}`, color: showVerifier ? '#10B981' : 'var(--text-3)', fontSize: '12px', cursor: 'pointer', fontFamily: F_BODY, fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.18s' }}>
+            <CheckCircle size={13} /> Verify My Hike
+          </button>
+        </div>
+      )}
+
+      <AnimatePresence>
+        {showBurnRate && (
+          <motion.div key="br" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={T}
+            style={{ marginBottom: '16px', padding: '20px', borderRadius: '14px', background: 'var(--surface)', border: '1px solid var(--glass-border)' }}>
+            <BurnRate certName={certName} breakEvenMonths={roi.breakEvenMonths || 6} />
+          </motion.div>
+        )}
+        {showVerifier && (
+          <motion.div key="hv" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={T}>
+            <HikeVerifier certName={certName} projectedHike={hikePercent} onClose={() => setShowVerifier(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
 
-export default LandingPage
+export default Hero
