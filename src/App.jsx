@@ -1,3 +1,4 @@
+import CertCompare from './components/CertCompare.jsx'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -298,6 +299,7 @@ const APP_TABS = [
   { id: 'resume',     label: 'Step 1 · Find Cert',  icon: FileText,      desc: 'Upload resume → AI picks your cert'      },
   { id: 'calculator', label: 'Step 2 · ROI',         icon: TrendingUp,    desc: 'Break-even, 5yr gain, Ghost of Inaction' },
   { id: 'heatmap',    label: 'Step 3 · City',        icon: Map,           desc: 'Is this cert hot in your city?'          },
+  { id: 'compare',    label: 'Step 4 · Compare',     icon: Award,         desc: 'Compare two certs side by side'          },
   { id: 'college',    label: 'Degree vs Certs',      icon: GraduationCap, desc: 'MBA vs 4 certifications — numbers'       },
 ]
 
@@ -598,6 +600,11 @@ const AppPage = ({ activeTab, onTabChange, mode, onModeChange, onCertSelected, p
                   <Heatmap prefilledCity={resumeCity} prefilledDomain={resumeDomain} certName={prefilledCert} resumeName={resumeName} />
                 </div>
               )}
+              {activeTab === 'compare' && (
+  <div className="glass" style={{ padding: '28px' }}>
+    <CertCompare salary={mode === 'student' ? 4.8 : 8} prefilledCert={prefilledCert} />
+  </div>
+)}
 
               {activeTab === 'college' && (
                 <div className="glass" style={{ padding: '28px' }}>

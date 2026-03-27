@@ -170,6 +170,26 @@ const MoneyCounter = () => {
 }
 
 // ── Cert assembly (300vh sticky scroll) ───────────────────────
+// Theme-aware overlay for cert assembly dark screen effect
+const ThemeAwareOverlay = ({ opacity }) => {
+  const [isDark, setIsDark] = useState(
+    () => document.documentElement.getAttribute('data-theme') !== 'light'
+  )
+  useEffect(() => {
+    const obs = new MutationObserver(() =>
+      setIsDark(document.documentElement.getAttribute('data-theme') !== 'light')
+    )
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => obs.disconnect()
+  }, [])
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+      background: isDark ? '#020408' : '#F0EDE8',
+      opacity,
+    }} />
+  )
+}
 const CertAssembly = () => {
   const trackRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ['start start', 'end end'] })
@@ -219,7 +239,7 @@ const CertAssembly = () => {
     <div ref={trackRef} className="cert-assembly-track" style={{ height: '300vh', position: 'relative' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
-        <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: '#020408', opacity: overlayOp }} />
+        <ThemeAwareOverlay opacity={overlayOp} />
 
         <div style={{
           position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none', opacity: gridOp,
