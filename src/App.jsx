@@ -1,3 +1,4 @@
+import JobCertMap from './components/JobCertMap.jsx'
 import CertCompare from './components/CertCompare.jsx'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -5,7 +6,8 @@ import {
   TrendingUp, FileText, Map, LogIn, LogOut, User,
   Menu, X, Home, Info, Phone, BookOpen,
   Shield, ChevronRight, Sparkles, Mail, FileCheck,
-  GraduationCap, Flame, CheckCircle, Brain, Award
+  GraduationCap, Flame, CheckCircle, Brain, Award,
+  Route, Building2
 } from 'lucide-react'
 import { AuthProvider, useAuth } from './hooks/useAuth.jsx'
 import { ThemeProvider } from './hooks/useTheme.jsx'
@@ -301,6 +303,7 @@ const APP_TABS = [
   { id: 'heatmap',    label: 'Step 3 · City',        icon: Map,           desc: 'Is this cert hot in your city?'          },
   { id: 'compare',    label: 'Step 4 · Compare',     icon: Award,         desc: 'Compare two certs side by side'          },
   { id: 'college',    label: 'Degree vs Certs',      icon: GraduationCap, desc: 'MBA vs 4 certifications — numbers'       },
+  { id: 'jobmap', label: 'Cert → Job Map', icon: Building2, desc: 'Which cert gets which role' },
 ]
 
 const HAMBURGER_FEATURES = [
