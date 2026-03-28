@@ -540,85 +540,79 @@ backdropFilter: 'blur(20px)',
 // ─────────────────────────────────────────────────────────
 // APP PAGE — contrasting dark-purple bg with wave
 // ─────────────────────────────────────────────────────────
-const AppPage = ({ activeTab, onTabChange, mode, onModeChange, onCertSelected, prefilledCert, resumeCity, resumeDomain, resumeName }) => {
-  const banners = {
-    resume:     { color: 'var(--indigo-light)', bg: 'var(--indigo-dim)',          border: 'var(--border-accent)',         icon: FileText,      title: 'Step 1 — Find Your Cert',      body: "Don't know which cert? Upload your resume. AI reads your skills, goal, and domain — recommends top 3 with one ", bold: 'Primary Move.',                              sub: 'Click any cert to jump to Step 2 pre-filled.' },
-    calculator: { color: 'var(--emerald-light)', bg: 'rgba(16,185,129,0.06)',     border: 'rgba(16,185,129,0.2)',         icon: TrendingUp,    title: 'Step 2 — Calculate ROI',       body: 'Know which cert you want? Enter salary, cost, hike. See your ',                                              bold: 'break-even date, 5-year gain, and Ghost of Inaction cost.', sub: 'After AI analysis: Pitch My Boss, Track Progress, Verify Real Hike.' },
-    heatmap:    { color: 'var(--amber)',          bg: 'rgba(245,158,11,0.06)',     border: 'rgba(245,158,11,0.2)',         icon: Map,           title: 'Step 3 — Check City Demand',   body: 'See demand across 8 Indian cities. ',                                                                        bold: 'High demand = more leverage negotiating your hike.',         sub: null },
-    college:    { color: 'var(--indigo-light)',   bg: 'var(--indigo-dim)',         border: 'var(--border-accent)',         icon: GraduationCap, title: 'Degree vs Certifications',    body: 'MBA or 4 certs? Run the actual numbers — cost, opportunity cost, 5-year earnings. ',                          bold: 'Data over family pressure.',                                 sub: null },
-  }
+const firstName = resumeName ? resumeName.split(' ')[0] : ''
+const certShort = prefilledCert ? prefilledCert.split(' ').slice(0, 3).join(' ') : ''
 
-  const b        = banners[activeTab]
-  const maxWidth = activeTab === 'resume' ? '720px' : activeTab === 'college' ? '900px' : activeTab === 'heatmap' ? '1000px' : '1100px'
-  const NAV_H    = 64
-  const TABS_H   = 48
-
-  return (
-    <div style={{ paddingTop: `${NAV_H + TABS_H}px`, minHeight: '100vh', background: 'var(--app-bg)', position: 'relative' }}>
-      {/* App-page wave background — contrasting to landing */}
-      <WaveBg variant="app" />
-
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '20px 20px 0' }}>
-          <ModeSelector activeMode={mode} onChange={onModeChange} />
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={T}
-          >
-            <div style={{ maxWidth, margin: '0 auto', padding: '0 20px 60px' }}>
-              {b && (
-                <div className="app-banner" style={{ marginBottom: '20px', padding: '14px 16px', borderRadius: '12px', background: b.bg, border: `1px solid ${b.border}`, transition: 'background 0.3s' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <b.icon size={15} color={b.color} />
-                    <span style={{ fontSize: '14px', fontWeight: '700', color: b.color, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{b.title}</span>
-                  </div>
-                  <p style={{ fontSize: '14px', color: 'var(--text-2)', lineHeight: '1.65', fontFamily: 'Inter, sans-serif', margin: 0 }}>
-                    {b.body}<strong style={{ color: 'var(--text)' }}>{b.bold}</strong>
-                    {b.sub && <span style={{ color: 'var(--text-3)', display: 'block', marginTop: '4px', fontSize: '13px' }}>{b.sub}</span>}
-                  </p>
-                </div>
-              )}
-
-              {activeTab === 'resume' && (
-                <div className="glass" style={{ padding: '28px' }}>
-                  <ResumeAnalyzer mode={mode} onCertSelected={(certName, city, domain, name) => { onCertSelected(certName, city, domain, name) }} />
-                </div>
-              )}
-
-              {activeTab === 'calculator' && (
-                <Hero mode={mode} prefilledCert={prefilledCert} resumeName={resumeName} />
-              )}
-
-              {activeTab === 'heatmap' && (
-                <div className="glass" style={{ padding: '28px' }}>
-                  <Heatmap prefilledCity={resumeCity} prefilledDomain={resumeDomain} certName={prefilledCert} resumeName={resumeName} />
-                </div>
-              )}
-              {activeTab === 'compare' && (
-  <div className="glass" style={{ padding: '28px' }}>
-    <CertCompare salary={mode === 'student' ? 4.8 : 8} prefilledCert={prefilledCert} />
-  </div>
-)}
-
-              {activeTab === 'college' && (
-                <div className="glass" style={{ padding: '28px' }}>
-                  <CollegeVsCorporate />
-                </div>
-              )}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </div>
-  )
+const banners = {
+  resume: {
+    color: 'var(--indigo-light)',
+    bg: 'var(--indigo-dim)',
+    border: 'var(--border-accent)',
+    icon: FileText,
+    title: firstName ? `Hey ${firstName} — Let's Find Your Cert` : 'Step 1 — Find Your Cert',
+    body: firstName
+      ? `Upload your resume, ${firstName}. AI reads your actual skills and maps them to India's 2026 job market — recommends top 3 with one `
+      : "Don't know which cert? Upload your resume. AI reads your skills, goal, and domain — recommends top 3 with one ",
+    bold: 'Primary Move.',
+    sub: 'Click any cert to jump to Step 2 pre-filled.',
+  },
+  calculator: {
+    color: 'var(--emerald-light)',
+    bg: 'rgba(16,185,129,0.06)',
+    border: 'rgba(16,185,129,0.2)',
+    icon: TrendingUp,
+    title: firstName && certShort
+      ? `${firstName} — Is ${certShort} Worth It?`
+      : firstName
+      ? `${firstName} — Calculate Your ROI`
+      : 'Step 2 — Calculate ROI',
+    body: certShort
+      ? `Running the numbers for ${certShort}. See your exact `
+      : 'Know which cert you want? Enter salary, cost, hike. See your ',
+    bold: 'break-even date, 5-year gain, and Ghost of Inaction cost.',
+    sub: 'After AI analysis: Pitch My Boss, Track Progress, Verify Real Hike.',
+  },
+  heatmap: {
+    color: 'var(--amber)',
+    bg: 'rgba(245,158,11,0.06)',
+    border: 'rgba(245,158,11,0.2)',
+    icon: Map,
+    title: resumeCity && certShort
+      ? `${certShort} Demand in ${resumeCity}`
+      : resumeCity
+      ? `Cert Demand in ${resumeCity}`
+      : 'Step 3 — Check City Demand',
+    body: resumeCity
+      ? `Showing demand data for ${resumeCity}${certShort ? ` · ${certShort}` : ''}. `
+      : 'See demand across 8 Indian cities. ',
+    bold: 'High demand = more leverage negotiating your hike.',
+    sub: null,
+  },
+  compare: {
+    color: 'var(--indigo-light)',
+    bg: 'var(--indigo-dim)',
+    border: 'var(--border-accent)',
+    icon: Award,
+    title: certShort
+      ? `Compare ${certShort} vs Another`
+      : 'Step 4 — Compare Certifications',
+    body: certShort
+      ? `${certShort} is pre-loaded. Pick a second cert to compare break-even, 5-year gain, and demand `
+      : 'Pick two certifications and compare break-even, 5-year gain, and demand ',
+    bold: 'side by side.',
+    sub: null,
+  },
+  college: {
+    color: 'var(--indigo-light)',
+    bg: 'var(--indigo-dim)',
+    border: 'var(--border-accent)',
+    icon: GraduationCap,
+    title: firstName ? `${firstName} — MBA or Certs?` : 'Degree vs Certifications',
+    body: 'MBA or 4 certs? Run the actual numbers — cost, opportunity cost, 5-year earnings. ',
+    bold: 'Data over family pressure.',
+    sub: null,
+  },
 }
-
 // ─────────────────────────────────────────────────────────
 // FOOTER
 // ─────────────────────────────────────────────────────────
