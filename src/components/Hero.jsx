@@ -145,7 +145,6 @@ const AIResult = ({ result, certName, onReset }) => {
 const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '', resumeCity = '' }) => {
   const isStudent = mode === 'student'
 
-  const { useLocalStorage } = await import('../hooks/hooks.jsx')
 
 const [domain,       setDomain]       = useState('all')
 const [certName,     setCertName]     = useState(prefilledCert || '')
