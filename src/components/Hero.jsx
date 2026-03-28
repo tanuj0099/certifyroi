@@ -9,7 +9,7 @@ import {
   ResponsiveContainer, ReferenceLine, CartesianGrid
 } from 'recharts'
 import { CERTIFICATIONS, CERT_DOMAINS, INDIA_CONTEXT, GUEST_FREE_LIMIT } from '../tokens.js'
-import { useROICalc, useGuestCounter } from '../hooks/hooks.jsx'
+import { useROICalc, useGuestCounter, useLocalStorage, useDebounce } from '../hooks/hooks.jsx'
 import { useAuth } from '../hooks/useAuth.jsx'
 import { analyzeROI } from '../services/aiService.jsx'
 import AILoadingState from './AILoadingState.jsx'
@@ -145,18 +145,23 @@ const AIResult = ({ result, certName, onReset }) => {
 const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '', resumeCity = '' }) => {
   const isStudent = mode === 'student'
 
-  const [domain,       setDomain]       = useState('all')
-  const [certName,     setCertName]     = useState(prefilledCert || '')
-  const [selectedCert, setSelectedCert] = useState(null)
-  const [salary,       setSalary]       = useState(isStudent ? 0 : 8)
-  const [certCost,     setCertCost]     = useState(2)
-  const [hikePercent,  setHikePercent]  = useState(30)
-  const [aiResult,     setAiResult]     = useState(null)
-  const [aiLoading,    setAiLoading]    = useState(false)
-  const [aiError,      setAiError]      = useState(null)
-  const [showBurnRate, setShowBurnRate] = useState(false)
-  const [showVerifier, setShowVerifier] = useState(false)
+  const { useLocalStorage } = await import('../hooks/hooks.jsx')
 
+const [domain,       setDomain]       = useState('all')
+const [certName,     setCertName]     = useState(prefilledCert || '')
+const [selectedCert, setSelectedCert] = useState(null)
+const [aiResult,     setAiResult]     = useState(null)
+const [aiLoading,    setAiLoading]    = useState(false)
+const [aiError,      setAiError]      = useState(null)
+const [showBurnRate, setShowBurnRate] = useState(false)
+const [showVerifier, setShowVerifier] = useState(false)
+const [cooldown,    setCooldown]    = useState(0)
+
+
+// Persisted — survives refresh, back navigation, accidental swipe
+const [salary,      setSalary]      = useLocalStorage('croi_salary',      isStudent ? 0 : 8)
+const [certCost,    setCertCost]    = useLocalStorage('croi_cert_cost',    2)
+const [hikePercent, setHikePercent] = useLocalStorage('croi_hike_percent', 30)
   const { user } = useAuth()
   const guest    = useGuestCounter(GUEST_FREE_LIMIT)
 
@@ -174,6 +179,13 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '', resu
       setHikePercent(found.avgHike)
     }
   }, [prefilledCert])
+
+  // Cooldown timer — counts down visually after each AI call
+useEffect(() => {
+  if (cooldown <= 0) return
+  const t = setTimeout(() => setCooldown(v => v - 1), 1000)
+  return () => clearTimeout(t)
+}, [cooldown])
 
   useEffect(() => { if (isStudent) setSalary(0) }, [isStudent])
 
@@ -193,19 +205,21 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '', resu
   }, [])
 
   const handleAnalyse = useCallback(async () => {
-    if (!certName.trim())        { setAiError('Select a certification first'); return }
-    if (!user && guest.exceeded) { setAiError(`Free limit reached — sign in for unlimited`); return }
-    setAiLoading(true); setAiResult(null); setAiError(null)
-    try {
-      const result = await analyzeROI({ certName, currentSalary: salary, certCost, hikePercent, isStudent })
-      setAiResult(result)
-      if (!user) guest.increment()
-    } catch (e) {
-      setAiError(e.message?.includes('endpoint not found')
-        ? 'Run: vercel dev (not npm run dev) to enable AI'
-        : e.message || 'Analysis failed')
-    } finally { setAiLoading(false) }
-  }, [certName, salary, certCost, hikePercent, isStudent, user, guest])
+  if (!certName.trim())        { setAiError('Select a certification first'); return }
+  if (!user && guest.exceeded) { setAiError('Free limit reached — sign in for unlimited'); return }
+  if (cooldown > 0)            { return }
+  setAiLoading(true); setAiResult(null); setAiError(null)
+  try {
+    const result = await analyzeROI({ certName, currentSalary: salary, certCost, hikePercent, isStudent })
+    setAiResult(result)
+    if (!user) guest.increment()
+    setCooldown(10) // 10 second cooldown after each call
+  } catch (e) {
+    setAiError(e.message?.includes('endpoint not found')
+      ? 'Run: vercel dev (not npm run dev) to enable AI'
+      : e.message || 'Analysis failed')
+  } finally { setAiLoading(false) }
+}, [certName, salary, certCost, hikePercent, isStudent, user, guest, cooldown])
 
   const firstName = resumeName ? resumeName.split(' ')[0] : ''
 
@@ -379,80 +393,46 @@ const Hero = ({ mode = 'professional', prefilledCert = '', resumeName = '', resu
       )}
 
       {/* ── AI analysis ── */}
-      <div style={{ marginBottom: '18px' }}>
-        {aiError && (
-          <div style={{ marginBottom: '10px', padding: '9px 13px', borderRadius: '9px', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', fontSize: '12px', color: '#EF4444', fontFamily: F_BODY }}>
-            {aiError}
-          </div>
+      {!aiResult && !aiLoading && (
+  <motion.button
+    onClick={handleAnalyse}
+    disabled={!certName || aiLoading || (!user && guest.exceeded) || cooldown > 0}
+    whileHover={cooldown === 0 ? { y: -3, scale: 1.02, boxShadow: '0 16px 36px rgba(99,102,241,0.35)' } : {}}
+    whileTap={cooldown === 0 ? { scale: 0.97 } : {}}
+    style={{
+      width: '100%', padding: '15px 24px', borderRadius: '12px',
+      background: cooldown > 0
+        ? 'var(--surface)'
+        : 'linear-gradient(135deg, #6366F1, #4338CA)',
+      border: cooldown > 0 ? '1px solid var(--border)' : 'none',
+      color: cooldown > 0 ? 'var(--text-4)' : 'white',
+      fontSize: '14px', fontWeight: '700',
+      cursor: (certName && (user || !guest.exceeded) && cooldown === 0) ? 'pointer' : 'not-allowed',
+      fontFamily: F_HEAD,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px',
+      opacity: (!certName || (!user && guest.exceeded)) ? 0.45 : 1,
+      letterSpacing: '-0.01em', transition: 'all 0.3s',
+    }}
+  >
+    {cooldown > 0 ? (
+      <>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--border)', borderTopColor: 'var(--indigo)', flexShrink: 0 }}
+        />
+        Cooling down {cooldown}s
+      </>
+    ) : (
+      <>
+        <Zap size={16} />
+        Get AI ROI Analysis
+        {!user && !guest.exceeded && (
+          <span style={{ fontSize: '11px', opacity: 0.75, fontFamily: F_MONO }}>({guest.remaining} free)</span>
         )}
-        {!aiResult && !aiLoading && (
-          <motion.button
-            onClick={handleAnalyse}
-            disabled={!certName || aiLoading || (!user && guest.exceeded)}
-            whileHover={{ y: -3, scale: 1.02, boxShadow: '0 16px 36px rgba(99,102,241,0.35)' }}
-            whileTap={{ scale: 0.97 }}
-            style={{ width: '100%', padding: '15px 24px', borderRadius: '12px', background: 'linear-gradient(135deg, #6366F1, #4338CA)', border: 'none', color: 'white', fontSize: '14px', fontWeight: '700', cursor: certName && (user || !guest.exceeded) ? 'pointer' : 'not-allowed', fontFamily: F_HEAD, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px', opacity: (!certName || (!user && guest.exceeded)) ? 0.45 : 1, letterSpacing: '-0.01em', transition: 'opacity 0.2s' }}
-          >
-            <Zap size={16} />
-            Get AI ROI Analysis
-            {!user && !guest.exceeded && (
-              <span style={{ fontSize: '11px', opacity: 0.75, fontFamily: F_MONO }}>({guest.remaining} free)</span>
-            )}
-          </motion.button>
-        )}
-        {aiLoading && <AILoadingState certName={certName} />}
-        {aiResult  && <AIResult result={aiResult} certName={certName} onReset={() => setAiResult(null)} />}
-      </div>
-
-      {/* ── Extra tools row ── */}
-      {certName && (
-        <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', marginBottom: '8px' }}>
-          <button onClick={() => setShowBurnRate(v => !v)}
-            style={{ padding: '8px 13px', borderRadius: '9px', background: showBurnRate ? 'rgba(245,158,11,0.1)' : 'var(--surface)', border: `1px solid ${showBurnRate ? 'rgba(245,158,11,0.3)' : 'var(--border)'}`, color: showBurnRate ? '#F59E0B' : 'var(--text-3)', fontSize: '12px', cursor: 'pointer', fontFamily: F_BODY, fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.18s' }}>
-            <Flame size={13} /> Study Tracker
-          </button>
-          <button onClick={() => setShowVerifier(v => !v)}
-            style={{ padding: '8px 13px', borderRadius: '9px', background: showVerifier ? 'rgba(16,185,129,0.1)' : 'var(--surface)', border: `1px solid ${showVerifier ? 'rgba(16,185,129,0.25)' : 'var(--border)'}`, color: showVerifier ? '#10B981' : 'var(--text-3)', fontSize: '12px', cursor: 'pointer', fontFamily: F_BODY, fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.18s' }}>
-            <CheckCircle size={13} /> Verify My Hike
-          </button>
-        </div>
-      )}
-
-      <AnimatePresence>
-        {showBurnRate && certName && (
-          <motion.div key="br" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={T}
-            style={{ marginBottom: '12px', padding: '18px', borderRadius: '14px', background: 'var(--surface)', border: '1px solid var(--glass-border)' }}>
-            <BurnRate certName={certName} breakEvenMonths={roi.breakEvenMonths || 6} />
-          </motion.div>
-        )}
-        {showVerifier && certName && (
-          <motion.div key="hv" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={T}>
-            <HikeVerifier certName={certName} projectedHike={hikePercent} onClose={() => setShowVerifier(false)} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Pitch Boss + Share Card ── */}
-      {certName && (
-        <>
-          <PitchBoss
-            certName={certName} salary={salary} certCost={certCost}
-            hikePercent={hikePercent} name={resumeName} mode={mode}
-          />
-          {!isStudent && roi.breakEvenMonths > 0 && (
-            <ShareROICard
-              certName={certName} name={resumeName}
-              breakEven={roi.breakEvenMonths}
-              fiveYearGain={roi.fiveYearGainL}
-              monthlyGain={roi.monthlyGainK}
-              roiPercent={roi.roiPercent}
-              newSalary={roi.newSalaryL}
-            />
-          )}
-        </>
-      )}
-    </div>
-  )
-}
+      </>
+    )}
+  </motion.button>
+)}
 
 export default Hero
