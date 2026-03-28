@@ -11,6 +11,21 @@ import {
 import NeonCard from './NeonCard.jsx'
 import WaveBg   from './WaveBg.jsx'
 
+// Theme-aware hook for cert card
+const useIsDark = () => {
+  const [isDark, setIsDark] = useState(
+    () => document.documentElement.getAttribute('data-theme') !== 'light'
+  )
+  useEffect(() => {
+    const obs = new MutationObserver(() =>
+      setIsDark(document.documentElement.getAttribute('data-theme') !== 'light')
+    )
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => obs.disconnect()
+  }, [])
+  return isDark
+}
+
 const F_HEAD = "'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif"
 const F_MONO = "'Commit Mono', 'JetBrains Mono', monospace"
 const F_BODY = "'Inter', sans-serif"
@@ -191,6 +206,13 @@ const ThemeAwareOverlay = ({ opacity }) => {
   )
 }
 const CertAssembly = () => {
+  const isDark = useIsDark()
+
+const certBg    = isDark ? '#04060e'              : '#F8F7F4'
+const certText1 = isDark ? '#F0F2FF'              : '#0F172A'
+const certText2 = isDark ? 'rgba(255,255,255,0.38)' : 'rgba(15,23,42,0.45)'
+const certMuted = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(15,23,42,0.3)'
+const certDot   = isDark ? 'rgba(99,102,241,0.2)' : 'rgba(99,102,241,0.15)'
   const trackRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ['start start', 'end end'] })
 
@@ -283,7 +305,7 @@ const CertAssembly = () => {
                         <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
                       </filter>
                     </defs>
-                    <rect x="0" y="0" width="500" height="354" rx="16" fill="#04060e" fillOpacity="0.97"/>
+                    <rect x="0" y="0" width="500" height="354" rx="16" fill={certBg} fillOpacity="0.97"/>
                     <rect x="1.5" y="1.5" width="497" height="351" rx="15" fill="none" stroke="url(#cBorder)" strokeWidth="2.5" filter="url(#cGlow)"/>
                     <rect x="10" y="10" width="480" height="334" rx="11" fill="none" stroke="rgba(99,102,241,0.2)" strokeWidth="0.6"/>
                     {[[22,22],[478,22],[22,332],[478,332]].map(([cx,cy],i) => (
@@ -304,8 +326,8 @@ const CertAssembly = () => {
                 {/* Layer 2 — content */}
                 <div style={{ position: 'absolute', inset: 0, transform: l2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(16px,4vw,40px)' }}>
                   <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'rgba(99,102,241,0.72)', letterSpacing: '0.26em', marginBottom: '11px', textTransform: 'uppercase' }}>CERTIFYROI · INDIA 2026</div>
-                  <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(0.9rem,3.2vw,1.75rem)', letterSpacing: '-0.04em', color: '#F0F2FF', marginBottom: '6px', textAlign: 'center', lineHeight: 1.1 }}>Your Certification</div>
-                  <div style={{ fontFamily: F_BODY, fontSize: 'clamp(10px,1.5vw,12px)', color: 'rgba(255,255,255,0.38)', marginBottom: '22px', textAlign: 'center' }}>Personalised ROI Analysis · Your City</div>
+                  <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(0.9rem,3.2vw,1.75rem)', letterSpacing: '-0.04em', color: certText1, marginBottom: '6px', textAlign: 'center', lineHeight: 1.1 }}>Your Certification</div>
+<div style={{ fontFamily: F_BODY, fontSize: 'clamp(10px,1.5vw,12px)', color: certText2, marginBottom: '22px', textAlign: 'center' }}>Personalised ROI Analysis · Your City</div>
                   <div style={{ display: 'flex', gap: 'clamp(10px,4vw,40px)', marginBottom: '18px' }}>
                     {[
                       { label: 'BREAK-EVEN', value: '6 mo',   color: '#F59E0B' },
@@ -313,13 +335,13 @@ const CertAssembly = () => {
                       { label: 'HIKE',        value: '+35%',   color: '#818CF8' },
                     ].map((s,i) => (
                       <div key={i} style={{ textAlign: 'center' }}>
-                        <div style={{ fontFamily: F_MONO, fontSize: '7px', color: 'rgba(255,255,255,0.28)', letterSpacing: '0.12em', marginBottom: '5px' }}>{s.label}</div>
+                        <div style={{ fontFamily: F_MONO, fontSize: '7px', color: certMuted, letterSpacing: '0.12em', marginBottom: '5px' }}>{s.label}</div>
                         <div style={{ fontFamily: F_MONO, fontSize: 'clamp(0.8rem,2.5vw,1.5rem)', color: s.color, fontWeight: '700', letterSpacing: '-0.03em' }}>{s.value}</div>
                       </div>
                     ))}
                   </div>
                   <div style={{ width: '74%', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.55), transparent)', marginBottom: '12px' }} />
-                  <div style={{ fontFamily: F_MONO, fontSize: '7px', color: 'rgba(255,255,255,0.22)', letterSpacing: '0.14em', textAlign: 'center' }}>VERIFIED BY AI · DATA: NAUKRI MARCH 2026</div>
+                  <div style={{ fontFamily: F_MONO, fontSize: '7px', color: certMuted, letterSpacing: '0.14em', textAlign: 'center' }}>VERIFIED BY AI · DATA: NAUKRI MARCH 2026</div>
                 </div>
 
                 {/* Layer 3 — seal */}
@@ -334,7 +356,7 @@ const CertAssembly = () => {
                     </defs>
                     <polygon points="36,4 43,22 62,22 48,35 54,54 36,43 18,54 24,35 10,22 29,22" fill="none" stroke="url(#sealG)" strokeWidth="1.5"/>
                     <circle cx="36" cy="36" r="10" fill="none" stroke="rgba(99,102,241,0.5)" strokeWidth="1"/>
-                    <circle cx="36" cy="36" r="4.5" fill="rgba(99,102,241,0.2)"/>
+                    <circle cx="36" cy="36" r="4.5" fill={certDot}/>
                     <text x="36" y="40" textAnchor="middle" fontSize="7" fill="#818CF8" fontFamily="monospace" fontWeight="700">AI</text>
                   </svg>
                 </div>

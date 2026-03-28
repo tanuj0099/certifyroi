@@ -337,13 +337,13 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
         animate={{ y: 0, opacity: 1 }}
         transition={T}
         style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-          background: 'rgba(11,14,20,0.92)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid var(--border)',
-          transition: 'background 0.3s, border-color 0.3s',
-        }}
+  position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+  background: 'var(--bg)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  borderBottom: '1px solid var(--border)',
+  transition: 'background 0.3s, border-color 0.3s',
+}}
       >
         {/* ── Main nav row ── */}
         <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 16px' }}>
@@ -428,7 +428,7 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
 
         {/* ── Sub-tabs (app page only) ── */}
         {currentPage === 'app' && (
-          <div style={{ borderTop: '1px solid var(--border)', background: 'rgba(11,14,20,0.96)' }}>
+          <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg)' }}>
             <div className="subtabs" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 16px', display: 'flex', height: `${tabsH}px`, alignItems: 'stretch', overflowX: 'auto', gap: '2px', justifyContent: 'center' }}>
               {APP_TABS.map(tab => {
                 const active = activeTab === tab.id
@@ -473,8 +473,8 @@ const NavBar = ({ currentPage, activeTab, onNavigate, onTabChange }) => {
               position: 'fixed',
               top: `${totalH}px`,
               left: 0, right: 0, zIndex: 99,
-              background: 'rgba(11,14,20,0.98)',
-              backdropFilter: 'blur(20px)',
+              background: 'var(--bg)',
+backdropFilter: 'blur(20px)',
               borderBottom: '1px solid var(--border)',
               padding: '20px 16px',
             }}
