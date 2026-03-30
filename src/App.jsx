@@ -14,7 +14,7 @@ import LandingPage from './components/LandingPage.jsx'
 import ResumeAnalyzer from './components/ResumeAnalyzer.jsx'
 import Hero from './components/Hero.jsx'
 import Heatmap from './components/Heatmap.jsx'
-import ModeSelector from './components/ModeSelector.jsx'
+import ModeSelector, { ModePill } from './components/ModeSelector.jsx'
 import CollegeVsCorporate from './components/CollegeVsCorporate.jsx'
 import WaveBg from './components/WaveBg.jsx'
 import CertCompare from './components/CertCompare.jsx'
@@ -131,7 +131,7 @@ const PrivacyPage = function() {
 const BLOG_POSTS = [
   { id: 1, tag: 'Cloud',        tagColor: '#6366F1', title: 'Is AWS Solutions Architect Worth It in 2026?',           excerpt: 'With 2,400+ open roles on Naukri and average hikes of 30-40%, AWS SAA remains the highest-ROI cert for Indian engineers. But market saturation is real.', readTime: '4 min', date: 'Mar 2026', forWho: 'Professional' },
   { id: 2, tag: 'Career Switch', tagColor: '#F59E0B', title: 'From Ops Manager to Data Analyst: A 6-Month Plan',        excerpt: 'Three real people. Three backgrounds. One goal: break into data from operations. What certifications actually bridged the gap.',                           readTime: '6 min', date: 'Feb 2026', forWho: 'Switcher'     },
-  { id: 3, tag: 'Student',       tagColor: '#818CF8', title: "Fresher Guide to First Offer in India 2026",               excerpt: 'No experience. No salary history. But you can get a strong first offer in 5-8 months with the right cert and portfolio strategy.',                        readTime: '8 min', date: 'Feb 2026', forWho: 'Student'      },
+  { id: 3, tag: 'Student',       tagColor: '#818CF8', title: 'Fresher Guide to First Offer in India 2026',               excerpt: 'No experience. No salary history. But you can get a strong first offer in 5-8 months with the right cert and portfolio strategy.',                        readTime: '8 min', date: 'Feb 2026', forWho: 'Student'      },
   { id: 4, tag: 'Management',    tagColor: '#10B981', title: 'PMP vs CSM: Which Pays More in India?',                    excerpt: 'Both are management certs but target completely different markets. We ran the ROI numbers for Bangalore, Hyderabad, and Delhi NCR.',                   readTime: '5 min', date: 'Jan 2026', forWho: 'Professional' },
   { id: 5, tag: 'Finance',       tagColor: '#34D399', title: 'Best Finance Certifications for Indian Professionals 2026', excerpt: 'CFA, FMVA, or CPA? We break down which finance cert gives the best ROI for Indian banking and startup finance professionals.',                        readTime: '6 min', date: 'Dec 2025', forWho: 'Professional' },
 ]
@@ -205,7 +205,7 @@ const FAQPage = function() {
                 <AnimatePresence>
                   {open===i ? (
                     <motion.div initial={{ height:0, opacity:0 }} animate={{ height:'auto', opacity:1 }} exit={{ height:0, opacity:0 }} transition={{ duration:0.22 }} style={{ overflow:'hidden' }}>
-                      <div style={{ padding:'0 20px 18px', paddingTop:'4px', fontSize:'14px', color:'var(--text-2)', borderTop:'1px solid var(--border)', paddingTop:'12px', fontFamily:'Inter, sans-serif', lineHeight:'1.75' }}>{faq.a}</div>
+                      <div style={{ padding:'12px 20px 18px', fontSize:'14px', color:'var(--text-2)', borderTop:'1px solid var(--border)', fontFamily:'Inter, sans-serif', lineHeight:'1.75' }}>{faq.a}</div>
                     </motion.div>
                   ) : null}
                 </AnimatePresence>
@@ -303,7 +303,6 @@ const TOOL_TABS = [
 
 const ALL_TABS = [...STEP_TABS, ...TOOL_TABS]
 
-// Animated arrow connector between steps
 const StepArrow = function({ active }) {
   return (
     <div style={{ display:'flex', alignItems:'center', flexShrink:0, padding:'0 2px' }}>
@@ -327,8 +326,8 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
   const [signingIn, setSigningIn] = useState(false)
   const { user, signInGoogle, signOut, loading } = useAuth()
 
-  const go        = function(id)  { onNavigate(id); setMenuOpen(false) }
-  const switchTab = function(id)  { onTabChange(id) }
+  const go        = function(id) { onNavigate(id); setMenuOpen(false) }
+  const switchTab = function(id) { onTabChange(id) }
 
   const handleSignIn = async function() {
     setSigningIn(true)
@@ -337,14 +336,13 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
   }
 
   const NAV_H  = 64
-  const TABS_H = 88   // two rows: 44px + 44px
+  const TABS_H = 88
 
   return (
     <>
       <motion.header initial={{ y:-20, opacity:0 }} animate={{ y:0, opacity:1 }} transition={T}
         style={{ position:'fixed', top:0, left:0, right:0, zIndex:100, background:'var(--bg)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:'1px solid var(--border)', transition:'background 0.3s' }}>
 
-        {/* ── Main nav row ── */}
         <div style={{ maxWidth:'1240px', margin:'0 auto', padding:'0 16px' }}>
           <div style={{ display:'flex', alignItems:'center', height:NAV_H+'px', gap:'4px' }}>
 
@@ -398,30 +396,21 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
           </div>
         </div>
 
-        {/* ── Two-row tab bar ── */}
         {currentPage === 'app' ? (
           <div>
-
-            {/* Row 1: Steps with flow arrows */}
             <div style={{ borderTop:'1px solid var(--border)', background:'var(--bg)' }}>
               <div style={{ maxWidth:'1240px', margin:'0 auto', padding:'0 24px', display:'flex', alignItems:'center', justifyContent:'center', height:'46px', gap:'0' }}>
-
-                {/* Step label */}
                 <div style={{ fontSize:'9px', color:'var(--text-4)', fontFamily:"'JetBrains Mono', monospace", textTransform:'uppercase', letterSpacing:'0.12em', marginRight:'16px', flexShrink:0, whiteSpace:'nowrap' }}>
                   Core Flow
                 </div>
-
-                {/* Step tabs with arrows */}
                 {STEP_TABS.map(function(tab, i) {
                   const active = activeTab === tab.id
-                  const prevActive = i > 0 && activeTab === STEP_TABS[i-1].id
                   const isCompleted = STEP_TABS.findIndex(function(t) { return t.id === activeTab }) > i
                   return (
                     <div key={tab.id} style={{ display:'flex', alignItems:'center' }}>
                       {i > 0 ? <StepArrow active={isCompleted || (activeTab === tab.id)} /> : null}
                       <button onClick={function() { switchTab(tab.id) }}
                         style={{ display:'flex', alignItems:'center', gap:'7px', padding:'6px 14px', borderRadius:'8px', border:'1px solid '+(active?'var(--border-accent)':'transparent'), background:active?'var(--indigo-dim)':'transparent', color:active?'var(--indigo-light)':isCompleted?'rgba(99,102,241,0.5)':'var(--text-3)', cursor:'pointer', fontFamily:"'Plus Jakarta Sans', sans-serif", transition:'all 0.2s', whiteSpace:'nowrap', flexShrink:0 }}>
-                        {/* Step number bubble */}
                         <div style={{ width:'18px', height:'18px', borderRadius:'50%', background:active?'var(--indigo)':isCompleted?'rgba(99,102,241,0.3)':'var(--surface)', border:'1px solid '+(active?'var(--indigo)':isCompleted?'rgba(99,102,241,0.4)':'var(--border)'), display:'flex', alignItems:'center', justifyContent:'center', fontSize:'10px', fontWeight:'700', color:active?'white':isCompleted?'var(--indigo-light)':'var(--text-4)', flexShrink:0, transition:'all 0.2s', fontFamily:"'JetBrains Mono', monospace" }}>
                           {tab.num}
                         </div>
@@ -433,15 +422,11 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
                 })}
               </div>
             </div>
-
-            {/* Row 2: Extra tools — centered, same width approach */}
             <div style={{ borderTop:'1px solid rgba(99,102,241,0.08)', background:'rgba(99,102,241,0.02)' }}>
               <div style={{ maxWidth:'1240px', margin:'0 auto', padding:'0 24px', display:'flex', alignItems:'center', justifyContent:'center', height:'40px', gap:'2px' }}>
-
                 <div style={{ fontSize:'9px', color:'var(--text-4)', fontFamily:"'JetBrains Mono', monospace", textTransform:'uppercase', letterSpacing:'0.12em', marginRight:'16px', flexShrink:0, opacity:0.7, whiteSpace:'nowrap' }}>
                   Tools
                 </div>
-
                 {TOOL_TABS.map(function(tab) {
                   const active = activeTab === tab.id
                   return (
@@ -451,15 +436,12 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
                     </button>
                   )
                 })}
-
               </div>
             </div>
-
           </div>
         ) : null}
       </motion.header>
 
-      {/* Hamburger */}
       <AnimatePresence>
         {menuOpen ? (
           <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-8 }} transition={{ duration:0.2 }}
@@ -506,65 +488,78 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
   )
 }
 
-const AppPage = function({ activeTab, onTabChange, mode, onModeChange, onCertSelected, prefilledCert, resumeCity, resumeDomain, resumeName }) {
+// ─── AppPage — shows cinematic selector if not locked ─────────
+const AppPage = function({ activeTab, onTabChange, mode, modeLocked, onModeSelect, onModeReset, onCertSelected, prefilledCert, resumeCity, resumeDomain, resumeName }) {
   const NAV_H  = 64
   const TABS_H = 88
 
   return (
     <div style={{ paddingTop:(NAV_H+TABS_H)+'px', minHeight:'100vh', background:'var(--app-bg)', position:'relative' }}>
       <WaveBg variant="app" />
-      <div style={{ position:'relative', zIndex:1 }}>
-        <div style={{ maxWidth:'1100px', margin:'0 auto', padding:'20px 20px 0' }}>
-          <ModeSelector activeMode={mode} onChange={onModeChange} />
+
+      {/* ── Cinematic mode selector overlay ── */}
+      <AnimatePresence>
+        {!modeLocked ? (
+          <ModeSelector onSelect={onModeSelect} />
+        ) : null}
+      </AnimatePresence>
+
+      {/* ── Tools content (only after locked) ── */}
+      {modeLocked ? (
+        <div style={{ position:'relative', zIndex:1 }}>
+          <div style={{ maxWidth:'1100px', margin:'0 auto', padding:'20px 20px 0' }}>
+            {/* Mode pill — always visible during core flow */}
+            <ModePill mode={mode} onReset={onModeReset} />
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div key={activeTab} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-6 }} transition={T}>
+              <div style={{ maxWidth:'1100px', margin:'0 auto', padding:'0 20px 60px' }}>
+
+                {activeTab==='resume' ? (
+                  <div className="glass" style={{ padding:'28px' }}>
+                    <ResumeAnalyzer mode={mode} onCertSelected={function(certName,city,domain,name) { onCertSelected(certName,city,domain,name) }} />
+                  </div>
+                ) : null}
+
+                {activeTab==='calculator' ? (
+                  <Hero mode={mode} prefilledCert={prefilledCert} resumeName={resumeName} resumeCity={resumeCity} />
+                ) : null}
+
+                {activeTab==='heatmap' ? (
+                  <div className="glass" style={{ padding:'28px' }}>
+                    <Heatmap prefilledCity={resumeCity} prefilledDomain={resumeDomain} certName={prefilledCert} resumeName={resumeName} />
+                  </div>
+                ) : null}
+
+                {activeTab==='compare' ? (
+                  <div className="glass" style={{ padding:'28px' }}>
+                    <CertCompare salary={mode==='student'?4.8:8} prefilledCert={prefilledCert} />
+                  </div>
+                ) : null}
+
+                {activeTab==='simulate' ? (
+                  <div className="glass" style={{ padding:'28px' }}>
+                    <CareerSimulator initialSalary={mode==='student'?4.8:8} />
+                  </div>
+                ) : null}
+
+                {activeTab==='jobmap' ? (
+                  <div className="glass" style={{ padding:'28px' }}>
+                    <JobCertMap />
+                  </div>
+                ) : null}
+
+                {activeTab==='college' ? (
+                  <div className="glass" style={{ padding:'28px' }}>
+                    <CollegeVsCorporate />
+                  </div>
+                ) : null}
+
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
-        <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-6 }} transition={T}>
-            <div style={{ maxWidth:'1100px', margin:'0 auto', padding:'0 20px 60px' }}>
-
-              {activeTab==='resume' ? (
-                <div className="glass" style={{ padding:'28px' }}>
-                  <ResumeAnalyzer mode={mode} onCertSelected={function(certName,city,domain,name) { onCertSelected(certName,city,domain,name) }} />
-                </div>
-              ) : null}
-
-              {activeTab==='calculator' ? (
-                <Hero mode={mode} prefilledCert={prefilledCert} resumeName={resumeName} resumeCity={resumeCity} />
-              ) : null}
-
-              {activeTab==='heatmap' ? (
-                <div className="glass" style={{ padding:'28px' }}>
-                  <Heatmap prefilledCity={resumeCity} prefilledDomain={resumeDomain} certName={prefilledCert} resumeName={resumeName} />
-                </div>
-              ) : null}
-
-              {activeTab==='compare' ? (
-                <div className="glass" style={{ padding:'28px' }}>
-                  <CertCompare salary={mode==='student'?4.8:8} prefilledCert={prefilledCert} />
-                </div>
-              ) : null}
-
-              {activeTab==='simulate' ? (
-                <div className="glass" style={{ padding:'28px' }}>
-                  <CareerSimulator initialSalary={mode==='student'?4.8:8} />
-                </div>
-              ) : null}
-
-              {activeTab==='jobmap' ? (
-                <div className="glass" style={{ padding:'28px' }}>
-                  <JobCertMap />
-                </div>
-              ) : null}
-
-              {activeTab==='college' ? (
-                <div className="glass" style={{ padding:'28px' }}>
-                  <CollegeVsCorporate />
-                </div>
-              ) : null}
-
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      ) : null}
     </div>
   )
 }
@@ -574,8 +569,6 @@ const Footer = function({ onNavigate }) {
     <footer style={{ borderTop:'1px solid var(--border)', padding:'48px 24px 28px', marginTop:'auto', background:'var(--bg)' }}>
       <div style={{ maxWidth:'1240px', margin:'0 auto' }}>
         <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr 1fr', gap:'32px', marginBottom:'40px' }} className="footer-grid">
-
-          {/* Brand */}
           <div>
             <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'12px' }}>
               <div style={{ width:'28px', height:'28px', background:'linear-gradient(135deg,var(--indigo),#4338CA)', borderRadius:'8px', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -592,8 +585,6 @@ const Footer = function({ onNavigate }) {
               Data: LinkedIn · NASSCOM · AmbitionBox · Naukri · WEF 2026
             </p>
           </div>
-
-          {/* Tools */}
           <div>
             <div style={{ fontSize:'10px', color:'var(--text-4)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'14px', fontFamily:'JetBrains Mono, monospace' }}>Tools</div>
             {[
@@ -614,8 +605,6 @@ const Footer = function({ onNavigate }) {
               )
             })}
           </div>
-
-          {/* Company */}
           <div>
             <div style={{ fontSize:'10px', color:'var(--text-4)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'14px', fontFamily:'JetBrains Mono, monospace' }}>Company</div>
             {['about','blog','faq','contact'].map(function(id) {
@@ -630,8 +619,6 @@ const Footer = function({ onNavigate }) {
               )
             })}
           </div>
-
-          {/* Legal */}
           <div>
             <div style={{ fontSize:'10px', color:'var(--text-4)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'14px', fontFamily:'JetBrains Mono, monospace' }}>Legal</div>
             {['terms','privacy'].map(function(id) {
@@ -650,10 +637,7 @@ const Footer = function({ onNavigate }) {
               <a href="mailto:hello@certifyroi.in" style={{ fontSize:'12px', color:'var(--text-3)', fontFamily:'Inter, sans-serif', textDecoration:'none' }}>hello@certifyroi.in</a>
             </div>
           </div>
-
         </div>
-
-        {/* Bottom bar */}
         <div style={{ borderTop:'1px solid var(--border)', paddingTop:'20px', display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'8px', alignItems:'center' }}>
           <p style={{ fontSize:'12px', color:'var(--text-4)', fontFamily:'Inter, sans-serif' }}>
             2026 CertifyROI. All rights reserved. Not financial advice.
@@ -671,13 +655,33 @@ function AppRoot() {
   const [page,          setPage]          = useState('home')
   const [activeTab,     setActiveTab]     = useState('resume')
   const [mode,          setMode]          = useState('professional')
+  const [modeLocked,    setModeLocked]    = useState(false)
   const [prefilledCert, setPrefilledCert] = useState('')
   const [resumeCity,    setResumeCity]    = useState('')
   const [resumeDomain,  setResumeDomain]  = useState('')
   const [resumeName,    setResumeName]    = useState('')
 
-  const navigate = function(pageId) { setPage(pageId); window.scrollTo({ top:0, behavior:'smooth' }) }
-  const goToApp  = function(tab)    { setActiveTab(tab||'resume'); navigate('app') }
+  const navigate = function(pageId) {
+    setPage(pageId)
+    window.scrollTo({ top:0, behavior:'smooth' })
+  }
+
+  const goToApp = function(tab) {
+    setActiveTab(tab || 'resume')
+    navigate('app')
+    // Do NOT reset modeLocked here — stays locked if already chosen
+  }
+
+  // Called when user picks a mode in the cinematic selector
+  const handleModeSelect = function(id) {
+    setMode(id)
+    setModeLocked(true)
+  }
+
+  // Called from ModePill reset button OR when new resume is uploaded
+  const handleModeReset = function() {
+    setModeLocked(false)
+  }
 
   const handleCertSelected = function(certName, city, domain, name) {
     setPrefilledCert(certName)
@@ -689,7 +693,21 @@ function AppRoot() {
 
   const renderPage = function() {
     if (page==='home')    return <LandingPage onEnter={function() { goToApp('resume') }} />
-    if (page==='app')     return <AppPage activeTab={activeTab} onTabChange={setActiveTab} mode={mode} onModeChange={setMode} onCertSelected={handleCertSelected} prefilledCert={prefilledCert} resumeCity={resumeCity} resumeDomain={resumeDomain} resumeName={resumeName} />
+    if (page==='app')     return (
+      <AppPage
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        mode={mode}
+        modeLocked={modeLocked}
+        onModeSelect={handleModeSelect}
+        onModeReset={handleModeReset}
+        onCertSelected={handleCertSelected}
+        prefilledCert={prefilledCert}
+        resumeCity={resumeCity}
+        resumeDomain={resumeDomain}
+        resumeName={resumeName}
+      />
+    )
     if (page==='blog')    return <BlogPage />
     if (page==='faq')     return <FAQPage />
     if (page==='about')   return <AboutPage />
