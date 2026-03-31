@@ -831,7 +831,6 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
     demand={selectedCert ? selectedCert.demand : 'High'}
     name={resumeName}
   />
-) : null}
           ) : null}
         </div>
       ) : null}
