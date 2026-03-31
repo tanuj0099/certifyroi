@@ -1,45 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Share2, Download, Copy, Check, Linkedin } from 'lucide-react'
+import { Download, Copy, Check, Linkedin, LayoutTemplate } from 'lucide-react'
 
 const FM = "'JetBrains Mono','Commit Mono',monospace"
 const FH = "'Plus Jakarta Sans','Bricolage Grotesque',sans-serif"
 const FB = "'Inter',sans-serif"
 
-// ── rounded rect helper ───────────────────────────────────
-function rr(ctx, x, y, w, h, r) {
-  ctx.beginPath()
-  ctx.moveTo(x + r, y)
-  ctx.lineTo(x + w - r, y)
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
-  ctx.lineTo(x + w, y + h - r)
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
-  ctx.lineTo(x + r, y + h)
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
-  ctx.lineTo(x, y + r)
-  ctx.quadraticCurveTo(x, y, x + r, y)
-  ctx.closePath()
-}
-
-// ── text wrap helper ──────────────────────────────────────
-function wrapLines(ctx, text, maxWidth) {
-  var words = text.split(' ')
-  var lines = []
-  var line  = ''
-  words.forEach(function(w) {
-    var test = line ? (line + ' ' + w) : w
-    if (ctx.measureText(test).width > maxWidth) {
-      if (line) lines.push(line)
-      line = w
-    } else {
-      line = test
-    }
-  })
-  if (line) lines.push(line)
-  return lines
-}
-
-// ── domain display labels ─────────────────────────────────
+// ── Domain display labels ─────────────────────────────────
 var DOMAIN_LABELS = {
   tech:          'Cloud & Tech',
   data:          'Data & AI',
@@ -59,7 +26,7 @@ var DOMAIN_LABELS = {
   business:      'Business & Ops',
 }
 
-// ── demand pill colors ────────────────────────────────────
+// ── Demand colors ─────────────────────────────────────────
 var DEMAND_COLORS = {
   'Very High': '#10B981',
   'High':      '#51B1E7',
@@ -67,268 +34,488 @@ var DEMAND_COLORS = {
   'Low':       '#94A3B8',
 }
 
-// ─────────────────────────────────────────────────────────
-// DRAW CARD — pure canvas, 1200×628 (LinkedIn standard)
-// No salary data. No numbers. Just cert + domain + demand.
-// ─────────────────────────────────────────────────────────
-function drawCard(canvas, opts) {
-  var certName = opts.certName || 'Your Certification'
-  var domain   = opts.domain   || 'tech'
-  var demand   = opts.demand   || 'High'
-  var isDark   = opts.isDark !== false // default dark
+// ── Domain accent colors (used for card glow) ─────────────
+var DOMAIN_ACCENTS = {
+  tech:          ['#6366F1', '#51B1E7'],
+  data:          ['#8B5CF6', '#06B6D4'],
+  cybersecurity: ['#EF4444', '#F59E0B'],
+  management:    ['#6366F1', '#10B981'],
+  finance:       ['#10B981', '#F59E0B'],
+  marketing:     ['#EC4899', '#F59E0B'],
+  hr:            ['#F59E0B', '#10B981'],
+  product:       ['#6366F1', '#EC4899'],
+  design:        ['#EC4899', '#8B5CF6'],
+  medical:       ['#10B981', '#06B6D4'],
+  law:           ['#94A3B8', '#6366F1'],
+  architecture:  ['#F59E0B', '#10B981'],
+  engineering:   ['#51B1E7', '#6366F1'],
+  government:    ['#10B981', '#F59E0B'],
+  mba:           ['#6366F1', '#F59E0B'],
+  business:      ['#10B981', '#6366F1'],
+}
 
-  // Always render dark — LinkedIn card is always dark regardless of site theme
-  // (dark card looks far better on LinkedIn's white feed)
-  var W = 1200, H = 628, SC = 2
-  canvas.width        = W * SC
-  canvas.height       = H * SC
-  canvas.style.width  = W + 'px'
-  canvas.style.height = H + 'px'
-  var c = canvas.getContext('2d')
-  c.scale(SC, SC)
+// ── Rounded rect helper ───────────────────────────────────
+function rr(ctx, x, y, w, h, r) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+  ctx.lineTo(x + r, y + h)
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
+  ctx.closePath()
+}
 
-  // ── Background ───────────────────────────────────────────
-  var bgGrad = c.createLinearGradient(0, 0, W, H)
-  bgGrad.addColorStop(0,   '#0B1426')
-  bgGrad.addColorStop(0.5, '#0E1C35')
-  bgGrad.addColorStop(1,   '#080F1E')
-  c.fillStyle = bgGrad
-  c.fillRect(0, 0, W, H)
-
-  // Dot grid
-  c.fillStyle = 'rgba(99,102,241,0.065)'
-  for (var xi = 0; xi <= W; xi += 32) {
-    for (var yi = 0; yi <= H; yi += 32) {
-      c.beginPath()
-      c.arc(xi, yi, 1.5, 0, Math.PI * 2)
-      c.fill()
-    }
-  }
-
-  // Radial center glow
-  var glow = c.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, 440)
-  glow.addColorStop(0,   'rgba(99,102,241,0.07)')
-  glow.addColorStop(0.5, 'rgba(16,185,129,0.04)')
-  glow.addColorStop(1,   'transparent')
-  c.fillStyle = glow
-  c.fillRect(0, 0, W, H)
-
-  // ── Top gradient bar (5px) ───────────────────────────────
-  var topGrad = c.createLinearGradient(0, 0, W, 0)
-  topGrad.addColorStop(0,    '#6366F1')
-  topGrad.addColorStop(0.45, '#10B981')
-  topGrad.addColorStop(1,    '#51B1E7')
-  c.fillStyle = topGrad
-  c.fillRect(0, 0, W, 5)
-
-  // ── Logo top-left ────────────────────────────────────────
-  // Square icon
-  var lgGrad = c.createLinearGradient(44, 34, 82, 72)
-  lgGrad.addColorStop(0, '#6366F1')
-  lgGrad.addColorStop(1, '#4338CA')
-  c.fillStyle = lgGrad
-  rr(c, 44, 34, 40, 40, 10)
-  c.fill()
-  // Arrow up-right inside icon
-  c.fillStyle = 'white'
-  c.font = 'bold 22px Arial'
-  c.textAlign = 'center'
-  c.fillText('↗', 64, 62)
-  // Brand name
-  c.textAlign = 'left'
-  c.fillStyle = 'white'
-  c.font = 'bold 20px Arial'
-  c.fillText('Certify', 94, 62)
-  var cw = c.measureText('Certify').width
-  c.fillStyle = '#818CF8'
-  c.font = 'bold 20px Arial'
-  c.fillText('ROI', 94 + cw, 62)
-
-  // ── "INDIA · 2026" badge top-right ───────────────────────
-  c.font = '12px "Courier New", monospace'
-  var badgeText = 'INDIA · 2026'
-  var btw = c.measureText(badgeText).width
-  var bPad = 14, bH2 = 28, bW2 = btw + bPad * 2
-  var bX = W - bW2 - 44, bY = 34
-  c.fillStyle = 'rgba(129,140,248,0.12)'
-  rr(c, bX, bY, bW2, bH2, 7)
-  c.fill()
-  c.strokeStyle = 'rgba(129,140,248,0.28)'
-  c.lineWidth = 1
-  rr(c, bX, bY, bW2, bH2, 7)
-  c.stroke()
-  c.fillStyle = '#818CF8'
-  c.textAlign = 'center'
-  c.fillText(badgeText, bX + bW2 / 2, bY + 18)
-
-  // ── Thin divider under header ────────────────────────────
-  c.strokeStyle = 'rgba(255,255,255,0.05)'
-  c.lineWidth = 1
-  c.beginPath()
-  c.moveTo(44, 92)
-  c.lineTo(W - 44, 92)
-  c.stroke()
-
-  // ── Center vertical midpoint ─────────────────────────────
-  var centerY = 316
-
-  // ── Eyebrow label ────────────────────────────────────────
-  c.fillStyle = 'rgba(129,140,248,0.7)'
-  c.font = '13px "Courier New", monospace'
-  c.textAlign = 'center'
-  c.fillText('MY 2026 CERTIFICATION MOVE', W / 2, centerY - 116)
-
-  // Eyebrow dot accent
-  c.fillStyle = '#6366F1'
-  c.beginPath()
-  c.arc(W / 2, centerY - 100, 2.5, 0, Math.PI * 2)
-  c.fill()
-
-  // ── Cert name — hero element ─────────────────────────────
-  var maxCertW = 900
-  var certLen  = certName.length
-  var certSize = certLen > 42 ? 52 : certLen > 32 ? 62 : certLen > 20 ? 72 : 82
-  c.font = 'bold ' + certSize + 'px Arial, sans-serif'
-  var certLines = wrapLines(c, certName, maxCertW)
-  var lineH     = certSize * 1.18
-
-  // Subtle text glow
-  c.shadowColor = 'rgba(99,102,241,0.3)'
-  c.shadowBlur  = 24
-  c.fillStyle   = '#FFFFFF'
-  c.textAlign   = 'center'
-  certLines.forEach(function(line, i) {
-    c.fillText(line, W / 2, centerY - 44 + i * lineH)
+// ── Text wrap helper ──────────────────────────────────────
+function wrapLines(ctx, text, maxWidth) {
+  var words = text.split(' ')
+  var lines = [], line = ''
+  words.forEach(function(w) {
+    var test = line ? (line + ' ' + w) : w
+    if (ctx.measureText(test).width > maxWidth) { if (line) lines.push(line); line = w }
+    else { line = test }
   })
-  c.shadowBlur = 0
-
-  var afterCert = centerY - 44 + certLines.length * lineH
-
-  // ── Domain + Demand pills ────────────────────────────────
-  var pillY = afterCert + 36
-  var domainLabel = DOMAIN_LABELS[domain] || (domain.charAt(0).toUpperCase() + domain.slice(1))
-  var demColor    = DEMAND_COLORS[demand] || '#94A3B8'
-
-  c.font = '12px "Courier New", monospace'
-
-  var p1Text = domainLabel.toUpperCase()
-  var p2Text = (demand + ' DEMAND').toUpperCase()
-  var p1W    = c.measureText(p1Text).width + 28
-  var p2W    = c.measureText(p2Text).width + 28
-  var gap    = 14
-  var totalPW = p1W + p2W + gap
-  var p1X    = W / 2 - totalPW / 2
-  var p2X    = p1X + p1W + gap
-  var pH     = 30, pR = 15
-
-  // Domain pill
-  c.fillStyle = 'rgba(99,102,241,0.2)'
-  rr(c, p1X, pillY - pH / 2, p1W, pH, pR)
-  c.fill()
-  c.strokeStyle = 'rgba(99,102,241,0.4)'
-  c.lineWidth = 1
-  rr(c, p1X, pillY - pH / 2, p1W, pH, pR)
-  c.stroke()
-  c.fillStyle   = '#818CF8'
-  c.textAlign   = 'center'
-  c.fillText(p1Text, p1X + p1W / 2, pillY + 5)
-
-  // Demand pill
-  c.fillStyle = demColor + '25'
-  rr(c, p2X, pillY - pH / 2, p2W, pH, pR)
-  c.fill()
-  c.strokeStyle = demColor + '50'
-  c.lineWidth = 1
-  rr(c, p2X, pillY - pH / 2, p2W, pH, pR)
-  c.stroke()
-  c.fillStyle = demColor
-  c.fillText(p2Text, p2X + p2W / 2, pillY + 5)
-
-  // ── Bottom divider ───────────────────────────────────────
-  var footerDivY = H - 62
-  c.strokeStyle = 'rgba(255,255,255,0.06)'
-  c.lineWidth = 1
-  c.beginPath()
-  c.moveTo(44, footerDivY)
-  c.lineTo(W - 44, footerDivY)
-  c.stroke()
-
-  // ── Footer left — tagline ────────────────────────────────
-  c.fillStyle = 'rgba(148,163,184,0.55)'
-  c.font = '14px Arial, sans-serif'
-  c.textAlign = 'left'
-  c.fillText('Backed by data. Decided with clarity.', 44, H - 30)
-
-  // ── Footer right — URL ───────────────────────────────────
-  c.fillStyle = 'rgba(129,140,248,0.8)'
-  c.font = 'bold 14px "Courier New", monospace'
-  c.textAlign = 'right'
-  c.fillText('certifyroi.vercel.app', W - 44, H - 30)
-
-  // ── Corner bracket accents ───────────────────────────────
-  var acLen = 44
-  var acAlpha = 'rgba(99,102,241,0.18)'
-  c.strokeStyle = acAlpha
-  c.lineWidth = 1.5
-  // top-right
-  c.beginPath(); c.moveTo(W - 44, 8);     c.lineTo(W - 44, 8 + acLen);   c.stroke()
-  c.beginPath(); c.moveTo(W - 8, 44);     c.lineTo(W - 8 - acLen, 44);   c.stroke()
-  // bottom-left
-  c.beginPath(); c.moveTo(8, H - 44);     c.lineTo(8 + acLen, H - 44);   c.stroke()
-  c.beginPath(); c.moveTo(44, H - 8);     c.lineTo(44, H - 8 - acLen);   c.stroke()
-  // top-left subtle
-  c.strokeStyle = 'rgba(99,102,241,0.1)'
-  c.beginPath(); c.moveTo(44, 8);         c.lineTo(44, 8 + acLen);        c.stroke()
-  c.beginPath(); c.moveTo(8, 44);         c.lineTo(8 + acLen, 44);        c.stroke()
+  if (line) lines.push(line)
+  return lines
 }
 
 // ─────────────────────────────────────────────────────────
-// SHARE ROI CARD COMPONENT
+// VARIANT A — "MY 2026 CERT MOVE"
+// Classic announcement. Cert name big, domain + demand pills,
+// clean footer. What someone shares when they've decided.
+// ─────────────────────────────────────────────────────────
+function drawCardA(canvas, opts) {
+  var certName = opts.certName || 'Your Certification'
+  var domain   = opts.domain   || 'tech'
+  var demand   = opts.demand   || 'High'
+
+  var W = 1200, H = 628, SC = 2
+  canvas.width = W * SC; canvas.height = H * SC
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px'
+  var c = canvas.getContext('2d')
+  c.scale(SC, SC)
+
+  var accents  = DOMAIN_ACCENTS[domain] || ['#6366F1', '#51B1E7']
+  var accent1  = accents[0]
+  var accent2  = accents[1]
+  var demColor = DEMAND_COLORS[demand] || '#94A3B8'
+
+  // ── Background ───────────────────────────────────────────
+  var bg = c.createLinearGradient(0, 0, W, H)
+  bg.addColorStop(0,   '#080E1E')
+  bg.addColorStop(0.6, '#0C1628')
+  bg.addColorStop(1,   '#060C18')
+  c.fillStyle = bg; c.fillRect(0, 0, W, H)
+
+  // Dot grid — very subtle
+  c.fillStyle = 'rgba(255,255,255,0.028)'
+  for (var xi = 0; xi <= W; xi += 36) {
+    for (var yi = 0; yi <= H; yi += 36) {
+      c.beginPath(); c.arc(xi, yi, 1.2, 0, Math.PI * 2); c.fill()
+    }
+  }
+
+  // Domain-specific radial glow — shifts based on domain color
+  var g1 = c.createRadialGradient(W * 0.3, H * 0.4, 0, W * 0.3, H * 0.4, 480)
+  g1.addColorStop(0,   accent1 + '12')
+  g1.addColorStop(0.5, accent1 + '06')
+  g1.addColorStop(1,   'transparent')
+  c.fillStyle = g1; c.fillRect(0, 0, W, H)
+
+  var g2 = c.createRadialGradient(W * 0.75, H * 0.65, 0, W * 0.75, H * 0.65, 380)
+  g2.addColorStop(0,   accent2 + '10')
+  g2.addColorStop(1,   'transparent')
+  c.fillStyle = g2; c.fillRect(0, 0, W, H)
+
+  // ── Scan lines — very subtle horizontal texture ───────────
+  for (var si = 0; si < H; si += 3) {
+    c.fillStyle = 'rgba(0,0,0,0.04)'
+    c.fillRect(0, si, W, 1)
+  }
+
+  // ── Inset border frame ───────────────────────────────────
+  c.strokeStyle = 'rgba(255,255,255,0.04)'
+  c.lineWidth = 1
+  rr(c, 12, 12, W - 24, H - 24, 6)
+  c.stroke()
+
+  // ── Top gradient bar ─────────────────────────────────────
+  var topBar = c.createLinearGradient(0, 0, W, 0)
+  topBar.addColorStop(0,    accent1)
+  topBar.addColorStop(0.5,  accent2)
+  topBar.addColorStop(1,    accent1)
+  c.fillStyle = topBar; c.fillRect(0, 0, W, 4)
+
+  // ── Top bar glow line ────────────────────────────────────
+  var topGlow = c.createLinearGradient(0, 0, W, 0)
+  topGlow.addColorStop(0,   accent1 + '00')
+  topGlow.addColorStop(0.3, accent1 + '40')
+  topGlow.addColorStop(0.7, accent2 + '40')
+  topGlow.addColorStop(1,   accent1 + '00')
+  c.fillStyle = topGlow; c.fillRect(0, 4, W, 18)
+
+  // ── Logo ─────────────────────────────────────────────────
+  var lgGrad = c.createLinearGradient(44, 34, 82, 72)
+  lgGrad.addColorStop(0, '#6366F1'); lgGrad.addColorStop(1, '#4338CA')
+  c.fillStyle = lgGrad; rr(c, 44, 34, 40, 40, 10); c.fill()
+  c.fillStyle = 'white'; c.font = 'bold 22px Arial'; c.textAlign = 'center'
+  c.fillText('↗', 64, 62)
+  c.textAlign = 'left'
+  c.fillStyle = 'white'; c.font = 'bold 20px Arial'; c.fillText('Certify', 94, 62)
+  var cw = c.measureText('Certify').width
+  c.fillStyle = '#818CF8'; c.font = 'bold 20px Arial'; c.fillText('ROI', 94 + cw, 62)
+
+  // ── "INDIA · 2026" badge ─────────────────────────────────
+  c.font = '11px "Courier New", monospace'
+  var bt = 'INDIA · 2026', btw = c.measureText(bt).width
+  var bW = btw + 28, bH = 26, bX = W - bW - 44, bY = 36
+  c.fillStyle = 'rgba(129,140,248,0.12)'
+  rr(c, bX, bY, bW, bH, 7); c.fill()
+  c.strokeStyle = 'rgba(129,140,248,0.25)'; c.lineWidth = 1
+  rr(c, bX, bY, bW, bH, 7); c.stroke()
+  c.fillStyle = '#818CF8'; c.textAlign = 'center'
+  c.fillText(bt, bX + bW / 2, bY + 17)
+
+  // ── Header divider ───────────────────────────────────────
+  c.strokeStyle = 'rgba(255,255,255,0.05)'; c.lineWidth = 1
+  c.beginPath(); c.moveTo(44, 90); c.lineTo(W - 44, 90); c.stroke()
+
+  // ── Eyebrow ──────────────────────────────────────────────
+  var midY = 308
+  c.font = '12px "Courier New", monospace'
+  c.fillStyle = 'rgba(129,140,248,0.65)'
+  c.textAlign = 'center'
+  c.fillText('MY  2026  CERTIFICATION  MOVE', W / 2, midY - 122)
+
+  // Eyebrow decorative dots
+  c.fillStyle = accent1 + 'AA'
+  ;[-120, -100, -80].forEach(function(ox) {
+    c.beginPath(); c.arc(W / 2 + ox * 0, midY - 108, 1.8, 0, Math.PI * 2); c.fill()
+  })
+  c.fillStyle = accent1 + '80'
+  c.beginPath(); c.arc(W / 2, midY - 108, 2.2, 0, Math.PI * 2); c.fill()
+  c.fillStyle = accent1 + '40'
+  c.beginPath(); c.arc(W / 2 - 14, midY - 108, 1.8, 0, Math.PI * 2); c.fill()
+  c.beginPath(); c.arc(W / 2 + 14, midY - 108, 1.8, 0, Math.PI * 2); c.fill()
+
+  // ── Cert name — hero ─────────────────────────────────────
+  var cLen = certName.length
+  var cSize = cLen > 44 ? 50 : cLen > 34 ? 60 : cLen > 22 ? 72 : cLen > 16 ? 80 : 88
+  c.font = 'bold ' + cSize + 'px Arial, sans-serif'
+  var cLines = wrapLines(c, certName, 900)
+  var lH     = cSize * 1.18
+
+  // Gradient text effect — white → light steel
+  var tGrad = c.createLinearGradient(W / 2 - 400, 0, W / 2 + 400, 0)
+  tGrad.addColorStop(0,   'rgba(255,255,255,0.82)')
+  tGrad.addColorStop(0.5, '#FFFFFF')
+  tGrad.addColorStop(1,   'rgba(255,255,255,0.82)')
+
+  // Glow under text
+  c.shadowColor = accent1 + '55'
+  c.shadowBlur  = 32
+  c.fillStyle   = tGrad
+  c.textAlign   = 'center'
+  cLines.forEach(function(line, i) {
+    c.fillText(line, W / 2, midY - 40 + i * lH)
+  })
+  c.shadowBlur = 0
+
+  var afterCert = midY - 40 + cLines.length * lH
+
+  // ── Domain + Demand pills ────────────────────────────────
+  var pillY   = afterCert + 38
+  var domLabel = DOMAIN_LABELS[domain] || domain
+  c.font = '12px "Courier New", monospace'
+
+  var p1t = domLabel.toUpperCase()
+  var p2t = (demand.toUpperCase() + ' DEMAND')
+  var p1w = c.measureText(p1t).width + 30
+  var p2w = c.measureText(p2t).width + 30
+  var gap = 16, totalPW = p1w + p2w + gap
+  var p1x = W / 2 - totalPW / 2, p2x = p1x + p1w + gap
+  var pH = 30, pRad = 15
+
+  // Domain pill
+  c.fillStyle = accent1 + '22'; rr(c, p1x, pillY - pH / 2, p1w, pH, pRad); c.fill()
+  c.strokeStyle = accent1 + '50'; c.lineWidth = 1; rr(c, p1x, pillY - pH / 2, p1w, pH, pRad); c.stroke()
+  c.fillStyle = '#818CF8'; c.textAlign = 'center'
+  c.fillText(p1t, p1x + p1w / 2, pillY + 5)
+
+  // Demand pill
+  c.fillStyle = demColor + '22'; rr(c, p2x, pillY - pH / 2, p2w, pH, pRad); c.fill()
+  c.strokeStyle = demColor + '55'; c.lineWidth = 1; rr(c, p2x, pillY - pH / 2, p2w, pH, pRad); c.stroke()
+  c.fillStyle = demColor; c.textAlign = 'center'
+  c.fillText(p2t, p2x + p2w / 2, pillY + 5)
+
+  // ── Year progress arc — bottom right decorative element ──
+  var arcX = W - 80, arcY = H - 80, arcR = 36
+  // Track ring
+  c.strokeStyle = 'rgba(255,255,255,0.05)'
+  c.lineWidth = 3
+  c.beginPath(); c.arc(arcX, arcY, arcR, 0, Math.PI * 2); c.stroke()
+  // Progress arc (roughly Q1 of year = ~0.25 of circle)
+  var arcGrad = c.createLinearGradient(arcX - arcR, arcY, arcX + arcR, arcY)
+  arcGrad.addColorStop(0, accent1); arcGrad.addColorStop(1, accent2)
+  c.strokeStyle = arcGrad; c.lineWidth = 3
+  c.lineCap = 'round'
+  c.beginPath()
+  c.arc(arcX, arcY, arcR, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * 0.22)
+  c.stroke()
+  c.lineCap = 'butt'
+  // "2026" inside arc
+  c.font = 'bold 11px "Courier New", monospace'
+  c.fillStyle = 'rgba(129,140,248,0.7)'; c.textAlign = 'center'
+  c.fillText('2026', arcX, arcY + 4)
+
+  // ── Footer divider ───────────────────────────────────────
+  var fY = H - 58
+  c.strokeStyle = 'rgba(255,255,255,0.06)'; c.lineWidth = 1
+  c.beginPath(); c.moveTo(44, fY); c.lineTo(W - 130, fY); c.stroke()
+
+  // ── Footer — tagline left ────────────────────────────────
+  c.fillStyle = 'rgba(148,163,184,0.5)'
+  c.font = '13px Arial, sans-serif'; c.textAlign = 'left'
+  c.fillText('Backed by data. Decided with clarity.', 44, H - 28)
+
+  // ── Footer — URL (not in arc zone) ───────────────────────
+  c.fillStyle = 'rgba(129,140,248,0.75)'
+  c.font = 'bold 13px "Courier New", monospace'; c.textAlign = 'right'
+  c.fillText('certifyroi.vercel.app', W - 140, H - 28)
+
+  // ── Corner accents ───────────────────────────────────────
+  var aLen = 40, aA = 'rgba(99,102,241,0.22)'
+  c.strokeStyle = aA; c.lineWidth = 1.5
+  c.beginPath(); c.moveTo(W - 44, 10); c.lineTo(W - 44, 10 + aLen); c.stroke()
+  c.beginPath(); c.moveTo(W - 10, 44); c.lineTo(W - 10 - aLen, 44); c.stroke()
+  c.beginPath(); c.moveTo(10, H - 44); c.lineTo(10 + aLen, H - 44); c.stroke()
+  c.beginPath(); c.moveTo(44, H - 10); c.lineTo(44, H - 10 - aLen); c.stroke()
+}
+
+// ─────────────────────────────────────────────────────────
+// VARIANT B — "CAREER BADGE"
+// More badge-like. Left-aligned layout.
+// Looks like a verified credential / achievement card.
+// What someone shares after completing — "I mapped this out."
+// ─────────────────────────────────────────────────────────
+function drawCardB(canvas, opts) {
+  var certName = opts.certName || 'Your Certification'
+  var domain   = opts.domain   || 'tech'
+  var demand   = opts.demand   || 'High'
+
+  var W = 1200, H = 628, SC = 2
+  canvas.width = W * SC; canvas.height = H * SC
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px'
+  var c = canvas.getContext('2d')
+  c.scale(SC, SC)
+
+  var accents  = DOMAIN_ACCENTS[domain] || ['#6366F1', '#51B1E7']
+  var accent1  = accents[0]
+  var accent2  = accents[1]
+  var demColor = DEMAND_COLORS[demand] || '#94A3B8'
+  var domLabel = DOMAIN_LABELS[domain] || domain
+
+  // ── Background ───────────────────────────────────────────
+  var bg = c.createLinearGradient(0, 0, 0, H)
+  bg.addColorStop(0, '#0A0F20')
+  bg.addColorStop(1, '#070B18')
+  c.fillStyle = bg; c.fillRect(0, 0, W, H)
+
+  // Left panel background — slightly lighter
+  c.fillStyle = 'rgba(255,255,255,0.018)'
+  c.fillRect(0, 0, 420, H)
+
+  // Left panel border line
+  c.strokeStyle = 'rgba(255,255,255,0.06)'; c.lineWidth = 1
+  c.beginPath(); c.moveTo(420, 0); c.lineTo(420, H); c.stroke()
+
+  // Left panel domain glow
+  var lGlow = c.createRadialGradient(210, H / 2, 0, 210, H / 2, 380)
+  lGlow.addColorStop(0,   accent1 + '18')
+  lGlow.addColorStop(0.6, accent1 + '08')
+  lGlow.addColorStop(1,   'transparent')
+  c.fillStyle = lGlow; c.fillRect(0, 0, W, H)
+
+  // Right side subtle glow
+  var rGlow = c.createRadialGradient(W * 0.7, H * 0.5, 0, W * 0.7, H * 0.5, 360)
+  rGlow.addColorStop(0,   accent2 + '0C')
+  rGlow.addColorStop(1,   'transparent')
+  c.fillStyle = rGlow; c.fillRect(0, 0, W, H)
+
+  // Scan lines
+  for (var si = 0; si < H; si += 3) {
+    c.fillStyle = 'rgba(0,0,0,0.035)'; c.fillRect(0, si, W, 1)
+  }
+
+  // Inset frame
+  c.strokeStyle = 'rgba(255,255,255,0.035)'; c.lineWidth = 1
+  rr(c, 12, 12, W - 24, H - 24, 8); c.stroke()
+
+  // ── Left accent bar (vertical) ───────────────────────────
+  var lBar = c.createLinearGradient(0, 0, 0, H)
+  lBar.addColorStop(0,   accent1 + '00')
+  lBar.addColorStop(0.3, accent1)
+  lBar.addColorStop(0.7, accent2)
+  lBar.addColorStop(1,   accent2 + '00')
+  c.fillStyle = lBar; c.fillRect(0, 0, 4, H)
+
+  // ── LEFT PANEL CONTENT ───────────────────────────────────
+  var lMid = H / 2
+
+  // Big domain letter — giant background character
+  c.font = 'bold 280px Arial'
+  c.fillStyle = 'rgba(255,255,255,0.025)'
+  c.textAlign = 'center'
+  c.fillText(domLabel.charAt(0).toUpperCase(), 210, lMid + 90)
+
+  // Domain label — vertical text simulation via normal text
+  c.font = 'bold 13px "Courier New", monospace'
+  c.fillStyle = accent1 + 'CC'
+  c.textAlign = 'center'
+  c.fillText(domLabel.toUpperCase(), 210, lMid - 130)
+
+  // Separator micro line
+  c.strokeStyle = accent1 + '40'; c.lineWidth = 1
+  c.beginPath(); c.moveTo(130, lMid - 115); c.lineTo(290, lMid - 115); c.stroke()
+
+  // Demand badge — centered in left panel
+  var dbW = 140, dbH = 34, dbX = 210 - dbW / 2, dbY = lMid - 100
+  c.fillStyle = demColor + '20'; rr(c, dbX, dbY, dbW, dbH, 17); c.fill()
+  c.strokeStyle = demColor + '55'; c.lineWidth = 1; rr(c, dbX, dbY, dbW, dbH, 17); c.stroke()
+  c.font = '11px "Courier New", monospace'
+  c.fillStyle = demColor; c.textAlign = 'center'
+  c.fillText(demand.toUpperCase() + ' DEMAND', 210, dbY + 22)
+
+  // CertifyROI badge — bottom of left panel
+  var lgGrad = c.createLinearGradient(170, H - 100, 250, H - 50)
+  lgGrad.addColorStop(0, '#6366F1'); lgGrad.addColorStop(1, '#4338CA')
+  c.fillStyle = lgGrad; rr(c, 170, H - 98, 36, 36, 9); c.fill()
+  c.fillStyle = 'white'; c.font = 'bold 18px Arial'; c.textAlign = 'center'
+  c.fillText('↗', 188, H - 73)
+  c.fillStyle = 'rgba(255,255,255,0.75)'; c.font = '11px Arial'; c.textAlign = 'center'
+  c.fillText('CertifyROI', 210, H - 50)
+
+  // ── RIGHT PANEL CONTENT ──────────────────────────────────
+  var rx = 470, rw = W - rx - 60
+  var ry = H / 2 - 80
+
+  // Eyebrow
+  c.font = '11px "Courier New", monospace'
+  c.fillStyle = 'rgba(129,140,248,0.6)'
+  c.textAlign = 'left'
+  c.fillText('CERT PATH  ·  MAPPED  ·  2026', rx, ry - 40)
+
+  // Eyebrow underline
+  c.strokeStyle = 'rgba(99,102,241,0.2)'; c.lineWidth = 1
+  c.beginPath(); c.moveTo(rx, ry - 28); c.lineTo(rx + 300, ry - 28); c.stroke()
+
+  // Cert name
+  var cLen = certName.length
+  var cSize = cLen > 38 ? 52 : cLen > 28 ? 62 : cLen > 18 ? 72 : 82
+  c.font = 'bold ' + cSize + 'px Arial, sans-serif'
+  c.textAlign = 'left'
+  var cLines = wrapLines(c, certName, rw)
+  var lH = cSize * 1.15
+
+  c.shadowColor = accent1 + '40'; c.shadowBlur = 28
+  var tGrad = c.createLinearGradient(rx, 0, rx + rw, 0)
+  tGrad.addColorStop(0,   '#FFFFFF')
+  tGrad.addColorStop(0.6, '#E2E8F0')
+  tGrad.addColorStop(1,   '#C7D2FE')
+  c.fillStyle = tGrad
+  cLines.forEach(function(line, i) {
+    c.fillText(line, rx, ry + i * lH)
+  })
+  c.shadowBlur = 0
+
+  var afterCert = ry + cLines.length * lH
+
+  // Subtitle line
+  c.font = '16px Arial, sans-serif'
+  c.fillStyle = 'rgba(148,163,184,0.6)'
+  c.textAlign = 'left'
+  c.fillText('Analysed · Data-backed · India Market', rx, afterCert + 28)
+
+  // 3 micro verification dots
+  var dotsY = afterCert + 60
+  var dots = ['Data-backed decision', 'India market 2026', 'certifyroi.vercel.app']
+  dots.forEach(function(dot, i) {
+    var dx = rx + i * 220
+    c.fillStyle = accent1 + 'CC'
+    c.beginPath(); c.arc(dx, dotsY, 3, 0, Math.PI * 2); c.fill()
+    c.font = '11px "Courier New", monospace'
+    c.fillStyle = 'rgba(148,163,184,0.55)'
+    c.textAlign = 'left'
+    c.fillText(dot, dx + 10, dotsY + 4)
+  })
+
+  // ── Bottom right — INDIA · 2026 badge ───────────────────
+  c.font = '11px "Courier New", monospace'
+  var bt = 'INDIA · 2026', btw = c.measureText(bt).width
+  var bW = btw + 24, bH = 24, bX = W - bW - 24, bY = H - bH - 24
+  c.fillStyle = 'rgba(129,140,248,0.1)'
+  rr(c, bX, bY, bW, bH, 6); c.fill()
+  c.strokeStyle = 'rgba(129,140,248,0.22)'; c.lineWidth = 1
+  rr(c, bX, bY, bW, bH, 6); c.stroke()
+  c.fillStyle = 'rgba(129,140,248,0.65)'; c.textAlign = 'center'
+  c.fillText(bt, bX + bW / 2, bY + 16)
+}
+
+// ─────────────────────────────────────────────────────────
+// POST TIPS — different copy per variant
+// ─────────────────────────────────────────────────────────
+var POST_TIPS = {
+  A: '"Ran the numbers before deciding. This is my 2026 cert move." — no salary, no bragging. Just looks like a researched career decision. Gets curiosity clicks.',
+  B: '"Mapped out my cert path for 2026. Data says go." — feels like a confident professional announcement, not job hunting. Perfect for LinkedIn.',
+}
+
+// ─────────────────────────────────────────────────────────
+// MAIN COMPONENT
 // ─────────────────────────────────────────────────────────
 function ShareROICard({ certName, domain, demand, name }) {
-  var canvasRef            = useRef(null)
-  var [open,    setOpen]   = useState(false)
+  var canvasRef             = useRef(null)
+  var [open,    setOpen]    = useState(false)
+  var [variant, setVariant] = useState('A')
   var [drawing, setDrawing] = useState(false)
-  var [done,    setDone]   = useState(false)
-  var [copied,  setCopied] = useState(false)
+  var [done,    setDone]    = useState(false)
+  var [copied,  setCopied]  = useState(false)
 
-  // ── Render ────────────────────────────────────────────────
+  // ── Draw ─────────────────────────────────────────────────
   var render = useCallback(async function() {
     var canvas = canvasRef.current
     if (!canvas || !certName) return
-    setDrawing(true)
-    setDone(false)
+    setDrawing(true); setDone(false)
     try { await document.fonts.ready } catch(_) {}
-    await new Promise(function(r) { return setTimeout(r, 120) })
-    drawCard(canvas, {
+    await new Promise(function(r) { return setTimeout(r, 100) })
+    var drawFn = variant === 'B' ? drawCardB : drawCardA
+    drawFn(canvas, {
       certName: certName,
       domain:   domain || 'tech',
       demand:   demand || 'High',
       name:     name   || '',
-      isDark:   true, // always dark for LinkedIn
     })
-    setDrawing(false)
-    setDone(true)
-  }, [certName, domain, demand, name])
+    setDrawing(false); setDone(true)
+  }, [certName, domain, demand, name, variant])
 
-  // ── Open → trigger render after canvas is in DOM ─────────
+  // Re-render when variant changes
   useEffect(function() {
     if (!open) return
     var id1 = requestAnimationFrame(function() {
-      var id2 = requestAnimationFrame(function() {
-        render()
-      })
+      var id2 = requestAnimationFrame(function() { render() })
       return function() { cancelAnimationFrame(id2) }
     })
     return function() { cancelAnimationFrame(id1) }
-  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, variant]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Download PNG ──────────────────────────────────────────
+  // ── Download ──────────────────────────────────────────────
   var download = function() {
     var canvas = canvasRef.current
     if (!canvas || !done) return
     var a = document.createElement('a')
-    a.download = 'certifyroi-' + (certName || 'card').replace(/\s+/g, '-').toLowerCase() + '.png'
+    a.download = 'certifyroi-' + (certName || 'card').replace(/\s+/g, '-').toLowerCase() + '-' + variant.toLowerCase() + '.png'
     a.href = canvas.toDataURL('image/png')
     a.click()
   }
@@ -339,16 +526,11 @@ function ShareROICard({ certName, domain, demand, name }) {
     if (!canvas || !done) return
     try {
       var blob = await new Promise(function(res, rej) {
-        canvas.toBlob(function(b) {
-          return b ? res(b) : rej(new Error('blob failed'))
-        }, 'image/png')
+        canvas.toBlob(function(b) { return b ? res(b) : rej(new Error('blob')) }, 'image/png')
       })
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
-      setCopied(true)
-      setTimeout(function() { setCopied(false) }, 2500)
-    } catch(_) {
-      download()
-    }
+      setCopied(true); setTimeout(function() { setCopied(false) }, 2500)
+    } catch(_) { download() }
   }
 
   var toggle = function() {
@@ -368,43 +550,28 @@ function ShareROICard({ certName, domain, demand, name }) {
         whileHover={{ scale: 1.01, y: -1 }}
         whileTap={{ scale: 0.98 }}
         style={{
-          width: '100%',
-          padding: '12px 16px',
-          borderRadius: '11px',
+          width: '100%', padding: '12px 16px', borderRadius: '11px',
           background: open
-            ? 'linear-gradient(135deg,rgba(99,102,241,0.12),rgba(16,185,129,0.08))'
+            ? 'linear-gradient(135deg,rgba(99,102,241,0.12),rgba(16,185,129,0.07))'
             : 'var(--surface)',
           border: '1px solid ' + (open ? 'rgba(99,102,241,0.35)' : 'var(--border)'),
           color: open ? '#818CF8' : 'var(--text-3)',
-          fontSize: '13px',
-          cursor: 'pointer',
-          fontFamily: FH,
-          fontWeight: '700',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          transition: 'all 0.2s',
-          letterSpacing: '-0.01em',
+          fontSize: '13px', cursor: 'pointer', fontFamily: FH, fontWeight: '700',
+          display: 'flex', alignItems: 'center', gap: '8px',
+          transition: 'all 0.2s', letterSpacing: '-0.01em',
         }}
       >
         <div style={{
           width: '26px', height: '26px', borderRadius: '7px',
-          background: open ? 'rgba(99,102,241,0.2)' : 'var(--bg)',
-          border: '1px solid ' + (open ? 'rgba(99,102,241,0.3)' : 'var(--border)'),
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0, transition: 'all 0.2s',
+          background: open ? 'rgba(10,102,194,0.15)' : 'var(--bg)',
+          border: '1px solid ' + (open ? 'rgba(10,102,194,0.3)' : 'var(--border)'),
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          transition: 'all 0.2s',
         }}>
-          <Linkedin size={13} color={open ? '#818CF8' : 'var(--text-4)'} />
+          <Linkedin size={13} color={open ? '#0A66C2' : 'var(--text-4)'} />
         </div>
         Share on LinkedIn
-        <span style={{
-          marginLeft: 'auto',
-          fontSize: '10px',
-          opacity: 0.5,
-          fontFamily: FM,
-          letterSpacing: '0.05em',
-          fontWeight: '400',
-        }}>
+        <span style={{ marginLeft: 'auto', fontSize: '10px', opacity: 0.5, fontFamily: FM, letterSpacing: '0.05em', fontWeight: '400' }}>
           PNG · 1200×628
         </span>
       </motion.button>
@@ -421,90 +588,88 @@ function ShareROICard({ certName, domain, demand, name }) {
           >
             <div style={{ paddingTop: '12px' }}>
 
-              {/* Loading state */}
+              {/* ── Variant switcher ─────────────────────── */}
+              <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
+                {[
+                  { key: 'A', label: 'Cert Move', desc: 'Announcement' },
+                  { key: 'B', label: 'Career Badge', desc: 'Credential' },
+                ].map(function(v) {
+                  var active = variant === v.key
+                  return (
+                    <motion.button
+                      key={v.key}
+                      onClick={function() { if (variant !== v.key) { setVariant(v.key); setDone(false) } }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      style={{
+                        flex: 1, padding: '9px 12px', borderRadius: '9px', cursor: 'pointer',
+                        background: active ? 'rgba(99,102,241,0.1)' : 'var(--surface)',
+                        border: '1px solid ' + (active ? 'rgba(99,102,241,0.35)' : 'var(--border)'),
+                        display: 'flex', alignItems: 'center', gap: '7px',
+                        transition: 'all 0.18s',
+                      }}
+                    >
+                      <LayoutTemplate size={12} color={active ? '#818CF8' : 'var(--text-4)'} />
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ fontFamily: FH, fontWeight: '700', fontSize: '12px', color: active ? '#818CF8' : 'var(--text-3)' }}>
+                          {v.label}
+                        </div>
+                        <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', letterSpacing: '0.04em' }}>
+                          {v.desc}
+                        </div>
+                      </div>
+                      {active && (
+                        <motion.div
+                          layoutId="variantActive"
+                          style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: '#818CF8' }}
+                        />
+                      )}
+                    </motion.button>
+                  )
+                })}
+              </div>
+
+              {/* ── Loading state ────────────────────────── */}
               {drawing ? (
-                <div style={{
-                  height: '120px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
-                  borderRadius: '12px',
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                }}>
+                <div style={{ height: '130px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', borderRadius: '12px', background: 'var(--surface)', border: '1px solid var(--border)' }}>
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    style={{
-                      width: 20, height: 20, borderRadius: '50%',
-                      border: '2px solid rgba(99,102,241,0.5)',
-                      borderTopColor: '#6366F1',
-                    }}
+                    style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid rgba(99,102,241,0.4)', borderTopColor: '#6366F1' }}
                   />
-                  <span style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: FB }}>
-                    Building your card...
-                  </span>
+                  <span style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: FB }}>Building your card...</span>
                 </div>
               ) : null}
 
-              {/* Canvas — always mounted when open so ref is valid */}
+              {/* ── Canvas ───────────────────────────────── */}
               <canvas
                 ref={canvasRef}
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  borderRadius: '12px',
-                  border: '1px solid var(--border)',
-                  display: done ? 'block' : 'none',
-                }}
+                style={{ width: '100%', height: 'auto', borderRadius: '12px', border: '1px solid var(--border)', display: done ? 'block' : 'none' }}
               />
 
-              {/* Dimension label */}
+              {/* ── Dimension label ──────────────────────── */}
               {done ? (
-                <div style={{
-                  marginTop: '6px', marginBottom: '10px',
-                  fontSize: '10px', color: 'var(--text-4)',
-                  fontFamily: FM, textAlign: 'center',
-                  letterSpacing: '0.07em', textTransform: 'uppercase',
-                }}>
-                  LinkedIn post card · 1200 × 628 px
+                <div style={{ marginTop: '6px', marginBottom: '10px', fontSize: '10px', color: 'var(--text-4)', fontFamily: FM, textAlign: 'center', letterSpacing: '0.07em', textTransform: 'uppercase' }}>
+                  LinkedIn Post Card · 1200 × 628 px · {variant === 'A' ? 'Cert Move' : 'Career Badge'}
                 </div>
               ) : null}
 
-              {/* Action buttons */}
+              {/* ── Action buttons ───────────────────────── */}
               {done ? (
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <motion.button
                     onClick={download}
                     whileHover={{ scale: 1.02, y: -1 }}
                     whileTap={{ scale: 0.97 }}
-                    style={{
-                      flex: 1, padding: '12px',
-                      borderRadius: '10px',
-                      background: 'linear-gradient(135deg,#6366F1,#4338CA)',
-                      border: 'none', color: 'white',
-                      fontSize: '13px', cursor: 'pointer',
-                      fontFamily: FH, fontWeight: '700',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      gap: '7px', letterSpacing: '-0.01em',
-                    }}
+                    style={{ flex: 1, padding: '12px', borderRadius: '10px', background: 'linear-gradient(135deg,#6366F1,#4338CA)', border: 'none', color: 'white', fontSize: '13px', cursor: 'pointer', fontFamily: FH, fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', letterSpacing: '-0.01em' }}
                   >
                     <Download size={14} /> Download PNG
                   </motion.button>
-
                   <motion.button
                     onClick={copyImg}
                     whileHover={{ scale: 1.02, y: -1 }}
                     whileTap={{ scale: 0.97 }}
-                    style={{
-                      flex: 1, padding: '12px',
-                      borderRadius: '10px',
-                      background: copied ? 'rgba(16,185,129,0.1)' : 'var(--surface)',
-                      border: '1px solid ' + (copied ? 'rgba(16,185,129,0.3)' : 'var(--border)'),
-                      color: copied ? '#10B981' : 'var(--text-2)',
-                      fontSize: '13px', cursor: 'pointer',
-                      fontFamily: FH, fontWeight: '600',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      gap: '7px', transition: 'all 0.2s', letterSpacing: '-0.01em',
-                    }}
+                    style={{ flex: 1, padding: '12px', borderRadius: '10px', background: copied ? 'rgba(16,185,129,0.1)' : 'var(--surface)', border: '1px solid ' + (copied ? 'rgba(16,185,129,0.3)' : 'var(--border)'), color: copied ? '#10B981' : 'var(--text-2)', fontSize: '13px', cursor: 'pointer', fontFamily: FH, fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', transition: 'all 0.2s', letterSpacing: '-0.01em' }}
                   >
                     {copied ? <Check size={14} /> : <Copy size={14} />}
                     {copied ? 'Copied!' : 'Copy Image'}
@@ -512,32 +677,14 @@ function ShareROICard({ certName, domain, demand, name }) {
                 </div>
               ) : null}
 
-              {/* LinkedIn tip box */}
+              {/* ── Post tip ─────────────────────────────── */}
               {done ? (
-                <div style={{
-                  marginTop: '12px',
-                  padding: '12px 16px',
-                  borderRadius: '10px',
-                  background: 'rgba(99,102,241,0.06)',
-                  border: '1px solid rgba(99,102,241,0.15)',
-                }}>
-                  <div style={{
-                    fontSize: '10px', color: '#818CF8',
-                    fontFamily: FM, letterSpacing: '0.08em',
-                    textTransform: 'uppercase', marginBottom: '6px',
-                  }}>
-                    Post tip
+                <div style={{ marginTop: '12px', padding: '12px 16px', borderRadius: '10px', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
+                  <div style={{ fontSize: '10px', color: '#818CF8', fontFamily: FM, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '6px' }}>
+                    Post tip · {variant === 'A' ? 'Cert Move' : 'Career Badge'}
                   </div>
-                  <div style={{
-                    fontSize: '13px', color: 'var(--text-3)',
-                    fontFamily: FB, lineHeight: '1.65',
-                  }}>
-                    Post with a line like{' '}
-                    <em style={{ color: 'var(--text-2)', fontStyle: 'normal', fontWeight: '600' }}>
-                      "Ran the numbers before deciding. This is my 2026 cert move."
-                    </em>
-                    {' '}— no numbers, no salary talk. Just looks like a smart decision.
-                    Drives curiosity and clicks.
+                  <div style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: FB, lineHeight: '1.65' }}>
+                    {POST_TIPS[variant]}
                   </div>
                 </div>
               ) : null}
