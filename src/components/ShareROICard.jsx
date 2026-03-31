@@ -1,7 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { motion } from 'framer-motion'
-import { Share2, Download, Copy, Check } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Share2, Download, Copy, Check, Linkedin } from 'lucide-react'
 
+const FM = "'JetBrains Mono','Commit Mono',monospace"
+const FH = "'Plus Jakarta Sans','Bricolage Grotesque',sans-serif"
+const FB = "'Inter',sans-serif"
+
+// ── rounded rect helper ───────────────────────────────────
 function rr(ctx, x, y, w, h, r) {
   ctx.beginPath()
   ctx.moveTo(x + r, y)
@@ -16,237 +21,534 @@ function rr(ctx, x, y, w, h, r) {
   ctx.closePath()
 }
 
-function drawCard(canvas, p) {
-  const W = 800, H = 420, SC = 2
-  canvas.width  = W * SC
-  canvas.height = H * SC
-  canvas.style.width  = W + 'px'
-  canvas.style.height = H + 'px'
-  const c = canvas.getContext('2d')
-  c.scale(SC, SC)
-
-  const dk = p.isDark
-  const bg = dk ? '#0B0E14' : '#F0EDE8'
-  const sf = dk ? '#121826' : '#FFFFFF'
-  const bd = dk ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'
-  const t1 = dk ? '#F8FAFC' : '#0F172A'
-  const t3 = dk ? '#94A3B8' : '#475569'
-  const t4 = dk ? '#64748B' : '#94A3B8'
-
-  // bg
-  c.fillStyle = bg
-  c.fillRect(0, 0, W, H)
-
-  // dots
-  c.fillStyle = dk ? 'rgba(99,102,241,0.06)' : 'rgba(99,102,241,0.07)'
-  for (let xi = 0; xi < W; xi += 28)
-    for (let yi = 0; yi < H; yi += 28) {
-      c.beginPath(); c.arc(xi, yi, 1, 0, Math.PI * 2); c.fill()
+// ── text wrap helper ──────────────────────────────────────
+function wrapLines(ctx, text, maxWidth) {
+  var words = text.split(' ')
+  var lines = []
+  var line  = ''
+  words.forEach(function(w) {
+    var test = line ? (line + ' ' + w) : w
+    if (ctx.measureText(test).width > maxWidth) {
+      if (line) lines.push(line)
+      line = w
+    } else {
+      line = test
     }
-
-  // card surface
-  c.fillStyle = sf; rr(c, 24, 24, W-48, H-48, 18); c.fill()
-  c.strokeStyle = bd; c.lineWidth = 1.5; rr(c, 24, 24, W-48, H-48, 18); c.stroke()
-
-  // gradient top line
-  const gl = c.createLinearGradient(80, 24, W-80, 24)
-  gl.addColorStop(0, '#6366F1'); gl.addColorStop(0.5, '#10B981'); gl.addColorStop(1, '#51B1E7')
-  c.strokeStyle = gl; c.lineWidth = 3
-  c.beginPath(); c.moveTo(80, 25.5); c.lineTo(W-80, 25.5); c.stroke()
-
-  // logo box
-  c.fillStyle = '#6366F1'; rr(c, 44, 44, 26, 26, 7); c.fill()
-  c.fillStyle = '#fff'; c.font = 'bold 14px Arial'; c.textAlign = 'center'
-  c.fillText('↗', 57, 62)
-
-  // brand name
-  c.fillStyle = t1; c.font = 'bold 15px Arial'; c.textAlign = 'left'
-  c.fillText('CertifyROI', 78, 62)
-
-  // person + date
-  c.fillStyle = t4; c.font = '12px Arial'; c.textAlign = 'right'
-  c.fillText(p.name ? p.name + ' · India 2026' : 'India 2026', W - 44, 62)
-
-  // cert name
-  const cn = p.certName || 'Your Certification'
-  const fs = cn.length > 35 ? 20 : cn.length > 25 ? 24 : 28
-  c.fillStyle = t1; c.font = 'bold ' + fs + 'px Arial'; c.textAlign = 'left'
-  c.fillText(cn, 44, 115)
-
-  // divider
-  c.strokeStyle = dk ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)'; c.lineWidth = 1
-  c.beginPath(); c.moveTo(44, 132); c.lineTo(W-44, 132); c.stroke()
-
-  // 4 stat boxes
-  const stats = [
-    { l: 'NEW SALARY',  v: '₹' + (p.newSalary    || 0) + 'L/yr',   col: '#51B1E7' },
-    { l: 'BREAK-EVEN',  v: (p.breakEven     || 0) + ' months',      col: '#F59E0B' },
-    { l: '5-YEAR GAIN', v: '₹' + (p.fiveYearGain || 0) + 'L',      col: '#10B981' },
-    { l: 'MONTHLY +',   v: '₹' + (p.monthlyGain  || 0) + 'K',      col: '#818CF8' },
-  ]
-  const bW = (W - 88 - 30) / 4
-  const bH = 88, bY = 150
-  stats.forEach((s, i) => {
-    const bX = 44 + i * (bW + 10)
-    c.fillStyle = s.col + '12'; rr(c, bX, bY, bW, bH, 10); c.fill()
-    c.strokeStyle = s.col + '28'; c.lineWidth = 1; rr(c, bX, bY, bW, bH, 10); c.stroke()
-    c.fillStyle = t4; c.font = '9px Arial'; c.textAlign = 'center'
-    c.fillText(s.l, bX + bW / 2, bY + 17)
-    c.fillStyle = s.col; c.font = 'bold ' + (s.v.length > 8 ? 15 : 19) + 'px Arial'
-    c.fillText(s.v, bX + bW / 2, bY + 54)
   })
-
-  // ROI bar
-  const barY = 265, barW = W - 88
-  c.fillStyle = dk ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'
-  rr(c, 44, barY, barW, 10, 5); c.fill()
-  const pct = Math.min((p.roiPercent || 0) / 800, 1)
-  if (pct > 0) {
-    const bg2 = c.createLinearGradient(44, barY, 44 + barW * pct, barY)
-    bg2.addColorStop(0, '#6366F1'); bg2.addColorStop(1, '#10B981')
-    c.fillStyle = bg2; rr(c, 44, barY, barW * pct, 10, 5); c.fill()
-  }
-  c.fillStyle = t3; c.font = '13px Arial'; c.textAlign = 'left'
-  c.fillText((p.roiPercent || 0) + '% return on investment over 5 years', 44, barY + 28)
-
-  // tags
-  const tags = ['India-specific', 'Groq AI Verified', 'Naukri Data 2026']
-  let tx = 44
-  c.font = '10px Arial'
-  tags.forEach(tag => {
-    const tw = c.measureText(tag).width + 20
-    c.fillStyle = dk ? 'rgba(99,102,241,0.1)' : 'rgba(99,102,241,0.07)'
-    rr(c, tx, barY + 40, tw, 20, 5); c.fill()
-    c.strokeStyle = 'rgba(99,102,241,0.2)'; c.lineWidth = 0.8
-    rr(c, tx, barY + 40, tw, 20, 5); c.stroke()
-    c.fillStyle = '#6366F1'; c.textAlign = 'center'
-    c.fillText(tag, tx + tw / 2, barY + 54)
-    tx += tw + 8
-  })
-
-  // footer
-  c.fillStyle = t4; c.font = '10px Arial'; c.textAlign = 'center'
-  c.fillText("certifyroi.vercel.app · Made for India's Tech Professionals", W / 2, H - 30)
+  if (line) lines.push(line)
+  return lines
 }
 
-export default function ShareROICard({ certName, name, breakEven, fiveYearGain, monthlyGain, roiPercent, newSalary }) {
-  const canvasRef             = useRef(null)
-  const [open,    setOpen]    = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [done,    setDone]    = useState(false)
-  const [copied,  setCopied]  = useState(false)
-  const drawnRef              = useRef(false)
+// ── domain display labels ─────────────────────────────────
+var DOMAIN_LABELS = {
+  tech:          'Cloud & Tech',
+  data:          'Data & AI',
+  cybersecurity: 'Cybersecurity',
+  management:    'Project Mgmt',
+  finance:       'Finance',
+  marketing:     'Marketing',
+  hr:            'HR & People',
+  product:       'Product',
+  design:        'UX & Design',
+  medical:       'Medical',
+  law:           'Law & Compliance',
+  architecture:  'Architecture',
+  engineering:   'Engineering',
+  government:    'Govt & PSU',
+  mba:           'MBA & Executive',
+  business:      'Business & Ops',
+}
 
-  const isDark = () => document.documentElement.getAttribute('data-theme') !== 'light'
+// ── demand pill colors ────────────────────────────────────
+var DEMAND_COLORS = {
+  'Very High': '#10B981',
+  'High':      '#51B1E7',
+  'Medium':    '#F59E0B',
+  'Low':       '#94A3B8',
+}
 
-  const render = useCallback(async () => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    drawnRef.current = false
-    setLoading(true)
-    setDone(false)
-    try { await document.fonts.ready } catch (_) {}
-    await new Promise(r => setTimeout(r, 150))
-    drawCard(canvas, {
-      certName, name, breakEven, fiveYearGain,
-      monthlyGain, roiPercent, newSalary,
-      isDark: isDark(),
-    })
-    drawnRef.current = true
-    setLoading(false)
-    setDone(true)
-  }, [certName, name, breakEven, fiveYearGain, monthlyGain, roiPercent, newSalary])
+// ─────────────────────────────────────────────────────────
+// DRAW CARD — pure canvas, 1200×628 (LinkedIn standard)
+// No salary data. No numbers. Just cert + domain + demand.
+// ─────────────────────────────────────────────────────────
+function drawCard(canvas, opts) {
+  var certName = opts.certName || 'Your Certification'
+  var domain   = opts.domain   || 'tech'
+  var demand   = opts.demand   || 'High'
+  var isDark   = opts.isDark !== false // default dark
 
-  // This effect fires once the canvas element is actually in the DOM
-  // canvasRef.current is guaranteed non-null when open === true and canvas is rendered
-  useEffect(() => {
-    if (!open) return
-    // Use requestAnimationFrame to ensure the canvas has painted
-    const id = requestAnimationFrame(() => {
-      requestAnimationFrame(() => render())
-    })
-    return () => cancelAnimationFrame(id)
-  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Always render dark — LinkedIn card is always dark regardless of site theme
+  // (dark card looks far better on LinkedIn's white feed)
+  var W = 1200, H = 628, SC = 2
+  canvas.width        = W * SC
+  canvas.height       = H * SC
+  canvas.style.width  = W + 'px'
+  canvas.style.height = H + 'px'
+  var c = canvas.getContext('2d')
+  c.scale(SC, SC)
 
-  // Re-render when theme changes
-  useEffect(() => {
-    if (!open || !done) return
-    const obs = new MutationObserver(() => render())
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-    return () => obs.disconnect()
-  }, [open, done, render])
+  // ── Background ───────────────────────────────────────────
+  var bgGrad = c.createLinearGradient(0, 0, W, H)
+  bgGrad.addColorStop(0,   '#0B1426')
+  bgGrad.addColorStop(0.5, '#0E1C35')
+  bgGrad.addColorStop(1,   '#080F1E')
+  c.fillStyle = bgGrad
+  c.fillRect(0, 0, W, H)
 
-  const toggle = () => {
-    const next = !open
-    setOpen(next)
-    if (!next) { setDone(false); setLoading(false) }
+  // Dot grid
+  c.fillStyle = 'rgba(99,102,241,0.065)'
+  for (var xi = 0; xi <= W; xi += 32) {
+    for (var yi = 0; yi <= H; yi += 32) {
+      c.beginPath()
+      c.arc(xi, yi, 1.5, 0, Math.PI * 2)
+      c.fill()
+    }
   }
 
-  const download = () => {
-    const canvas = canvasRef.current
+  // Radial center glow
+  var glow = c.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, 440)
+  glow.addColorStop(0,   'rgba(99,102,241,0.07)')
+  glow.addColorStop(0.5, 'rgba(16,185,129,0.04)')
+  glow.addColorStop(1,   'transparent')
+  c.fillStyle = glow
+  c.fillRect(0, 0, W, H)
+
+  // ── Top gradient bar (5px) ───────────────────────────────
+  var topGrad = c.createLinearGradient(0, 0, W, 0)
+  topGrad.addColorStop(0,    '#6366F1')
+  topGrad.addColorStop(0.45, '#10B981')
+  topGrad.addColorStop(1,    '#51B1E7')
+  c.fillStyle = topGrad
+  c.fillRect(0, 0, W, 5)
+
+  // ── Logo top-left ────────────────────────────────────────
+  // Square icon
+  var lgGrad = c.createLinearGradient(44, 34, 82, 72)
+  lgGrad.addColorStop(0, '#6366F1')
+  lgGrad.addColorStop(1, '#4338CA')
+  c.fillStyle = lgGrad
+  rr(c, 44, 34, 40, 40, 10)
+  c.fill()
+  // Arrow up-right inside icon
+  c.fillStyle = 'white'
+  c.font = 'bold 22px Arial'
+  c.textAlign = 'center'
+  c.fillText('↗', 64, 62)
+  // Brand name
+  c.textAlign = 'left'
+  c.fillStyle = 'white'
+  c.font = 'bold 20px Arial'
+  c.fillText('Certify', 94, 62)
+  var cw = c.measureText('Certify').width
+  c.fillStyle = '#818CF8'
+  c.font = 'bold 20px Arial'
+  c.fillText('ROI', 94 + cw, 62)
+
+  // ── "INDIA · 2026" badge top-right ───────────────────────
+  c.font = '12px "Courier New", monospace'
+  var badgeText = 'INDIA · 2026'
+  var btw = c.measureText(badgeText).width
+  var bPad = 14, bH2 = 28, bW2 = btw + bPad * 2
+  var bX = W - bW2 - 44, bY = 34
+  c.fillStyle = 'rgba(129,140,248,0.12)'
+  rr(c, bX, bY, bW2, bH2, 7)
+  c.fill()
+  c.strokeStyle = 'rgba(129,140,248,0.28)'
+  c.lineWidth = 1
+  rr(c, bX, bY, bW2, bH2, 7)
+  c.stroke()
+  c.fillStyle = '#818CF8'
+  c.textAlign = 'center'
+  c.fillText(badgeText, bX + bW2 / 2, bY + 18)
+
+  // ── Thin divider under header ────────────────────────────
+  c.strokeStyle = 'rgba(255,255,255,0.05)'
+  c.lineWidth = 1
+  c.beginPath()
+  c.moveTo(44, 92)
+  c.lineTo(W - 44, 92)
+  c.stroke()
+
+  // ── Center vertical midpoint ─────────────────────────────
+  var centerY = 316
+
+  // ── Eyebrow label ────────────────────────────────────────
+  c.fillStyle = 'rgba(129,140,248,0.7)'
+  c.font = '13px "Courier New", monospace'
+  c.textAlign = 'center'
+  c.fillText('MY 2026 CERTIFICATION MOVE', W / 2, centerY - 116)
+
+  // Eyebrow dot accent
+  c.fillStyle = '#6366F1'
+  c.beginPath()
+  c.arc(W / 2, centerY - 100, 2.5, 0, Math.PI * 2)
+  c.fill()
+
+  // ── Cert name — hero element ─────────────────────────────
+  var maxCertW = 900
+  var certLen  = certName.length
+  var certSize = certLen > 42 ? 52 : certLen > 32 ? 62 : certLen > 20 ? 72 : 82
+  c.font = 'bold ' + certSize + 'px Arial, sans-serif'
+  var certLines = wrapLines(c, certName, maxCertW)
+  var lineH     = certSize * 1.18
+
+  // Subtle text glow
+  c.shadowColor = 'rgba(99,102,241,0.3)'
+  c.shadowBlur  = 24
+  c.fillStyle   = '#FFFFFF'
+  c.textAlign   = 'center'
+  certLines.forEach(function(line, i) {
+    c.fillText(line, W / 2, centerY - 44 + i * lineH)
+  })
+  c.shadowBlur = 0
+
+  var afterCert = centerY - 44 + certLines.length * lineH
+
+  // ── Domain + Demand pills ────────────────────────────────
+  var pillY = afterCert + 36
+  var domainLabel = DOMAIN_LABELS[domain] || (domain.charAt(0).toUpperCase() + domain.slice(1))
+  var demColor    = DEMAND_COLORS[demand] || '#94A3B8'
+
+  c.font = '12px "Courier New", monospace'
+
+  var p1Text = domainLabel.toUpperCase()
+  var p2Text = (demand + ' DEMAND').toUpperCase()
+  var p1W    = c.measureText(p1Text).width + 28
+  var p2W    = c.measureText(p2Text).width + 28
+  var gap    = 14
+  var totalPW = p1W + p2W + gap
+  var p1X    = W / 2 - totalPW / 2
+  var p2X    = p1X + p1W + gap
+  var pH     = 30, pR = 15
+
+  // Domain pill
+  c.fillStyle = 'rgba(99,102,241,0.2)'
+  rr(c, p1X, pillY - pH / 2, p1W, pH, pR)
+  c.fill()
+  c.strokeStyle = 'rgba(99,102,241,0.4)'
+  c.lineWidth = 1
+  rr(c, p1X, pillY - pH / 2, p1W, pH, pR)
+  c.stroke()
+  c.fillStyle   = '#818CF8'
+  c.textAlign   = 'center'
+  c.fillText(p1Text, p1X + p1W / 2, pillY + 5)
+
+  // Demand pill
+  c.fillStyle = demColor + '25'
+  rr(c, p2X, pillY - pH / 2, p2W, pH, pR)
+  c.fill()
+  c.strokeStyle = demColor + '50'
+  c.lineWidth = 1
+  rr(c, p2X, pillY - pH / 2, p2W, pH, pR)
+  c.stroke()
+  c.fillStyle = demColor
+  c.fillText(p2Text, p2X + p2W / 2, pillY + 5)
+
+  // ── Bottom divider ───────────────────────────────────────
+  var footerDivY = H - 62
+  c.strokeStyle = 'rgba(255,255,255,0.06)'
+  c.lineWidth = 1
+  c.beginPath()
+  c.moveTo(44, footerDivY)
+  c.lineTo(W - 44, footerDivY)
+  c.stroke()
+
+  // ── Footer left — tagline ────────────────────────────────
+  c.fillStyle = 'rgba(148,163,184,0.55)'
+  c.font = '14px Arial, sans-serif'
+  c.textAlign = 'left'
+  c.fillText('Backed by data. Decided with clarity.', 44, H - 30)
+
+  // ── Footer right — URL ───────────────────────────────────
+  c.fillStyle = 'rgba(129,140,248,0.8)'
+  c.font = 'bold 14px "Courier New", monospace'
+  c.textAlign = 'right'
+  c.fillText('certifyroi.vercel.app', W - 44, H - 30)
+
+  // ── Corner bracket accents ───────────────────────────────
+  var acLen = 44
+  var acAlpha = 'rgba(99,102,241,0.18)'
+  c.strokeStyle = acAlpha
+  c.lineWidth = 1.5
+  // top-right
+  c.beginPath(); c.moveTo(W - 44, 8);     c.lineTo(W - 44, 8 + acLen);   c.stroke()
+  c.beginPath(); c.moveTo(W - 8, 44);     c.lineTo(W - 8 - acLen, 44);   c.stroke()
+  // bottom-left
+  c.beginPath(); c.moveTo(8, H - 44);     c.lineTo(8 + acLen, H - 44);   c.stroke()
+  c.beginPath(); c.moveTo(44, H - 8);     c.lineTo(44, H - 8 - acLen);   c.stroke()
+  // top-left subtle
+  c.strokeStyle = 'rgba(99,102,241,0.1)'
+  c.beginPath(); c.moveTo(44, 8);         c.lineTo(44, 8 + acLen);        c.stroke()
+  c.beginPath(); c.moveTo(8, 44);         c.lineTo(8 + acLen, 44);        c.stroke()
+}
+
+// ─────────────────────────────────────────────────────────
+// SHARE ROI CARD COMPONENT
+// ─────────────────────────────────────────────────────────
+function ShareROICard({ certName, domain, demand, name }) {
+  var canvasRef            = useRef(null)
+  var [open,    setOpen]   = useState(false)
+  var [drawing, setDrawing] = useState(false)
+  var [done,    setDone]   = useState(false)
+  var [copied,  setCopied] = useState(false)
+
+  // ── Render ────────────────────────────────────────────────
+  var render = useCallback(async function() {
+    var canvas = canvasRef.current
+    if (!canvas || !certName) return
+    setDrawing(true)
+    setDone(false)
+    try { await document.fonts.ready } catch(_) {}
+    await new Promise(function(r) { return setTimeout(r, 120) })
+    drawCard(canvas, {
+      certName: certName,
+      domain:   domain || 'tech',
+      demand:   demand || 'High',
+      name:     name   || '',
+      isDark:   true, // always dark for LinkedIn
+    })
+    setDrawing(false)
+    setDone(true)
+  }, [certName, domain, demand, name])
+
+  // ── Open → trigger render after canvas is in DOM ─────────
+  useEffect(function() {
+    if (!open) return
+    var id1 = requestAnimationFrame(function() {
+      var id2 = requestAnimationFrame(function() {
+        render()
+      })
+      return function() { cancelAnimationFrame(id2) }
+    })
+    return function() { cancelAnimationFrame(id1) }
+  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Download PNG ──────────────────────────────────────────
+  var download = function() {
+    var canvas = canvasRef.current
     if (!canvas || !done) return
-    const a = document.createElement('a')
-    a.download = 'certifyroi-' + (certName || 'roi').replace(/\s+/g, '-').toLowerCase() + '.png'
+    var a = document.createElement('a')
+    a.download = 'certifyroi-' + (certName || 'card').replace(/\s+/g, '-').toLowerCase() + '.png'
     a.href = canvas.toDataURL('image/png')
     a.click()
   }
 
-  const copyImg = async () => {
-    const canvas = canvasRef.current
+  // ── Copy to clipboard ─────────────────────────────────────
+  var copyImg = async function() {
+    var canvas = canvasRef.current
     if (!canvas || !done) return
     try {
-      const blob = await new Promise((res, rej) =>
-        canvas.toBlob(b => b ? res(b) : rej(new Error('blob failed')), 'image/png')
-      )
+      var blob = await new Promise(function(res, rej) {
+        canvas.toBlob(function(b) {
+          return b ? res(b) : rej(new Error('blob failed'))
+        }, 'image/png')
+      })
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch { download() }
+      setTimeout(function() { setCopied(false) }, 2500)
+    } catch(_) {
+      download()
+    }
+  }
+
+  var toggle = function() {
+    var next = !open
+    setOpen(next)
+    if (!next) { setDone(false); setDrawing(false) }
   }
 
   if (!certName) return null
 
   return (
     <div style={{ marginTop: '8px' }}>
-      <button onClick={toggle}
-        style={{ width: '100%', padding: '9px 14px', borderRadius: '9px', background: open ? 'rgba(81,177,231,0.1)' : 'var(--surface)', border: '1px solid ' + (open ? 'rgba(81,177,231,0.3)' : 'var(--border)'), color: open ? '#51B1E7' : 'var(--text-3)', fontSize: '12px', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.18s' }}>
-        <Share2 size={13} />
-        Share My ROI Card
-        <span style={{ marginLeft: 'auto', fontSize: '10px', opacity: 0.6 }}>save as image</span>
-      </button>
 
-      {open && (
-        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-          style={{ marginTop: '10px' }}>
+      {/* ── Trigger button ───────────────────────────────── */}
+      <motion.button
+        onClick={toggle}
+        whileHover={{ scale: 1.01, y: -1 }}
+        whileTap={{ scale: 0.98 }}
+        style={{
+          width: '100%',
+          padding: '12px 16px',
+          borderRadius: '11px',
+          background: open
+            ? 'linear-gradient(135deg,rgba(99,102,241,0.12),rgba(16,185,129,0.08))'
+            : 'var(--surface)',
+          border: '1px solid ' + (open ? 'rgba(99,102,241,0.35)' : 'var(--border)'),
+          color: open ? '#818CF8' : 'var(--text-3)',
+          fontSize: '13px',
+          cursor: 'pointer',
+          fontFamily: FH,
+          fontWeight: '700',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          transition: 'all 0.2s',
+          letterSpacing: '-0.01em',
+        }}
+      >
+        <div style={{
+          width: '26px', height: '26px', borderRadius: '7px',
+          background: open ? 'rgba(99,102,241,0.2)' : 'var(--bg)',
+          border: '1px solid ' + (open ? 'rgba(99,102,241,0.3)' : 'var(--border)'),
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0, transition: 'all 0.2s',
+        }}>
+          <Linkedin size={13} color={open ? '#818CF8' : 'var(--text-4)'} />
+        </div>
+        Share on LinkedIn
+        <span style={{
+          marginLeft: 'auto',
+          fontSize: '10px',
+          opacity: 0.5,
+          fontFamily: FM,
+          letterSpacing: '0.05em',
+          fontWeight: '400',
+        }}>
+          PNG · 1200×628
+        </span>
+      </motion.button>
 
-          {loading && !done && (
-            <div style={{ height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', borderRadius: '12px', background: 'var(--surface)', border: '1px solid var(--border)' }}>
-              <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                style={{ width: 18, height: 18, borderRadius: '50%', border: '2px solid var(--indigo)', borderTopColor: 'transparent' }} />
-              <span style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: "'Inter',sans-serif" }}>Rendering card...</span>
+      {/* ── Expandable panel ─────────────────────────────── */}
+      <AnimatePresence>
+        {open ? (
+          <motion.div
+            initial={{ opacity: 0, height: 0, y: -4 }}
+            animate={{ opacity: 1, height: 'auto', y: 0 }}
+            exit={{   opacity: 0, height: 0, y: -4 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ paddingTop: '12px' }}>
+
+              {/* Loading state */}
+              {drawing ? (
+                <div style={{
+                  height: '120px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
+                  borderRadius: '12px',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                }}>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    style={{
+                      width: 20, height: 20, borderRadius: '50%',
+                      border: '2px solid rgba(99,102,241,0.5)',
+                      borderTopColor: '#6366F1',
+                    }}
+                  />
+                  <span style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: FB }}>
+                    Building your card...
+                  </span>
+                </div>
+              ) : null}
+
+              {/* Canvas — always mounted when open so ref is valid */}
+              <canvas
+                ref={canvasRef}
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  borderRadius: '12px',
+                  border: '1px solid var(--border)',
+                  display: done ? 'block' : 'none',
+                }}
+              />
+
+              {/* Dimension label */}
+              {done ? (
+                <div style={{
+                  marginTop: '6px', marginBottom: '10px',
+                  fontSize: '10px', color: 'var(--text-4)',
+                  fontFamily: FM, textAlign: 'center',
+                  letterSpacing: '0.07em', textTransform: 'uppercase',
+                }}>
+                  LinkedIn post card · 1200 × 628 px
+                </div>
+              ) : null}
+
+              {/* Action buttons */}
+              {done ? (
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <motion.button
+                    onClick={download}
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.97 }}
+                    style={{
+                      flex: 1, padding: '12px',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg,#6366F1,#4338CA)',
+                      border: 'none', color: 'white',
+                      fontSize: '13px', cursor: 'pointer',
+                      fontFamily: FH, fontWeight: '700',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      gap: '7px', letterSpacing: '-0.01em',
+                    }}
+                  >
+                    <Download size={14} /> Download PNG
+                  </motion.button>
+
+                  <motion.button
+                    onClick={copyImg}
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.97 }}
+                    style={{
+                      flex: 1, padding: '12px',
+                      borderRadius: '10px',
+                      background: copied ? 'rgba(16,185,129,0.1)' : 'var(--surface)',
+                      border: '1px solid ' + (copied ? 'rgba(16,185,129,0.3)' : 'var(--border)'),
+                      color: copied ? '#10B981' : 'var(--text-2)',
+                      fontSize: '13px', cursor: 'pointer',
+                      fontFamily: FH, fontWeight: '600',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      gap: '7px', transition: 'all 0.2s', letterSpacing: '-0.01em',
+                    }}
+                  >
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                    {copied ? 'Copied!' : 'Copy Image'}
+                  </motion.button>
+                </div>
+              ) : null}
+
+              {/* LinkedIn tip box */}
+              {done ? (
+                <div style={{
+                  marginTop: '12px',
+                  padding: '12px 16px',
+                  borderRadius: '10px',
+                  background: 'rgba(99,102,241,0.06)',
+                  border: '1px solid rgba(99,102,241,0.15)',
+                }}>
+                  <div style={{
+                    fontSize: '10px', color: '#818CF8',
+                    fontFamily: FM, letterSpacing: '0.08em',
+                    textTransform: 'uppercase', marginBottom: '6px',
+                  }}>
+                    Post tip
+                  </div>
+                  <div style={{
+                    fontSize: '13px', color: 'var(--text-3)',
+                    fontFamily: FB, lineHeight: '1.65',
+                  }}>
+                    Post with a line like{' '}
+                    <em style={{ color: 'var(--text-2)', fontStyle: 'normal', fontWeight: '600' }}>
+                      "Ran the numbers before deciding. This is my 2026 cert move."
+                    </em>
+                    {' '}— no numbers, no salary talk. Just looks like a smart decision.
+                    Drives curiosity and clicks.
+                  </div>
+                </div>
+              ) : null}
+
             </div>
-          )}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
-          {/* Canvas always mounted when open so ref attaches — hidden until drawn */}
-          <canvas ref={canvasRef}
-            style={{ width: '100%', height: 'auto', borderRadius: '12px', border: '1px solid var(--border)', display: done ? 'block' : 'none' }}
-          />
-
-          {done && (
-            <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-              <motion.button onClick={download} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                style={{ flex: 1, padding: '10px', borderRadius: '8px', background: 'linear-gradient(135deg,#51B1E7,#3B8CC7)', border: 'none', color: 'white', fontSize: '12px', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                <Download size={13} /> Download PNG
-              </motion.button>
-              <motion.button onClick={copyImg} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                style={{ flex: 1, padding: '10px', borderRadius: '8px', background: copied ? 'rgba(16,185,129,0.1)' : 'var(--surface)', border: '1px solid ' + (copied ? 'rgba(16,185,129,0.3)' : 'var(--border)'), color: copied ? '#10B981' : 'var(--text-2)', fontSize: '12px', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s' }}>
-                {copied ? <Check size={13} /> : <Copy size={13} />}
-                {copied ? 'Copied!' : 'Copy Image'}
-              </motion.button>
-            </div>
-          )}
-        </motion.div>
-      )}
     </div>
   )
 }
+
+export default ShareROICard
