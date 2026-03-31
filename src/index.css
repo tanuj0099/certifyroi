@@ -305,6 +305,92 @@
   [data-theme="light"] .shimmer {
     background: linear-gradient(90deg, rgba(79,70,229,0) 0%, rgba(79,70,229,0.07) 50%, rgba(79,70,229,0) 100%);
     background-size: 200% 100%;
+
+    /* ── Tab row scrollable (mobile) ─────────────────────── */
+  .tab-row-scroll {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .tab-row-scroll::-webkit-scrollbar { display: none; }
+
+  /* ── Drawer body lock ────────────────────────────────── */
+  body.drawer-open { overflow: hidden !important; }
+
+  /* ── Landing bento grid — mobile ────────────────────── */
+  @media (max-width: 700px) {
+    .landing-bento {
+      grid-template-columns: 1fr !important;
+      grid-template-rows: auto !important;
+    }
+    .landing-bento > * {
+      grid-column: auto !important;
+      grid-row: auto !important;
+    }
+  }
+
+  /* ── Mode selector — tiny screens ───────────────────── */
+  @media (max-width: 400px) {
+    .mode-words-row {
+      flex-direction: column !important;
+      gap: 24px !important;
+    }
+  }
+
+  /* ── CertCompare table — mobile stack ───────────────── */
+  @media (max-width: 520px) {
+    .compare-table-row {
+      grid-template-columns: 1fr 1fr !important;
+    }
+    .compare-table-row .compare-label {
+      display: none !important;
+    }
+  }
+
+  /* ── Footer grid — mobile ────────────────────────────── */
+  @media (max-width: 520px) {
+    footer .footer-grid-auto {
+      grid-template-columns: 1fr 1fr !important;
+    }
+  }
+
+  /* ── Universal touch target enforcement ──────────────── */
+  @media (max-width: 768px) {
+    button, a, [role="button"], [role="tab"] {
+      min-height: 44px;
+    }
+
+    /* cert animation container — prevent 3D glitch on iOS */
+    .cert-assembly-track {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+
+    /* Prevent text size adjustment on orientation change */
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    /* Glass card padding on mobile */
+    .glass {
+      border-radius: 12px !important;
+    }
+
+    /* Page wrappers — tighter padding on mobile */
+    .page-inner {
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+    }
+  }
+
+  /* ── Cert animation — iOS Safari 3D fix ─────────────── */
+  @supports (-webkit-touch-callout: none) {
+    .cert-assembly-track * {
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+  }
   }
   @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
