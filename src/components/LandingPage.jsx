@@ -620,7 +620,7 @@ function LandingPage({ onEnter }) {
   var ghostY = useTransform(heroSP, [0,1], [0, isMobile ? 80 : 180])
 
   return (
-    <div style={{ minHeight:'100vh', background:'var(--bg)', overflowX:'hidden' }}>
+  <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
       <ScanlineOverlay />
       <WaveBg variant="landing" />
 
