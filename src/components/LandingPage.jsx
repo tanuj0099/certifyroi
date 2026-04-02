@@ -305,16 +305,30 @@ function CertAssembly() {
   var certDot   = isDark ? 'rgba(99,102,241,0.2)'   : 'rgba(99,102,241,0.15)'
 
   var trackRef = useRef(null)
-  var { scrollYProgress } = useScroll({
-    target: trackRef,
-    offset: ['start start', 'end end'],
-  })
 
+  // ── KEY FIX: watch window scroll, not element scroll ──
+  // useScroll with a target ref breaks on iOS Safari + Android.
+  // We watch the page scroll and compute progress from the
+  // track element's bounding rect ourselves.
+  var { scrollY } = useScroll()
   var [prog, setProg] = useState(0)
+
   useEffect(function() {
-    var unsub = scrollYProgress.on('change', function(v) { setProg(v) })
+    function update() {
+      var el = trackRef.current
+      if (!el) return
+      var rect   = el.getBoundingClientRect()
+      var total  = el.offsetHeight - window.innerHeight  // scrollable distance
+      var offset = -rect.top                             // how far we've scrolled in
+      var p      = Math.max(0, Math.min(1, offset / total))
+      setProg(p)
+    }
+
+    // Subscribe to framer's scrollY (works cross-browser incl. iOS)
+    var unsub = scrollY.on('change', update)
+    update() // run once on mount
     return unsub
-  }, [scrollYProgress])
+  }, [scrollY])
 
   function remap(p, inMin, inMax, outMin, outMax) {
     var t = Math.max(0, Math.min(1, (p - inMin) / (inMax - inMin)))
@@ -346,8 +360,14 @@ function CertAssembly() {
   var fired = useRef(false)
 
   useEffect(function() {
-    var unsub = scrollYProgress.on('change', function(v) {
-      var sp = remap(v, 0.74, 0.82, 0, 1)
+    function checkFlare() {
+      var el = trackRef.current
+      if (!el) return
+      var rect  = el.getBoundingClientRect()
+      var total = el.offsetHeight - window.innerHeight
+      var offset = -rect.top
+      var p = Math.max(0, Math.min(1, offset / total))
+      var sp = remap(p, 0.74, 0.82, 0, 1)
       if (sp > 0.96 && !fired.current) {
         fired.current = true
         setShake(true); setFlare(true)
@@ -355,15 +375,12 @@ function CertAssembly() {
         setTimeout(function() { setShake(false) }, 440)
       }
       if (sp < 0.05) fired.current = false
-    })
-    return unsub
-  }, [scrollYProgress])
+    }
 
-  // ─────────────────────────────────────────────────────
-  // CRITICAL: trackRef div has NO overflow property at all.
-  // The sticky child also has NO overflow.
-  // This is exactly what Antigravity does and it's the fix.
-  // ─────────────────────────────────────────────────────
+    var unsub = scrollY.on('change', checkFlare)
+    return unsub
+  }, [scrollY])
+
   return (
     <div ref={trackRef} style={{ height: '300vh', position: 'relative' }}>
       <div style={{
@@ -372,7 +389,7 @@ function CertAssembly() {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
 
-        {/* Overlay — position: absolute, NO fixed */}
+        {/* Overlay */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
           background: isDark ? '#020408' : '#F0EDE8',
@@ -393,7 +410,7 @@ function CertAssembly() {
           <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(99,102,241,0.14)' }} />
         </div>
 
-        {/* Cert card */}
+        {/* Card */}
         <div style={{ position: 'relative', zIndex: 4 }}>
           <motion.div
             animate={shake ? { x: [0,-7,7,-5,5,-2,2,0] } : { x: 0 }}
@@ -402,8 +419,8 @@ function CertAssembly() {
             <div style={{ transform: 'scale(' + certScale + ')', opacity: certOpacity }}>
               <div style={{
                 position: 'relative',
-                width: isMobile ? 'min(340px, 90vw)' : 'min(500px, 88vw)',
-                height: 'calc(' + (isMobile ? 'min(340px, 90vw)' : 'min(500px, 88vw)') + ' / 1.414)',
+                width: isMobile ? 'min(320px, 88vw)' : 'min(500px, 88vw)',
+                height: 'calc(' + (isMobile ? 'min(320px, 88vw)' : 'min(500px, 88vw)') + ' / 1.414)',
                 transformStyle: 'preserve-3d',
               }}>
 
@@ -418,7 +435,7 @@ function CertAssembly() {
                   ) : null}
                 </AnimatePresence>
 
-                {/* LAYER 1 — frame */}
+                {/* Layer 1 — frame */}
                 <div style={{ position: 'absolute', inset: 0, transform: l1 }}>
                   <svg viewBox="0 0 500 354" width="100%" height="100%" style={{ position: 'absolute', inset: 0, display: 'block' }}>
                     <defs>
@@ -454,10 +471,9 @@ function CertAssembly() {
                   </svg>
                 </div>
 
-                {/* LAYER 2 — content */}
+                {/* Layer 2 — content */}
                 <div style={{
-                  position: 'absolute', inset: 0,
-                  transform: l2,
+                  position: 'absolute', inset: 0, transform: l2,
                   display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center',
                   padding: 'clamp(16px,4vw,40px)',
@@ -483,7 +499,7 @@ function CertAssembly() {
                   <div style={{ fontFamily: F_MONO, fontSize: '7px', color: certMuted, letterSpacing: '0.14em', textAlign: 'center' }}>VERIFIED BY AI · DATA: NAUKRI MARCH 2026</div>
                 </div>
 
-                {/* LAYER 3 — seal */}
+                {/* Layer 3 — seal */}
                 <div style={{ position: 'absolute', right: '6%', bottom: '8%', transform: l3 }}>
                   <svg viewBox="0 0 72 72" width="clamp(36px,8vw,72px)" height="clamp(36px,8vw,72px)">
                     <defs>
@@ -521,7 +537,6 @@ function CertAssembly() {
     </div>
   )
 }
-
 // ─────────────────────────────────────────────────────────
 // MAGNETIC CTA
 // ─────────────────────────────────────────────────────────
