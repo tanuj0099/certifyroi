@@ -338,7 +338,7 @@ function ThreeTools({ onEnter }) {
   var isMobile = useIsMobile()
   var tools = [
     { num: '01', name: 'ROI Calculator',    sub: 'Enter salary, cert cost, expected hike.', body: 'Returns break-even to the month, 5-year net gain in rupees, monthly salary delta. The math is shown. No estimates.', stat: '₹23.6K / month', note: 'extra from month 7' },
-    { num: '02', name: 'Resume AI',         sub: 'Upload your resume.',                     body: 'AI reads your actual background — role, years, tools, city — and maps it to India's 2026 hiring data. Recommends the three certs with highest ROI for your specific profile.', stat: '103 certs', note: 'across 17 domains' },
+    { num: '02', name: 'Resume AI',         sub: 'Upload your resume.',                     body: "AI reads your actual background \u2014 role, years, tools, city \u2014 and maps it to India's 2026 hiring data. Recommends the three certs with highest ROI for your specific profile.", stat: '103 certs', note: 'across 17 domains' },
     { num: '03', name: 'City Demand Map',   sub: 'See where demand actually is.',           body: 'Which cert is hiring the most in your city right now. Bangalore cloud demand is not Chennai cloud demand. We track both.', stat: '8 cities', note: 'live demand data' },
   ]
 
@@ -384,7 +384,7 @@ function ThreeTools({ onEnter }) {
 function VsSection() {
   var pairs = [
     { wrong: '"AWS is good for cloud engineers"',      right: 'AWS SAA at ₹9L salary: break-even 6 months, ₹14.2L net gain over 5 years.' },
-    { wrong: '"Upskill for career growth"',            right: '₹23,600 extra every month from month 7. Or it isn\'t worth doing.' },
+    { wrong: '"Upskill for career growth"',            right: "₹23,600 extra every month from month 7. Or it isn't worth doing." },
     { wrong: 'US salary data converted to rupees',     right: 'Naukri · AmbitionBox · LinkedIn India. 2026 data. Not converted. Collected.' },
     { wrong: 'The same advice for every professional', right: 'AI reads your resume. Your role. Your city. Your domain. Then it advises.' },
   ]
