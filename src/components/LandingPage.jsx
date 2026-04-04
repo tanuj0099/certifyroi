@@ -1,13 +1,8 @@
 import {
-  motion, useScroll, useTransform, useSpring,
-  useMotionValue, AnimatePresence
+  motion, useScroll, useTransform, AnimatePresence
 } from 'framer-motion'
-import { useRef, useState, useCallback, useEffect } from 'react'
-import {
-  TrendingUp, ArrowRight,
-  GraduationCap, Repeat, Briefcase, Star, Zap, Award,
-  Brain, ChevronRight, CheckCircle
-} from 'lucide-react'
+import { useRef, useState, useEffect } from 'react'
+import { TrendingUp, ArrowRight, GraduationCap, Repeat, Briefcase, Zap } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────
 // HOOKS
@@ -39,55 +34,92 @@ function useIsMobile() {
 }
 
 // ─────────────────────────────────────────────────────────
-// CONSTANTS
+// DESIGN TOKENS
 // ─────────────────────────────────────────────────────────
 var F_HEAD = "'Bricolage Grotesque','Plus Jakarta Sans',sans-serif"
 var F_MONO = "'Commit Mono','JetBrains Mono',monospace"
 var F_BODY = "'Inter',sans-serif"
 
-// ─────────────────────────────────────────────────────────
-// CLEAN CARD — no glow, no tilt, no drag
-// Just a surface with a subtle hover
-// ─────────────────────────────────────────────────────────
-function Card({ children, style, onClick, accentColor, animate }) {
-  style       = style       || {}
-  accentColor = accentColor || null
-  animate     = animate !== false
+// 4 animation variants — nothing else used in this file
+var SLIDE_L = {
+  hidden: { x: -40, opacity: 0 },
+  show:   { x: 0,   opacity: 1, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+}
+var SLIDE_R = {
+  hidden: { x: 40,  opacity: 0 },
+  show:   { x: 0,   opacity: 1, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+}
+var RISE = {
+  hidden: { y: 24, opacity: 0 },
+  show:   { y: 0,  opacity: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+}
+function staggerRise(delay) {
+  return {
+    hidden: { y: 24, opacity: 0 },
+    show:   { y: 0,  opacity: 1, transition: { duration: 0.6, delay: delay || 0, ease: [0.16, 1, 0.3, 1] } }
+  }
+}
 
-  var hoverStyle = onClick
-    ? { y: -2, transition: { duration: 0.18 } }
-    : { y: -1, transition: { duration: 0.18 } }
-
+// ─────────────────────────────────────────────────────────
+// LAYOUT HELPERS
+// ─────────────────────────────────────────────────────────
+function Section({ children, style }) {
   return (
-    <motion.div
-      onClick={onClick}
-      initial={animate ? { opacity: 0, y: 16 } : false}
-      whileInView={animate ? { opacity: 1, y: 0 } : false}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-      whileHover={hoverStyle}
-      style={{
-        borderRadius: '12px',
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-        overflow: 'hidden',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'border-color 0.18s, box-shadow 0.18s',
-        borderTop: accentColor ? '2px solid ' + accentColor : undefined,
-        ...style,
-      }}
-      onMouseEnter={function(e) {
-        e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'
-        if (accentColor) e.currentTarget.style.borderColor = accentColor + '44'
-      }}
-      onMouseLeave={function(e) {
-        e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)'
-        e.currentTarget.style.borderColor = 'var(--border)'
-      }}
-    >
+    <div style={{ maxWidth: '920px', margin: '0 auto', padding: '0 48px', ...style }}>
+      {children}
+    </div>
+  )
+}
+
+function HRule() {
+  return <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '0 48px' }} />
+}
+
+function SectionLabel({ color, children }) {
+  return (
+    <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}
+      style={{ fontFamily: F_MONO, fontSize: '11px', color: color || 'rgba(99,102,241,0.55)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '20px' }}>
       {children}
     </motion.div>
+  )
+}
+
+function SectionHeading({ children }) {
+  return (
+    <motion.h2 variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}
+      style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2rem,5vw,3.8rem)', color: 'var(--text)', letterSpacing: '-0.04em', lineHeight: 0.95, marginBottom: '72px', marginTop: 0 }}>
+      {children}
+    </motion.h2>
+  )
+}
+
+function CTAButton({ onClick, children, size }) {
+  var isLarge = size === 'large'
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={function(e) {
+        e.currentTarget.style.backgroundColor = '#5558E8'
+        e.currentTarget.style.transform = 'translateY(-2px)'
+        e.currentTarget.style.boxShadow = '0 8px 24px rgba(99,102,241,0.28)'
+      }}
+      onMouseLeave={function(e) {
+        e.currentTarget.style.backgroundColor = '#6366F1'
+        e.currentTarget.style.transform = 'translateY(0)'
+        e.currentTarget.style.boxShadow = '0 4px 14px rgba(99,102,241,0.18)'
+      }}
+      style={{
+        padding: isLarge ? '16px 48px' : '13px 32px',
+        borderRadius: '8px', border: 'none',
+        background: '#6366F1', color: 'white',
+        fontSize: isLarge ? 'clamp(15px,2.2vw,18px)' : '15px',
+        fontFamily: F_HEAD, fontWeight: '700', letterSpacing: '-0.02em',
+        cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '9px',
+        boxShadow: '0 4px 14px rgba(99,102,241,0.18)',
+        transition: 'background-color 0.18s, transform 0.18s, box-shadow 0.18s',
+      }}>
+      {children}
+    </button>
   )
 }
 
@@ -104,16 +136,16 @@ function Ticker() {
     'Hyderabad cloud demand up 38% YoY',
   ]
   return (
-    <div style={{ overflow: 'hidden', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '10px 0', background: 'var(--surface)' }}>
+    <div style={{ overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '10px 0' }}>
       <motion.div
         animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 36, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
         style={{ display: 'flex', gap: '80px', whiteSpace: 'nowrap', width: 'max-content' }}
       >
         {[...items, ...items].map(function(item, i) {
           return (
-            <span key={i} style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: F_MONO, flexShrink: 0 }}>
-              <span style={{ color: '#6366F1', marginRight: '12px' }}>◆</span>{item}
+            <span key={i} style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: F_MONO, flexShrink: 0, letterSpacing: '0.04em' }}>
+              <span style={{ color: 'rgba(99,102,241,0.45)', marginRight: '14px' }}>◆</span>{item}
             </span>
           )
         })}
@@ -123,9 +155,7 @@ function Ticker() {
 }
 
 // ─────────────────────────────────────────────────────────
-// CERT ASSEMBLY — kept exactly as-is, this is the one
-// signature moment. Only removed: grid overlay, crosshairs,
-// shake effect, flare effect. The assembly itself unchanged.
+// CERT ASSEMBLY — unchanged
 // ─────────────────────────────────────────────────────────
 function CertAssembly() {
   var isDark   = useIsDark()
@@ -137,8 +167,8 @@ function CertAssembly() {
   var certMuted = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(15,23,42,0.3)'
   var certDot   = isDark ? 'rgba(99,102,241,0.2)'   : 'rgba(99,102,241,0.15)'
 
-  var trackRef = useRef(null)
-  var { scrollY } = useScroll()
+  var trackRef     = useRef(null)
+  var { scrollY }  = useScroll()
   var [prog, setProg] = useState(0)
 
   useEffect(function() {
@@ -162,7 +192,6 @@ function CertAssembly() {
   }
 
   var p8 = remap(prog, 0, 0.8, 0, 1)
-
   var l1, l2, l3
   if (isMobile) {
     l1 = 'translateY(' + remap(p8,0,1,-50,0) + 'px) rotateZ(' + remap(p8,0,1,3,0) + 'deg)'
@@ -183,119 +212,416 @@ function CertAssembly() {
   return (
     <div ref={trackRef} style={{ height: '300vh', position: 'relative' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-
-        {/* Background overlay */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: isDark ? '#020408' : '#F0EDE8', opacity: overlayOp }} />
-
-        {/* Card */}
         <div style={{ position: 'relative', zIndex: 4 }}>
           <div style={{ transform: 'scale(' + certScale + ')', opacity: certOpacity }}>
-            <div style={{
-              position: 'relative',
-              width: isMobile ? 'min(320px,88vw)' : 'min(500px,88vw)',
-              height: 'calc(' + (isMobile ? 'min(320px,88vw)' : 'min(500px,88vw)') + ' / 1.414)',
-              transformStyle: 'preserve-3d',
-            }}>
-
-              {/* Layer 1 — frame */}
+            <div style={{ position: 'relative', width: isMobile ? 'min(320px,88vw)' : 'min(500px,88vw)', height: 'calc(' + (isMobile ? 'min(320px,88vw)' : 'min(500px,88vw)') + ' / 1.414)', transformStyle: 'preserve-3d' }}>
               <div style={{ position: 'absolute', inset: 0, transform: l1 }}>
                 <svg viewBox="0 0 500 354" width="100%" height="100%" style={{ position: 'absolute', inset: 0, display: 'block' }}>
                   <defs>
                     <linearGradient id="cBorder" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%"   stopColor="#6366F1"/>
-                      <stop offset="32%"  stopColor="#818CF8"/>
-                      <stop offset="66%"  stopColor="#10B981"/>
-                      <stop offset="100%" stopColor="#51B1E7"/>
+                      <stop offset="0%"   stopColor="#6366F1"/><stop offset="32%"  stopColor="#818CF8"/>
+                      <stop offset="66%"  stopColor="#10B981"/><stop offset="100%" stopColor="#51B1E7"/>
                     </linearGradient>
-                    <filter id="cGlow">
-                      <feGaussianBlur stdDeviation="2.5" result="b"/>
-                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
+                    <filter id="cGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                   </defs>
                   <rect x="0" y="0" width="500" height="354" rx="16" fill={certBg} fillOpacity="0.97"/>
                   <rect x="1.5" y="1.5" width="497" height="351" rx="15" fill="none" stroke="url(#cBorder)" strokeWidth="2.5" filter="url(#cGlow)"/>
                   <rect x="10" y="10" width="480" height="334" rx="11" fill="none" stroke="rgba(99,102,241,0.2)" strokeWidth="0.6"/>
-                  {[[22,22],[478,22],[22,332],[478,332]].map(function(arr, i) {
-                    var cx = arr[0], cy = arr[1]
-                    return (
-                      <g key={i}>
-                        <circle cx={cx} cy={cy} r="5.5" fill="none" stroke="#6366F1" strokeWidth="1.6"/>
-                        <circle cx={cx} cy={cy} r="10" fill="none" stroke="rgba(99,102,241,0.28)" strokeWidth="0.6"/>
-                        <line x1={cx-14} y1={cy} x2={cx+14} y2={cy} stroke="rgba(99,102,241,0.5)" strokeWidth="0.7"/>
-                        <line x1={cx} y1={cy-14} x2={cx} y2={cy+14} stroke="rgba(99,102,241,0.5)" strokeWidth="0.7"/>
-                      </g>
-                    )
-                  })}
-                  <line x1="48"  y1="1.5"   x2="100" y2="1.5"   stroke="#818CF8" strokeWidth="3.5"/>
-                  <line x1="400" y1="1.5"   x2="452" y2="1.5"   stroke="#10B981" strokeWidth="3.5"/>
-                  <line x1="48"  y1="352.5" x2="100" y2="352.5" stroke="#10B981" strokeWidth="3.5"/>
+                  {[[22,22],[478,22],[22,332],[478,332]].map(function(arr,i){var cx=arr[0],cy=arr[1];return(<g key={i}><circle cx={cx} cy={cy} r="5.5" fill="none" stroke="#6366F1" strokeWidth="1.6"/><circle cx={cx} cy={cy} r="10" fill="none" stroke="rgba(99,102,241,0.28)" strokeWidth="0.6"/><line x1={cx-14} y1={cy} x2={cx+14} y2={cy} stroke="rgba(99,102,241,0.5)" strokeWidth="0.7"/><line x1={cx} y1={cy-14} x2={cx} y2={cy+14} stroke="rgba(99,102,241,0.5)" strokeWidth="0.7"/></g>)})}
+                  <line x1="48" y1="1.5" x2="100" y2="1.5" stroke="#818CF8" strokeWidth="3.5"/>
+                  <line x1="400" y1="1.5" x2="452" y2="1.5" stroke="#10B981" strokeWidth="3.5"/>
+                  <line x1="48" y1="352.5" x2="100" y2="352.5" stroke="#10B981" strokeWidth="3.5"/>
                   <line x1="400" y1="352.5" x2="452" y2="352.5" stroke="#818CF8" strokeWidth="3.5"/>
                 </svg>
               </div>
-
-              {/* Layer 2 — content */}
               <div style={{ position: 'absolute', inset: 0, transform: l2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(16px,4vw,40px)' }}>
                 <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'rgba(99,102,241,0.72)', letterSpacing: '0.26em', marginBottom: '11px', textTransform: 'uppercase' }}>CERTIFYROI · INDIA 2026</div>
                 <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(0.9rem,3.2vw,1.75rem)', letterSpacing: '-0.04em', color: certText1, marginBottom: '6px', textAlign: 'center', lineHeight: 1.1 }}>Your Certification</div>
                 <div style={{ fontFamily: F_BODY, fontSize: 'clamp(10px,1.5vw,12px)', color: certText2, marginBottom: '22px', textAlign: 'center' }}>Personalised ROI Analysis · Your City</div>
                 <div style={{ display: 'flex', gap: 'clamp(10px,4vw,40px)', marginBottom: '18px' }}>
-                  {[
-                    { label: 'BREAK-EVEN', value: '6 mo',   color: '#F59E0B' },
-                    { label: '5-YR GAIN',  value: '₹14.2L', color: '#10B981' },
-                    { label: 'HIKE',       value: '+35%',   color: '#818CF8' },
-                  ].map(function(s, i) {
-                    return (
-                      <div key={i} style={{ textAlign: 'center' }}>
-                        <div style={{ fontFamily: F_MONO, fontSize: '7px', color: certMuted, letterSpacing: '0.12em', marginBottom: '5px' }}>{s.label}</div>
-                        <div style={{ fontFamily: F_MONO, fontSize: 'clamp(0.8rem,2.5vw,1.5rem)', color: s.color, fontWeight: '700', letterSpacing: '-0.03em' }}>{s.value}</div>
-                      </div>
-                    )
-                  })}
+                  {[{label:'BREAK-EVEN',value:'6 mo',color:'#F59E0B'},{label:'5-YR GAIN',value:'₹14.2L',color:'#10B981'},{label:'HIKE',value:'+35%',color:'#818CF8'}].map(function(s,i){return(<div key={i} style={{textAlign:'center'}}><div style={{fontFamily:F_MONO,fontSize:'7px',color:certMuted,letterSpacing:'0.12em',marginBottom:'5px'}}>{s.label}</div><div style={{fontFamily:F_MONO,fontSize:'clamp(0.8rem,2.5vw,1.5rem)',color:s.color,fontWeight:'700',letterSpacing:'-0.03em'}}>{s.value}</div></div>)})}
                 </div>
-                <div style={{ width: '74%', height: '1px', background: 'linear-gradient(90deg,transparent,rgba(99,102,241,0.55),transparent)', marginBottom: '12px' }} />
-                <div style={{ fontFamily: F_MONO, fontSize: '7px', color: certMuted, letterSpacing: '0.14em', textAlign: 'center' }}>VERIFIED BY AI · DATA: NAUKRI MARCH 2026</div>
+                <div style={{ width:'74%',height:'1px',background:'linear-gradient(90deg,transparent,rgba(99,102,241,0.55),transparent)',marginBottom:'12px' }} />
+                <div style={{ fontFamily:F_MONO,fontSize:'7px',color:certMuted,letterSpacing:'0.14em',textAlign:'center' }}>VERIFIED BY AI · DATA: NAUKRI MARCH 2026</div>
               </div>
-
-              {/* Layer 3 — seal */}
-              <div style={{ position: 'absolute', right: '6%', bottom: '8%', transform: l3 }}>
+              <div style={{ position:'absolute',right:'6%',bottom:'8%',transform:l3 }}>
                 <svg viewBox="0 0 72 72" width="clamp(36px,8vw,72px)" height="clamp(36px,8vw,72px)">
-                  <defs>
-                    <linearGradient id="sealG" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%"   stopColor="#6366F1" stopOpacity="0.9"/>
-                      <stop offset="50%"  stopColor="#10B981" stopOpacity="0.7"/>
-                      <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.9"/>
-                    </linearGradient>
-                  </defs>
+                  <defs><linearGradient id="sealG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#6366F1" stopOpacity="0.9"/><stop offset="50%" stopColor="#10B981" stopOpacity="0.7"/><stop offset="100%" stopColor="#F59E0B" stopOpacity="0.9"/></linearGradient></defs>
                   <polygon points="36,4 43,22 62,22 48,35 54,54 36,43 18,54 24,35 10,22 29,22" fill="none" stroke="url(#sealG)" strokeWidth="1.5"/>
                   <circle cx="36" cy="36" r="10" fill="none" stroke="rgba(99,102,241,0.5)" strokeWidth="1"/>
                   <circle cx="36" cy="36" r="4.5" fill={certDot}/>
                   <text x="36" y="40" textAnchor="middle" fontSize="7" fill="#818CF8" fontFamily="monospace" fontWeight="700">AI</text>
                 </svg>
               </div>
-
             </div>
           </div>
-
-          {/* Scroll hint */}
           <div style={{ opacity: hintOp, marginTop: '44px', textAlign: 'center', pointerEvents: 'none', transition: 'opacity 0.3s' }}>
             <motion.div animate={{ y: [0,8,0] }} transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}>
-              <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'rgba(99,102,241,0.6)', letterSpacing: '0.22em', textTransform: 'uppercase' }}>↓  scroll to assemble  ↓</div>
+              <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'rgba(99,102,241,0.5)', letterSpacing: '0.22em', textTransform: 'uppercase' }}>↓  scroll to assemble  ↓</div>
             </motion.div>
           </div>
         </div>
-
-        {/* Assembled confirmation */}
         <div style={{ opacity: assembledOp, position: 'absolute', bottom: '8%', left: 0, right: 0, textAlign: 'center', pointerEvents: 'none', zIndex: 5, transition: 'opacity 0.3s' }}>
-          <div style={{ fontFamily: F_MONO, fontSize: '12px', color: 'rgba(16,185,129,0.9)', letterSpacing: '0.22em', textTransform: 'uppercase' }}>✓  YOUR ROI CERTIFICATE · ASSEMBLED</div>
+          <div style={{ fontFamily: F_MONO, fontSize: '12px', color: 'rgba(16,185,129,0.8)', letterSpacing: '0.22em', textTransform: 'uppercase' }}>✓  YOUR ROI CERTIFICATE · ASSEMBLED</div>
         </div>
-
       </div>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────
-// MAIN LANDING PAGE
+// DATA COMPOSITION — numbers at display scale, no cards
+// ─────────────────────────────────────────────────────────
+function DataComposition() {
+  var isMobile = useIsMobile()
+
+  return (
+    <Section style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+
+      <SectionLabel>What that certificate means for you</SectionLabel>
+
+      {/* Hero number */}
+      <motion.div variants={SLIDE_L} initial="hidden" whileInView="show" viewport={{ once: true }}
+        style={{ marginBottom: '72px', position: 'relative' }}>
+        <div style={{ fontFamily: F_MONO, fontWeight: '700', fontSize: 'clamp(4rem,12vw,9rem)', color: '#F59E0B', letterSpacing: '-0.04em', lineHeight: 1 }}>
+          ₹14.2L
+        </div>
+        <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'var(--text-4)', letterSpacing: '0.1em', marginTop: '12px', textTransform: 'uppercase' }}>
+          5-year net gain · AWS Solutions Architect · Bangalore
+        </div>
+        {/* SVG annotation — desktop only */}
+        {!isMobile ? (
+          <svg style={{ position: 'absolute', top: '10px', right: 0, width: '260px', height: '60px', overflow: 'visible', opacity: 0.6 }}>
+            <motion.path d="M 0 30 Q 80 5 260 30" fill="none" stroke="rgba(99,102,241,0.25)" strokeWidth="1" strokeDasharray="3 4"
+              initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }} transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }} />
+            <motion.text x="270" y="34" fill="rgba(99,102,241,0.4)" fontSize="9.5" fontFamily={F_MONO} letterSpacing="0.1em"
+              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 1.3 }}>
+              NOT "CAREER GROWTH"
+            </motion.text>
+          </svg>
+        ) : null}
+      </motion.div>
+
+      {/* Three stats — editorial grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3,1fr)', gap: isMobile ? '40px 20px' : '0', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '48px', position: 'relative' }}>
+        {!isMobile ? (
+          <>
+            <div style={{ position:'absolute',left:'33.33%',top:'48px',bottom:0,width:'1px',background:'rgba(255,255,255,0.06)' }} />
+            <div style={{ position:'absolute',left:'66.66%',top:'48px',bottom:0,width:'1px',background:'rgba(255,255,255,0.06)' }} />
+          </>
+        ) : null}
+
+        {[
+          { delay: 0,   label: 'Break-even',   num: '6 mo.',  numColor: 'var(--text)', body: 'Not "a few months." Exactly month six. ₹23,600 extra every month from day one.' },
+          { delay: 0.1, label: 'Expected hike', num: '+35%',   numColor: '#10B981',    body: 'Bangalore median for AWS SAA. Not US data. India market, 2026.' },
+          { delay: 0.2, label: 'Cities covered', num: '8',      numColor: 'var(--text)', body: 'Bangalore is not Hyderabad is not Pune. Separate salary benchmarks for each.' },
+        ].map(function(s, i) {
+          return (
+            <motion.div key={i} variants={staggerRise(s.delay)} initial="hidden" whileInView="show" viewport={{ once: true }}
+              style={{ paddingLeft: i > 0 && !isMobile ? '48px' : 0, paddingRight: i < 2 && !isMobile ? '48px' : 0 }}>
+              <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'var(--text-4)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '14px' }}>{s.label}</div>
+              <div style={{ fontFamily: F_MONO, fontWeight: '700', fontSize: 'clamp(1.8rem,4vw,3rem)', color: s.numColor, letterSpacing: '-0.04em', lineHeight: 1, marginBottom: '12px' }}>{s.num}</div>
+              <div style={{ fontFamily: F_BODY, fontSize: '14px', color: '#64748B', lineHeight: '1.75' }}>{s.body}</div>
+            </motion.div>
+          )
+        })}
+      </div>
+    </Section>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// THREE TOOLS — editorial list, no bento
+// ─────────────────────────────────────────────────────────
+function ThreeTools({ onEnter }) {
+  var isMobile = useIsMobile()
+  var tools = [
+    { num: '01', name: 'ROI Calculator',    sub: 'Enter salary, cert cost, expected hike.', body: 'Returns break-even to the month, 5-year net gain in rupees, monthly salary delta. The math is shown. No estimates.', stat: '₹23.6K / month', note: 'extra from month 7' },
+    { num: '02', name: 'Resume AI',         sub: 'Upload your resume.',                     body: 'AI reads your actual background — role, years, tools, city — and maps it to India's 2026 hiring data. Recommends the three certs with highest ROI for your specific profile.', stat: '103 certs', note: 'across 17 domains' },
+    { num: '03', name: 'City Demand Map',   sub: 'See where demand actually is.',           body: 'Which cert is hiring the most in your city right now. Bangalore cloud demand is not Chennai cloud demand. We track both.', stat: '8 cities', note: 'live demand data' },
+  ]
+
+  return (
+    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingTop: '120px', paddingBottom: '120px' }}>
+      <Section>
+        <SectionLabel>The toolkit</SectionLabel>
+        <SectionHeading>Three tools.<br /><span style={{ color: '#6366F1' }}>One decision.</span></SectionHeading>
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {tools.map(function(tool, i) {
+            return (
+              <motion.div key={i} variants={staggerRise(i * 0.1)} initial="hidden" whileInView="show" viewport={{ once: true }}
+                style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '64px 1fr 160px', gap: isMobile ? '8px' : '0', paddingTop: '36px', paddingBottom: '36px', borderBottom: i < tools.length-1 ? '1px solid rgba(255,255,255,0.06)' : 'none', alignItems: 'start' }}>
+                <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'rgba(99,102,241,0.35)', letterSpacing: '0.08em', paddingTop: '3px' }}>{tool.num}</div>
+                <div style={{ paddingRight: isMobile ? 0 : '56px' }}>
+                  <div style={{ fontFamily: F_HEAD, fontWeight: '700', fontSize: 'clamp(1rem,2.2vw,1.5rem)', color: 'var(--text)', letterSpacing: '-0.03em', marginBottom: '5px' }}>{tool.name}</div>
+                  <div style={{ fontFamily: F_BODY, fontSize: '14px', color: '#64748B', marginBottom: '8px' }}>{tool.sub}</div>
+                  <div style={{ fontFamily: F_BODY, fontSize: '14px', color: 'var(--text-2)', lineHeight: '1.75', maxWidth: '460px' }}>{tool.body}</div>
+                </div>
+                {!isMobile ? (
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontFamily: F_MONO, fontWeight: '700', fontSize: '1.3rem', color: '#F59E0B', letterSpacing: '-0.03em', lineHeight: 1 }}>{tool.stat}</div>
+                    <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.07em', marginTop: '6px' }}>{tool.note}</div>
+                  </div>
+                ) : null}
+              </motion.div>
+            )
+          })}
+        </div>
+
+        <motion.div variants={staggerRise(0.3)} initial="hidden" whileInView="show" viewport={{ once: true }} style={{ marginTop: '48px' }}>
+          <CTAButton onClick={onEnter}>Start with Resume AI <ArrowRight size={16} /></CTAButton>
+        </motion.div>
+      </Section>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// VS OTHER SITES — SVG strikethrough, no cards
+// ─────────────────────────────────────────────────────────
+function VsSection() {
+  var pairs = [
+    { wrong: '"AWS is good for cloud engineers"',      right: 'AWS SAA at ₹9L salary: break-even 6 months, ₹14.2L net gain over 5 years.' },
+    { wrong: '"Upskill for career growth"',            right: '₹23,600 extra every month from month 7. Or it isn\'t worth doing.' },
+    { wrong: 'US salary data converted to rupees',     right: 'Naukri · AmbitionBox · LinkedIn India. 2026 data. Not converted. Collected.' },
+    { wrong: 'The same advice for every professional', right: 'AI reads your resume. Your role. Your city. Your domain. Then it advises.' },
+  ]
+
+  return (
+    <Section style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+      <SectionLabel color="rgba(239,68,68,0.45)">The problem with every other site</SectionLabel>
+      <SectionHeading>Every other site<br /><span style={{ color: '#EF4444' }}>is lying to you.</span></SectionHeading>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '52px' }}>
+        {pairs.map(function(pair, i) {
+          return (
+            <motion.div key={i} variants={staggerRise(i * 0.08)} initial="hidden" whileInView="show" viewport={{ once: true }}>
+              <div style={{ position: 'relative', marginBottom: '16px', display: 'inline-block' }}>
+                <div style={{ fontFamily: F_HEAD, fontWeight: '600', fontSize: 'clamp(0.95rem,2.2vw,1.3rem)', color: 'rgba(255,255,255,0.15)', letterSpacing: '-0.02em', lineHeight: 1.3 }}>
+                  {pair.wrong}
+                </div>
+                <svg style={{ position: 'absolute', left: 0, top: '50%', width: '100%', height: '2px', overflow: 'visible', pointerEvents: 'none' }}>
+                  <motion.line x1="0" y1="0" x2="100%" y2="0"
+                    stroke="rgba(239,68,68,0.35)" strokeWidth="1.5"
+                    initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
+                    transition={{ duration: 1.0, ease: 'easeOut', delay: 0.2 + i * 0.06 }}
+                  />
+                </svg>
+              </div>
+              <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10B981', marginTop: '9px', flexShrink: 0 }} />
+                <div style={{ fontFamily: F_BODY, fontSize: 'clamp(14px,2vw,16px)', color: 'var(--text)', lineHeight: '1.7', fontWeight: '500' }}>{pair.right}</div>
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+    </Section>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// 11PM MOMENTS — editorial columns, no card borders
+// ─────────────────────────────────────────────────────────
+function ElevenPM({ onEnter }) {
+  var isMobile = useIsMobile()
+  var stories = [
+    { time:'11:47 PM', name:'Rohan', loc:'Pune', role:'2 yrs · Backend Engineer', thought:'"Should I do AWS? Or is it too late?"', context:'Ex-classmate promoted to Senior Cloud Architect. ₹28L CTC. Same college, same year.', answer:'AWS SAA at ₹9L: break-even 6 months. 5-year gain ₹14.2L. Not too late.', color:'#10B981' },
+    { time:'11:12 PM', name:'Sneha', loc:'Bangalore', role:'6 yrs · Ops Manager', thought:'"Is the switch possible without an MBA?"', context:'Every data job requires 3 years of data science experience. She has zero.', answer:'Google Data Analytics + 2 GitHub projects. 5 months. ₹8L to ₹12L, first switch.', color:'#F59E0B' },
+    { time:'12:03 AM', name:'Arjun', loc:'Pune', role:'Fresh graduate · CS', thought:'"Which cert actually gets me placed in India?"', context:'Three cert comparison articles. All recommend AWS. All written by Americans. All in USD.', answer:'Student Mode. India-specific. GCP placed 47 Pune freshers in Q1 2026.', color:'#818CF8' },
+  ]
+
+  return (
+    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '120px', paddingBottom: '120px' }}>
+      <Section>
+        <SectionLabel>Who this is for</SectionLabel>
+        <SectionHeading>We know what you're<br /><span style={{ color: '#6366F1' }}>going through right now.</span></SectionHeading>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '64px' }}>
+          {stories.map(function(s, i) {
+            return (
+              <motion.div key={i}
+                variants={i % 2 === 0 ? SLIDE_L : SLIDE_R}
+                initial="hidden" whileInView="show" viewport={{ once: true }}
+                style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '24px' : '60px', alignItems: 'start', cursor: 'pointer' }}
+                onClick={onEnter}>
+                <div style={{ order: isMobile ? 1 : i % 2 === 0 ? 1 : 2 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                    <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'var(--text-4)', letterSpacing: '0.07em' }}>{s.time}</div>
+                    <div style={{ width: '1px', height: '10px', background: 'rgba(255,255,255,0.1)' }} />
+                    <div style={{ fontFamily: F_BODY, fontSize: '13px', color: 'var(--text-4)', fontStyle: 'italic' }}>
+                      <em>{s.name}</em>, {s.loc} — {s.role}
+                    </div>
+                  </div>
+                  <div style={{ fontFamily: F_BODY, fontSize: '15px', color: '#64748B', lineHeight: '1.8', marginBottom: '24px' }}>{s.context}</div>
+                  <div style={{ borderLeft: '2px solid ' + s.color + '40', paddingLeft: '18px' }}>
+                    <div style={{ fontFamily: F_HEAD, fontWeight: '700', fontSize: 'clamp(1rem,2.2vw,1.3rem)', color: 'var(--text)', letterSpacing: '-0.02em', fontStyle: 'italic', lineHeight: 1.4 }}>{s.thought}</div>
+                  </div>
+                </div>
+                <div style={{ order: isMobile ? 2 : i % 2 === 0 ? 2 : 1 }}>
+                  <div style={{ fontFamily: F_MONO, fontSize: '10px', color: s.color, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '14px', opacity: 0.75 }}>What CertifyROI showed</div>
+                  <div style={{ fontFamily: F_BODY, fontWeight: '600', fontSize: 'clamp(14px,1.8vw,16px)', color: 'var(--text)', lineHeight: '1.7' }}>{s.answer}</div>
+                  <div style={{ marginTop: '18px', display: 'flex', alignItems: 'center', gap: '7px', color: s.color, fontSize: '13px', fontWeight: '600', fontFamily: F_HEAD }}>
+                    That's me tonight <ArrowRight size={13} />
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      </Section>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// THREE MODES — column layout, no card fills
+// ─────────────────────────────────────────────────────────
+function ThreeModes({ onEnter }) {
+  var isMobile = useIsMobile()
+  var modes = [
+    { icon: GraduationCap, color: '#818CF8', label: 'Student',      sub: 'No salary yet',    desc: 'Path to a ₹4.8L+ first offer. Student Mode reframes ROI around career investment, not salary hike.' },
+    { icon: Repeat,        color: '#F59E0B', label: 'Switcher',     sub: 'Changing domains', desc: 'Domain switch in 5–8 months with the right cert. Only fast-track options for your background.' },
+    { icon: Briefcase,     color: '#10B981', label: 'Professional', sub: 'Levelling up',     desc: 'Maximum ROI on your next cert. Break-even analysis, hike benchmarks, pitch-your-boss email included.' },
+  ]
+
+  return (
+    <Section style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+      <SectionLabel>Adapts to who you are</SectionLabel>
+      <SectionHeading>Three modes.<br /><span style={{ color: '#6366F1' }}>One tool.</span></SectionHeading>
+
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap: isMobile ? '48px' : '0', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '48px', position: 'relative' }}>
+        {!isMobile ? (
+          <>
+            <div style={{ position:'absolute',left:'33.33%',top:'48px',bottom:0,width:'1px',background:'rgba(255,255,255,0.06)' }} />
+            <div style={{ position:'absolute',left:'66.66%',top:'48px',bottom:0,width:'1px',background:'rgba(255,255,255,0.06)' }} />
+          </>
+        ) : null}
+        {modes.map(function(m, i) {
+          return (
+            <motion.div key={i} variants={staggerRise(i * 0.1)} initial="hidden" whileInView="show" viewport={{ once: true }}
+              style={{ paddingLeft: i > 0 && !isMobile ? '48px' : 0, paddingRight: i < 2 && !isMobile ? '48px' : 0 }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '7px', background: m.color + '10', border: '1px solid ' + m.color + '1E', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '18px' }}>
+                <m.icon size={15} color={m.color} />
+              </div>
+              <div style={{ fontFamily: F_HEAD, fontWeight: '700', fontSize: '1.05rem', color: 'var(--text)', letterSpacing: '-0.02em', marginBottom: '4px' }}>{m.label}</div>
+              <div style={{ fontFamily: F_MONO, fontSize: '10px', color: m.color, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '12px' }}>{m.sub}</div>
+              <div style={{ fontFamily: F_BODY, fontSize: '14px', color: '#64748B', lineHeight: '1.75' }}>{m.desc}</div>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      <motion.div variants={staggerRise(0.3)} initial="hidden" whileInView="show" viewport={{ once: true }} style={{ marginTop: '56px' }}>
+        <CTAButton onClick={onEnter}><Zap size={15} /> Pick My Mode</CTAButton>
+      </motion.div>
+    </Section>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// SOCIAL PROOF — full-bleed pull quotes, no borders
+// ─────────────────────────────────────────────────────────
+function SocialProof() {
+  var isMobile = useIsMobile()
+  var quotes = [
+    { quote: 'CertifyROI said break-even was 8 months. It was 7. Switched companies 7 months in.', name: 'Priya S.', detail: 'Bangalore · Engineer → Cloud Architect', hike: '+₹6L/yr', color: '#10B981' },
+    { quote: 'Was about to spend ₹12L on an MBA. Resume AI showed me Google Analytics gets there in 5 months at 1% of the cost.', name: 'Rahul M.', detail: 'Hyderabad · Ops Manager → Data Analyst', hike: 'Saved ₹12L', color: '#6366F1' },
+    { quote: 'Student Mode showed GCP had faster placement for freshers in Pune specifically. Got ₹5.2L. No salary field needed.', name: 'Ananya K.', detail: 'Pune · Fresh Graduate', hike: '₹5.2L offer', color: '#818CF8' },
+  ]
+
+  return (
+    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '120px', paddingBottom: '120px' }}>
+      <Section>
+        <SectionLabel color="rgba(16,185,129,0.5)">From people who ran the numbers</SectionLabel>
+        <SectionHeading>They used the data.<br /><span style={{ color: '#10B981' }}>It worked.</span></SectionHeading>
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {quotes.map(function(q, i) {
+            return (
+              <motion.div key={i}
+                variants={i % 2 === 0 ? SLIDE_L : SLIDE_R}
+                initial="hidden" whileInView="show" viewport={{ once: true }}
+                style={{ paddingTop: i > 0 ? '56px' : 0, paddingBottom: '56px', borderBottom: i < quotes.length-1 ? '1px solid rgba(255,255,255,0.06)' : 'none', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 120px', gap: '32px', alignItems: 'end' }}>
+                <div>
+                  <div style={{ fontFamily: F_HEAD, fontWeight: '700', fontSize: 'clamp(1.1rem,2.5vw,1.7rem)', color: 'var(--text)', letterSpacing: '-0.03em', fontStyle: 'italic', lineHeight: 1.35, marginBottom: '22px' }}>
+                    "{q.quote}"
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '20px', height: '1px', background: q.color }} />
+                    <span style={{ fontFamily: F_BODY, fontWeight: '600', fontSize: '14px', color: 'var(--text-2)', fontStyle: 'italic' }}>{q.name}</span>
+                    <span style={{ fontFamily: F_BODY, fontSize: '13px', color: '#64748B' }}>{q.detail}</span>
+                  </div>
+                </div>
+                <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
+                  <div style={{ fontFamily: F_MONO, fontWeight: '700', fontSize: 'clamp(1.3rem,2.5vw,1.8rem)', color: q.color, letterSpacing: '-0.04em', lineHeight: 1 }}>{q.hike}</div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      </Section>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// FINAL CTA — typographic monument
+// ─────────────────────────────────────────────────────────
+function FinalCTA({ onEnter }) {
+  return (
+    <Section style={{ paddingTop: '140px', paddingBottom: '120px', textAlign: 'center' }}>
+      <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <div style={{ fontFamily: F_MONO, fontSize: '11px', color: 'var(--text-4)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '32px' }}>
+          2 minutes from now
+        </div>
+        <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2.4rem,8vw,6.5rem)', color: 'var(--text)', letterSpacing: '-0.05em', lineHeight: 0.9, marginBottom: '44px', marginTop: 0 }}>
+          YOU'LL KNOW<br />THE ANSWER.
+        </h2>
+      </motion.div>
+      <motion.p variants={staggerRise(0.12)} initial="hidden" whileInView="show" viewport={{ once: true }}
+        style={{ fontFamily: F_BODY, fontSize: 'clamp(14px,2vw,16px)', color: '#64748B', lineHeight: '1.8', maxWidth: '380px', margin: '0 auto 44px' }}>
+        Stop reading about certs. Stop asking Reddit.{' '}
+        <span style={{ color: 'var(--text)', fontWeight: '600' }}>Run the numbers.</span>
+      </motion.p>
+      <motion.div variants={staggerRise(0.22)} initial="hidden" whileInView="show" viewport={{ once: true }}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+        <CTAButton onClick={onEnter} size="large">Run My Numbers <ArrowRight size={18} /></CTAButton>
+        <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.1em' }}>
+          FREE · NO CARD · NO SIGNUP · NO PAYWALLS
+        </div>
+      </motion.div>
+    </Section>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// PAGE FOOTER — minimal
+// ─────────────────────────────────────────────────────────
+function PageFooter() {
+  return (
+    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '32px 48px' }}>
+      <div style={{ maxWidth: '920px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+          <div style={{ width: '24px', height: '24px', background: '#6366F1', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <TrendingUp size={12} color="white" />
+          </div>
+          <span style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: '15px', letterSpacing: '-0.03em', color: 'var(--text)' }}>
+            Certify<span style={{ color: '#6366F1' }}>ROI</span>
+          </span>
+        </div>
+        <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.06em', opacity: 0.45 }}>
+          DATA: LINKEDIN · NASSCOM · AMBITIONBOX · NAUKRI · WEF 2026
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// MAIN
 // ─────────────────────────────────────────────────────────
 function LandingPage({ onEnter }) {
   var heroRef  = useRef(null)
@@ -303,433 +629,68 @@ function LandingPage({ onEnter }) {
 
   var { scrollYProgress: heroSP } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   var heroY  = useTransform(heroSP, [0,1], [0, isMobile ? 30 : 60])
-  var heroOp = useTransform(heroSP, [0,0.55], [1,0])
+  var heroOp = useTransform(heroSP, [0,0.5], [1,0])
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      <div style={{ position: 'relative', zIndex: 1 }}>
 
-        {/* ── HERO ── */}
-        <div ref={heroRef} style={{ maxWidth: '860px', margin: '0 auto', padding: 'calc(var(--nav-h,64px) + 56px) 24px 64px', textAlign: 'center' }}>
-          <motion.div style={{ y: heroY, opacity: heroOp }}>
+      {/* ── HERO ── */}
+      <div ref={heroRef} style={{ maxWidth: '920px', margin: '0 auto', padding: 'calc(var(--nav-h,64px) + 72px) 48px 80px' }}>
+        <motion.div style={{ y: heroY, opacity: heroOp }}>
 
-            {/* Eyebrow badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.6, ease: [0.16,1,0.3,1] }}
+            style={{ fontFamily: F_MONO, fontSize: '11px', color: 'rgba(99,102,241,0.5)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '44px' }}>
+            India's first AI-powered cert ROI calculator
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18, duration: 0.7, ease: [0.16,1,0.3,1] }}
+            style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2.8rem,9vw,7rem)', lineHeight: 0.9, letterSpacing: '-0.05em', color: 'var(--text)', marginBottom: '32px', wordBreak: 'break-word', marginTop: 0 }}>
+            YOUR NEXT CERT<br />
+            IS EITHER A{' '}
+            <span style={{ color: '#F59E0B' }}>GOLDMINE</span><br />
+            OR A{' '}
+            <span style={{ color: '#EF4444' }}>MISTAKE.</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6, ease: [0.16,1,0.3,1] }}
+            style={{ fontFamily: F_BODY, fontSize: 'clamp(15px,2.2vw,18px)', color: '#64748B', maxWidth: '500px', lineHeight: '1.8', margin: 0 }}>
+            We tell you which — in under 2 seconds — before you spend ₹50K and 6 months finding out the hard way.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+            style={{ marginTop: '60px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <motion.div
-              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '6px 14px', borderRadius: '20px', background: 'var(--indigo-dim)', border: '1px solid var(--border-accent)', fontSize: '11px', color: 'var(--indigo-light)', marginBottom: '36px', letterSpacing: '0.06em', fontFamily: F_MONO }}
-            >
-              <Award size={11} /> India's first AI-powered cert ROI calculator
+              animate={{ y: [0,6,0], opacity: [0.3,0.65,0.3] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ width: '20px', height: '34px', borderRadius: '10px', border: '1.5px solid rgba(255,255,255,0.12)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5px' }}>
+              <div style={{ width: '2.5px', height: '7px', borderRadius: '2px', background: 'rgba(255,255,255,0.2)' }} />
             </motion.div>
-
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.55 }}
-              style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(2.4rem,8vw,6rem)', lineHeight: 0.92, letterSpacing: '-0.04em', color: 'var(--text)', marginBottom: '28px', wordBreak: 'break-word' }}
-            >
-              YOUR NEXT CERT<br />
-              IS EITHER A{' '}
-              <span style={{ color: '#F59E0B' }}>GOLDMINE</span><br />
-              OR A{' '}
-              <span style={{ color: '#EF4444' }}>MISTAKE.</span>
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}
-              style={{ fontSize: 'clamp(15px,2.2vw,18px)', color: 'var(--text-2)', maxWidth: '520px', margin: '0 auto 12px', lineHeight: '1.75', fontFamily: F_BODY }}
-            >
-              We tell you which — in under 2 seconds — before you spend ₹50K and 6 months finding out the hard way.
-            </motion.p>
-
-            <motion.p
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.42 }}
-              style={{ fontSize: '11px', color: 'var(--text-4)', marginBottom: '48px', fontFamily: F_MONO, letterSpacing: '0.1em' }}
-            >
-              INDIA-SPECIFIC · AI-POWERED · FREE · NO NONSENSE
-            </motion.p>
-
-            {/* Scroll indicator */}
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.85, duration: 0.6 }}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}
-            >
-              <motion.div
-                animate={{ y: [0,8,0], opacity: [0.5,1,0.5] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ width: '26px', height: '42px', borderRadius: '13px', border: '1.5px solid rgba(99,102,241,0.25)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '6px' }}
-              >
-                <div style={{ width: '3px', height: '9px', borderRadius: '2px', background: 'rgba(99,102,241,0.5)' }} />
-              </motion.div>
-              <span style={{ fontSize: '10px', fontFamily: F_MONO, color: 'var(--text-4)', letterSpacing: '0.14em' }}>SCROLL</span>
-            </motion.div>
-
-          </motion.div>
-        </div>
-
-        {/* ── TICKER ── */}
-        <Ticker />
-
-        {/* ── CERT ASSEMBLY ── */}
-        <CertAssembly />
-
-        {/* ── ACTUAL NUMBERS ── */}
-        <div style={{ maxWidth: '840px', margin: '0 auto 80px', padding: '0 24px' }}>
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
-            <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--indigo-light)', letterSpacing: '0.12em', marginBottom: '12px', textTransform: 'uppercase', textAlign: 'center' }}>
-              What that certificate means for you
-            </div>
-            <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--text)', letterSpacing: '-0.04em', marginBottom: '16px', lineHeight: 1, textAlign: 'center' }}>
-              Not career advice.<br />
-              <span style={{ color: '#6366F1' }}>Actual numbers.</span>
-            </h2>
-            <p style={{ fontSize: '15px', color: 'var(--text-3)', lineHeight: '1.75', fontFamily: F_BODY, textAlign: 'center', maxWidth: '500px', margin: '0 auto 32px' }}>
-              Every analysis gives you a break-even date, 5-year gain, and salary delta — anchored to real rupee amounts.
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(220px,100%),1fr))', gap: '12px' }}>
-              {[
-                { color: '#10B981', title: 'Break-even to the month', desc: 'Not "a few months." Exactly month 6. Exactly ₹23,600 extra per month from day one.' },
-                { color: '#6366F1', title: '5-year gain in rupees',   desc: 'Not "career growth." ₹14.2L over 5 years. Honda City + 18 months Bangalore rent.' },
-                { color: '#F59E0B', title: 'India city-specific',     desc: 'Bangalore numbers are not Hyderabad numbers. Not Pune numbers. We know the difference.' },
-                { color: '#51B1E7', title: 'Reads your resume',       desc: 'A DevOps engineer and a data analyst need different certs. We read yours.' },
-              ].map(function(item, i) {
-                return (
-                  <Card key={i} accentColor={item.color} animate={true}>
-                    <div style={{ padding: '20px' }}>
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, marginBottom: '14px' }} />
-                      <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text)', fontFamily: F_HEAD, letterSpacing: '-0.02em', marginBottom: '6px' }}>{item.title}</div>
-                      <p style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: F_BODY, lineHeight: '1.6', margin: 0 }}>{item.desc}</p>
-                    </div>
-                  </Card>
-                )
-              })}
-            </div>
+            <span style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>scroll</span>
           </motion.div>
 
-          {/* CTA */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '48px' }}>
-            <motion.button
-              onClick={onEnter}
-              whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(99,102,241,0.3)' }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.18 }}
-              style={{ padding: '0 40px', height: '54px', borderRadius: '10px', border: 'none', background: '#6366F1', color: 'white', fontSize: '16px', fontFamily: F_HEAD, fontWeight: '700', letterSpacing: '-0.02em', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 4px 14px rgba(99,102,241,0.25)' }}
-            >
-              Find out in 2 minutes
-              <ArrowRight size={17} />
-            </motion.button>
-            <p style={{ marginTop: '12px', fontSize: '11px', fontFamily: F_MONO, color: 'var(--text-4)', letterSpacing: '0.08em' }}>
-              FREE · NO SIGNUP · TAKES 2 MINUTES
-            </p>
-          </div>
-        </div>
-
-        {/* ── BENTO ── */}
-        <div style={{ maxWidth: '1060px', margin: '0 auto 80px', padding: '0 24px' }}>
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}
-            style={{ textAlign: 'center', marginBottom: '44px' }}>
-            <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--text)', marginBottom: '8px', letterSpacing: '-0.04em' }}>
-              Three tools.{' '}
-              <span style={{ color: '#F59E0B' }}>One decision.</span>
-            </h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-4)', fontFamily: F_MONO, letterSpacing: '0.05em' }}>Built for Indian professionals</p>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gridTemplateRows: 'auto auto', gap: '12px' }}>
-
-            {/* ROI Calculator — wide */}
-            <Card accentColor="#6366F1" style={{ gridColumn: isMobile ? '1' : '1 / 3', minHeight: isMobile ? 'auto' : '240px' }}>
-              <div style={{ padding: '28px' }}>
-                <div style={{ display: 'flex', gap: '14px', marginBottom: '16px', alignItems: 'flex-start' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <TrendingUp size={20} color="#6366F1" />
-                  </div>
-                  <div>
-                    <h3 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1.1rem,2vw,1.5rem)', letterSpacing: '-0.03em', color: 'var(--text)', marginBottom: '2px' }}>ROI Calculator</h3>
-                    <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--text-4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Not estimates. Actual rupees.</div>
-                  </div>
-                </div>
-                <p style={{ fontSize: '14px', color: 'var(--text-3)', lineHeight: '1.7', maxWidth: '380px', fontFamily: F_BODY, marginBottom: '20px' }}>
-                  Enter your salary, cert cost, and expected hike. See break-even to the month, 5-year gain, monthly delta.
-                </p>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {[{ l: 'Break-even', v: '6 months', c: '#F59E0B' }, { l: '5-yr gain', v: '₹14.2L', c: '#10B981' }, { l: 'Monthly +', v: '₹23.6K', c: '#51B1E7' }].map(function(s, i) {
-                    return (
-                      <div key={i} style={{ padding: '9px 12px', borderRadius: '8px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
-                        <div style={{ fontFamily: F_MONO, fontSize: '8px', color: 'var(--text-4)', letterSpacing: '0.1em', marginBottom: '3px', textTransform: 'uppercase' }}>{s.l}</div>
-                        <div style={{ fontFamily: F_MONO, fontSize: '1rem', color: s.c, fontWeight: '700', letterSpacing: '-0.02em' }}>{s.v}</div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </Card>
-
-            {/* Resume AI — tall */}
-            <Card accentColor="#10B981" style={{ gridColumn: isMobile ? '1' : '3 / 4', gridRow: isMobile ? 'auto' : '1 / 3', minHeight: isMobile ? 'auto' : '500px' }}>
-              <div style={{ padding: '28px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
-                  <Brain size={20} color="#10B981" />
-                </div>
-                <h3 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: '1.3rem', letterSpacing: '-0.03em', color: 'var(--text)', marginBottom: '8px' }}>Resume AI</h3>
-                <p style={{ fontSize: '13px', color: 'var(--text-3)', lineHeight: '1.7', fontFamily: F_BODY, marginBottom: '20px', flex: isMobile ? 0 : 1 }}>
-                  Upload your resume. AI reads your actual background and maps it to India's 2026 job market.
-                </p>
-                {['Top Cert Recommendation', 'Second Best Option', 'Third Choice'].map(function(cert, i) {
-                  return (
-                    <div key={i} style={{ padding: '10px 13px', borderRadius: '8px', background: i === 0 ? 'rgba(16,185,129,0.08)' : 'var(--bg)', border: '1px solid ' + (i === 0 ? 'rgba(16,185,129,0.22)' : 'var(--border)'), marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '12px', color: i === 0 ? '#10B981' : 'var(--text-3)', fontFamily: F_HEAD, fontWeight: '600' }}>{cert}</span>
-                      {i === 0 ? <span style={{ fontSize: '8px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(16,185,129,0.15)', color: '#10B981', fontFamily: F_MONO }}>★ PRIMARY</span> : null}
-                    </div>
-                  )
-                })}
-                <button onClick={onEnter}
-                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', color: '#10B981', fontSize: '13px', fontWeight: '700', cursor: 'pointer', fontFamily: F_HEAD, marginTop: '16px', minHeight: '44px', padding: 0 }}>
-                  Analyse my resume <ChevronRight size={13} />
-                </button>
-              </div>
-            </Card>
-
-            {/* Stats block — replaces MoneyCounter */}
-            <Card>
-              <div style={{ padding: '24px' }}>
-                <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '20px' }}>By the numbers</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  {[
-                    { v: '103', l: 'Certifications tracked', c: '#6366F1' },
-                    { v: '8',   l: 'Indian cities covered',  c: '#10B981' },
-                    { v: '17',  l: 'Career domains',         c: '#F59E0B' },
-                    { v: '<2s', l: 'AI analysis speed',      c: '#51B1E7' },
-                  ].map(function(s, i) {
-                    return (
-                      <div key={i}>
-                        <div style={{ fontFamily: F_MONO, fontSize: '1.5rem', fontWeight: '700', letterSpacing: '-0.04em', color: s.c }}>{s.v}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: F_BODY, marginTop: '3px', lineHeight: '1.3' }}>{s.l}</div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </Card>
-
-            {/* India-specific */}
-            <Card accentColor="#51B1E7">
-              <div style={{ padding: '24px' }}>
-                <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '14px' }}>Data sources</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {['LinkedIn Economic Graph India', 'NASSCOM 2026 Talent Survey', 'Naukri Salary Insights', 'AmbitionBox Self-Reported Data'].map(function(src, i) {
-                    return (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-3)', fontFamily: F_BODY }}>
-                        <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#51B1E7', flexShrink: 0 }} />
-                        {src}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </Card>
-
-          </div>
-        </div>
-
-        {/* ── 11PM MOMENTS ── */}
-        <div style={{ maxWidth: '1020px', margin: '0 auto 80px', padding: '0 24px' }}>
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}
-            style={{ textAlign: 'center', marginBottom: '44px' }}>
-            <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--text)', marginBottom: '10px', letterSpacing: '-0.04em' }}>
-              We know what you're{' '}
-              <span style={{ color: '#6366F1' }}>going through right now</span>
-            </h2>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(280px,100%),1fr))', gap: '14px' }}>
-            {[
-              { time: '11:47 PM', name: 'Rohan, 27 · Pune',       color: '#10B981', msg: "Ex-classmate just got promoted to Senior Cloud Architect. ₹28L CTC. You're at ₹9L. Same college, same year.", thought: '"Should I do AWS? Or is it too late?"', answer: 'AWS SAA break-even at ₹9L salary: 6 months. 5-year gain: ₹14.2L. Not too late.' },
-              { time: '11:12 PM', name: 'Sneha, 31 · Bangalore',  color: '#F59E0B', msg: "Ops manager for 6 years. Every data job says '3 years experience in data science required.'", thought: '"Is the switch even possible without an MBA?"', answer: 'Google Data Analytics + 2 GitHub projects. 5 months. ₹8L → ₹12L first switch.' },
-              { time: '12:03 AM', name: 'Arjun, 22 · Fresh grad', color: '#818CF8', msg: 'Opened 3 cert comparison articles. All recommend AWS. All written by Americans. All show USD.', thought: '"Which cert actually gets me placed in India?"', answer: 'Student Mode. India-specific. GCP got 47 Pune freshers placed in Q1 2026.' },
-            ].map(function(card, i) {
-              return (
-                <Card key={i} accentColor={card.color} onClick={onEnter}>
-                  <div style={{ padding: '22px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
-                      <span style={{ fontSize: '10px', fontFamily: F_MONO, color: 'var(--text-4)', background: 'var(--bg)', padding: '3px 8px', borderRadius: '5px', border: '1px solid var(--border)' }}>{card.time}</span>
-                      <span style={{ fontSize: '11px', color: card.color, fontFamily: F_MONO, fontWeight: '700' }}>{card.name}</span>
-                    </div>
-                    <p style={{ fontSize: '13px', color: 'var(--text-3)', lineHeight: '1.7', marginBottom: '12px', fontFamily: F_BODY }}>{card.msg}</p>
-                    <div style={{ padding: '10px 12px', borderRadius: '8px', background: card.color + '0e', border: '1px solid ' + card.color + '22', marginBottom: '12px' }}>
-                      <p style={{ fontSize: '14px', color: 'var(--text)', fontWeight: '700', fontFamily: F_HEAD, fontStyle: 'italic', letterSpacing: '-0.02em', margin: 0 }}>{card.thought}</p>
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <div style={{ width: 4, height: 4, borderRadius: '50%', background: card.color, marginTop: 6, flexShrink: 0 }} />
-                      <p style={{ fontSize: '13px', color: card.color, fontWeight: '600', fontFamily: F_HEAD, margin: 0, lineHeight: '1.5' }}>{card.answer}</p>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: card.color, fontSize: '12px', fontWeight: '700', fontFamily: F_HEAD, marginTop: '16px' }}>
-                      That's me tonight <ArrowRight size={12} />
-                    </div>
-                  </div>
-                </Card>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* ── VS OTHER SITES ── */}
-        <div style={{ maxWidth: '860px', margin: '0 auto 80px', padding: '0 24px' }}>
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}
-            style={{ textAlign: 'center', marginBottom: '44px' }}>
-            <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--text)', marginBottom: '10px', letterSpacing: '-0.04em' }}>
-              Every other site is{' '}
-              <span style={{ color: '#EF4444' }}>lying to you</span>
-            </h2>
-            <p style={{ fontSize: '15px', color: 'var(--text-3)', maxWidth: '500px', margin: '0 auto', fontFamily: F_BODY, lineHeight: '1.7' }}>
-              US salary data dressed as India data. Affiliate-commission rankings. Vague "career growth" promises.
-            </p>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(300px,100%),1fr))', gap: '12px' }}>
-            {[
-              { bad: '"AWS is good for cloud engineers"',    good: 'AWS SAA at ₹9L salary: break-even 6 months, ₹14.2L gain', color: '#10B981' },
-              { bad: '"Upskill for career growth"',          good: '₹23,600 extra per month starting month 7',                 color: '#6366F1' },
-              { bad: 'US salary data converted to rupees',   good: 'Naukri + AmbitionBox + LinkedIn India 2026',               color: '#F59E0B' },
-              { bad: 'Same advice for everyone',             good: 'AI reads your resume, your city, your background',         color: '#51B1E7' },
-            ].map(function(item, i) {
-              return (
-                <Card key={i} accentColor={item.color}>
-                  <div style={{ padding: '20px' }}>
-                    <div style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: F_BODY, marginBottom: '10px', textDecoration: 'line-through', opacity: 0.55 }}>
-                      {item.bad}
-                    </div>
-                    <div style={{ fontSize: '14px', color: item.color, fontWeight: '700', fontFamily: F_HEAD, letterSpacing: '-0.01em', lineHeight: '1.4' }}>
-                      {item.good}
-                    </div>
-                  </div>
-                </Card>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* ── THREE MODES ── */}
-        <div style={{ maxWidth: '680px', margin: '0 auto 80px', padding: '0 24px' }}>
-          <div style={{ padding: '44px 36px', textAlign: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px' }}>
-            <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.12em', marginBottom: '8px', textTransform: 'uppercase' }}>Adapts to who you are</div>
-            <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1.6rem,3.5vw,2.2rem)', color: 'var(--text)', marginBottom: '28px', letterSpacing: '-0.04em' }}>
-              Three modes. <span style={{ color: '#6366F1' }}>One tool.</span>
-            </h2>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginBottom: '28px' }}>
-              {[
-                { icon: GraduationCap, color: '#818CF8', label: 'Student',      sub: 'No job yet',      desc: 'Path to ₹4.8L first offer' },
-                { icon: Repeat,        color: '#F59E0B', label: 'Switcher',     sub: 'Changing fields', desc: 'Bridge the skill gap' },
-                { icon: Briefcase,     color: '#10B981', label: 'Professional', sub: 'Levelling up',    desc: 'Max ROI on next cert' },
-              ].map(function(m, i) {
-                return (
-                  <motion.div key={i}
-                    initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                    whileHover={{ y: -3 }}
-                    style={{ padding: '18px 12px', borderRadius: '10px', background: m.color + '0a', border: '1px solid ' + m.color + '22', cursor: 'pointer' }}
-                  >
-                    <m.icon size={isMobile ? 18 : 22} color={m.color} style={{ margin: '0 auto 10px', display: 'block' }} />
-                    <div style={{ fontSize: 'clamp(11px,1.6vw,13px)', fontWeight: '700', color: m.color, marginBottom: '2px', fontFamily: F_HEAD, letterSpacing: '-0.02em' }}>{m.label}</div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-4)', marginBottom: '4px', fontFamily: F_MONO }}>{m.sub}</div>
-                    {!isMobile ? <div style={{ fontSize: '11px', color: 'var(--text-3)', fontFamily: F_BODY }}>{m.desc}</div> : null}
-                  </motion.div>
-                )
-              })}
-            </div>
-
-            <motion.button onClick={onEnter}
-              whileHover={{ y: -2, boxShadow: '0 6px 20px rgba(99,102,241,0.28)' }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ duration: 0.18 }}
-              style={{ fontSize: '15px', padding: '14px 36px', display: 'inline-flex', alignItems: 'center', gap: '8px', borderRadius: '10px', fontFamily: F_HEAD, fontWeight: '700', letterSpacing: '-0.02em', background: '#6366F1', color: 'white', border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(99,102,241,0.22)' }}
-            >
-              <Zap size={15} /> Pick My Mode
-            </motion.button>
-          </div>
-        </div>
-
-        {/* ── SOCIAL PROOF ── */}
-        <div style={{ maxWidth: '1020px', margin: '0 auto 80px', padding: '0 24px' }}>
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}
-            style={{ textAlign: 'center', marginBottom: '44px' }}>
-            <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--text)', marginBottom: '8px', letterSpacing: '-0.04em' }}>
-              They used the data.{' '}
-              <span style={{ color: '#10B981' }}>It worked.</span>
-            </h2>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(280px,100%),1fr))', gap: '16px' }}>
-            {[
-              { name: 'Priya S.',  role: 'Engineer → Cloud Architect', city: 'Bangalore', text: 'CertifyROI said AWS SAA break-even was 8 months. It was 7. Switched companies 7 months in. ₹6L hike.',         hike: '+₹6L/yr',   color: '#10B981' },
-              { name: 'Rahul M.',  role: 'Ops Manager → Data Analyst',  city: 'Hyderabad', text: 'Was about to do an MBA. Resume AI showed me Google Analytics gets me there in 5 months at 1% of the cost.',   hike: 'Saved ₹12L', color: '#6366F1' },
-              { name: 'Ananya K.', role: 'Fresh Graduate',               city: 'Pune',      text: 'Student Mode showed GCP had faster placement for freshers in Pune. Got ₹5.2L offer. No salary field needed.', hike: '₹5.2L offer', color: '#818CF8' },
-            ].map(function(t, i) {
-              return (
-                <Card key={i} accentColor={t.color}>
-                  <div style={{ padding: '24px' }}>
-                    <div style={{ display: 'flex', gap: '3px', marginBottom: '14px' }}>
-                      {[1,2,3,4,5].map(function(s) { return <Star key={s} size={12} color="#F59E0B" fill="#F59E0B" /> })}
-                    </div>
-                    <p style={{ fontSize: '14px', color: 'var(--text-2)', lineHeight: '1.75', marginBottom: '18px', fontFamily: F_BODY }}>"{t.text}"</p>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                      <div>
-                        <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text)', fontFamily: F_HEAD, letterSpacing: '-0.02em' }}>{t.name}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '2px', fontFamily: F_BODY }}>{t.role} · {t.city}</div>
-                      </div>
-                      <div style={{ fontFamily: F_MONO, fontSize: '1.2rem', fontWeight: '700', color: t.color, letterSpacing: '-0.03em' }}>{t.hike}</div>
-                    </div>
-                  </div>
-                </Card>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* ── FINAL CTA ── */}
-        <div style={{ maxWidth: '680px', margin: '0 auto 80px', padding: '0 24px' }}>
-          <div style={{ padding: '56px 40px', textAlign: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px' }}>
-            <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1.8rem,4.5vw,3rem)', color: 'var(--text)', marginBottom: '14px', letterSpacing: '-0.04em', lineHeight: 1 }}>
-              2 minutes from now<br />
-              <span style={{ color: '#6366F1' }}>you'll know the answer</span>
-            </h2>
-            <p style={{ fontSize: 'clamp(14px,2vw,16px)', color: 'var(--text-3)', lineHeight: '1.8', fontFamily: F_BODY, maxWidth: '400px', margin: '0 auto 36px' }}>
-              Stop reading about certs. Stop asking Reddit.{' '}
-              <strong style={{ color: 'var(--text)', fontFamily: F_HEAD }}>Run the numbers.</strong>
-            </p>
-            <motion.button onClick={onEnter}
-              whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(99,102,241,0.3)' }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ duration: 0.18 }}
-              style={{ fontSize: 'clamp(15px,2.2vw,17px)', padding: '16px 44px', display: 'inline-flex', alignItems: 'center', gap: '10px', borderRadius: '10px', fontFamily: F_HEAD, fontWeight: '700', letterSpacing: '-0.02em', background: '#6366F1', color: 'white', border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(99,102,241,0.22)' }}
-            >
-              Run My Numbers <ArrowRight size={18} />
-            </motion.button>
-            <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '16px', fontFamily: F_MONO, letterSpacing: '0.06em' }}>
-              FREE · NO CARD · NO SIGNUP · NO PAYWALLS
-            </div>
-          </div>
-        </div>
-
-        {/* ── PAGE FOOTER ── */}
-        <div style={{ borderTop: '1px solid var(--border)', padding: '28px 24px', textAlign: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px', marginBottom: '10px' }}>
-            <div style={{ width: '28px', height: '28px', background: 'linear-gradient(135deg,#6366F1,#4338CA)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <TrendingUp size={14} color="white" />
-            </div>
-            <span style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: '18px', letterSpacing: '-0.03em', color: 'var(--text)' }}>
-              Certify<span style={{ color: '#6366F1' }}>ROI</span>
-            </span>
-          </div>
-          <p style={{ fontSize: '12px', color: 'var(--text-4)', marginBottom: '5px', fontFamily: F_BODY }}>
-            India's First AI-Powered Cert ROI Calculator · Powered by Groq llama-3.3-70b
-          </p>
-          <p style={{ fontSize: '11px', color: 'var(--text-4)', opacity: 0.4, fontFamily: F_MONO, letterSpacing: '0.05em' }}>
-            DATA: LINKEDIN · NASSCOM · AMBITIONBOX · NAUKRI · WEF 2026
-          </p>
-        </div>
-
+        </motion.div>
       </div>
+
+      <Ticker />
+      <CertAssembly />
+      <DataComposition />
+      <HRule />
+      <ThreeTools onEnter={onEnter} />
+      <VsSection />
+      <ElevenPM onEnter={onEnter} />
+      <ThreeModes onEnter={onEnter} />
+      <SocialProof />
+      <FinalCTA onEnter={onEnter} />
+      <PageFooter />
+
     </div>
   )
 }
