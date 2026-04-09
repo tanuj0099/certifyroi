@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Zap, AlertTriangle, CheckCircle, RefreshCw,
   TrendingUp, MapPin, User, Star, ArrowRight,
-  ChevronDown, Sparkles
+  Info
 } from 'lucide-react'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
@@ -18,10 +18,14 @@ import HikeVerifier from './HikeVerifier.jsx'
 import PitchBoss from './PitchBoss.jsx'
 import ShareROICard from './ShareROICard.jsx'
 
-// ── Brand tokens ──────────────────────────────────────────
-const FH = "'Bricolage Grotesque','Plus Jakarta Sans',sans-serif"
-const FM = "'Commit Mono','JetBrains Mono',monospace"
+// ── Font constants — 3 fonts, no more ────────────────────
+// FH: Bricolage Grotesque — headings and CTAs
+// FM: JetBrains Mono      — data labels, numbers, badges
+// FB: Inter               — body copy, descriptions
+const FH = "'Bricolage Grotesque',sans-serif"
+const FM = "'JetBrains Mono',monospace"
 const FB = "'Inter',sans-serif"
+
 const TT = { duration: 0.28, ease: [0.4, 0, 0.2, 1] }
 
 const PICTON  = '#51B1E7'
@@ -30,7 +34,6 @@ const AMBER   = '#F59E0B'
 const INDIGO  = '#6366F1'
 const VIOLET  = '#818CF8'
 
-// ── Demand color helper ───────────────────────────────────
 function dc(d) {
   if (d === 'Very High') return EMERALD
   if (d === 'High')      return PICTON
@@ -39,8 +42,7 @@ function dc(d) {
 }
 
 // ─────────────────────────────────────────────────────────
-// CUSTOM SLIDER — div-based, no input[type=range]
-// identical behaviour on every browser + every phone
+// CUSTOM SLIDER
 // ─────────────────────────────────────────────────────────
 function Slider({ label, value, min = 0, max = 100, step = 1, onChange, prefix = '', suffix = '', color = INDIGO, note, formatDisplay, disabled = false }) {
   const trackRef        = useRef(null)
@@ -104,7 +106,6 @@ function Slider({ label, value, min = 0, max = 100, step = 1, onChange, prefix =
 
   return (
     <div style={{ marginBottom: '22px', opacity: disabled ? 0.45 : 1 }}>
-      {/* Label + value */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
         <label style={{ fontSize: '11px', color: 'var(--text-3)', fontFamily: FM, textTransform: 'uppercase', letterSpacing: '0.08em', userSelect: 'none' }}>
           {label}
@@ -120,7 +121,6 @@ function Slider({ label, value, min = 0, max = 100, step = 1, onChange, prefix =
         </motion.div>
       </div>
 
-      {/* Track hit-zone — 44px tall for easy mobile touch */}
       <div
         ref={trackRef}
         onMouseDown={onMouseDown}
@@ -143,25 +143,20 @@ function Slider({ label, value, min = 0, max = 100, step = 1, onChange, prefix =
           userSelect: 'none', WebkitUserSelect: 'none',
         }}
       >
-        {/* Background track */}
         <div style={{ position: 'absolute', left: 0, right: 0, height: '5px', borderRadius: '3px', background: 'var(--glass-border)', pointerEvents: 'none' }}>
-          {/* Fill */}
           <div style={{ position: 'absolute', left: 0, width: pct + '%', height: '100%', borderRadius: '3px', background: 'linear-gradient(90deg,' + color + '55,' + color + ')', transition: drag ? 'none' : 'width 0.06s linear', pointerEvents: 'none' }} />
         </div>
-
-        {/* Thumb */}
         <div style={{
           position: 'absolute', left: pct + '%',
           transform: 'translateX(-50%) scale(' + thumbScale + ')',
           width: '24px', height: '24px', borderRadius: '50%',
           backgroundImage: 'linear-gradient(145deg,' + color + ',' + color + 'cc)',
-          boxShadow:   thumbShadow,
-          cursor:      disabled ? 'not-allowed' : drag ? 'grabbing' : 'grab',
+          boxShadow: thumbShadow,
+          cursor: disabled ? 'not-allowed' : drag ? 'grabbing' : 'grab',
           zIndex: 3, pointerEvents: 'none',
           transition: drag ? 'transform 0.1s, box-shadow 0.1s' : 'left 0.06s linear, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          {/* 2×2 grip dots */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5px' }}>
             {[0, 1].map(function(r) {
               return (
@@ -176,7 +171,6 @@ function Slider({ label, value, min = 0, max = 100, step = 1, onChange, prefix =
         </div>
       </div>
 
-      {/* Note */}
       {note ? (
         <div style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '2px', fontFamily: FB, lineHeight: '1.5', paddingLeft: '2px' }}>
           {note}
@@ -187,19 +181,36 @@ function Slider({ label, value, min = 0, max = 100, step = 1, onChange, prefix =
 }
 
 // ─────────────────────────────────────────────────────────
+// INLINE DATA SOURCE NOTE
+// Shown below each slider group — trust signal at point of use
+// ─────────────────────────────────────────────────────────
+function DataNote({ children }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: '6px',
+      padding: '7px 10px', borderRadius: '7px',
+      background: 'rgba(100,116,139,0.06)',
+      border: '1px solid rgba(100,116,139,0.12)',
+      marginTop: '4px',
+    }}>
+      <Info size={10} color="var(--text-4)" style={{ flexShrink: 0, marginTop: '1px' }} />
+      <span style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.03em', lineHeight: '1.5' }}>
+        {children}
+      </span>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
 // CERT LEADERBOARD
-// Shows top certs from the user's domain (from resume).
-// Falls back to top-demand certs if no domain detected.
 // ─────────────────────────────────────────────────────────
 function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }) {
   const [showAll, setShowAll] = useState(false)
 
-  // Filter: show certs from resume domain first, sorted by demand + hike
   const demandScore = function(d) {
     return d === 'Very High' ? 4 : d === 'High' ? 3 : d === 'Medium' ? 2 : 1
   }
 
-  // Domain mapping: resume domain string → tokens.js domain id
   const domainAliases = {
     tech: 'tech', data: 'data', management: 'management', business: 'business',
     finance: 'finance', marketing: 'marketing', product: 'product',
@@ -210,26 +221,24 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
   const mappedDomain = domainAliases[resumeDomain] || null
 
   const domainCerts = mappedDomain
-    ? CERTIFICATIONS.filter(c => c.domain === mappedDomain)
+    ? CERTIFICATIONS.filter(function(c) { return c.domain === mappedDomain })
     : []
 
   const sorted = [...CERTIFICATIONS].sort(function(a, b) {
     return demandScore(b.demand) - demandScore(a.demand) || b.avgHike - a.avgHike
   })
 
-  // Always put prefilledCert first if it exists
   const preferred = prefilledCert
-    ? CERTIFICATIONS.filter(c =>
-        c.name.toLowerCase().includes(prefilledCert.toLowerCase()) ||
-        prefilledCert.toLowerCase().includes(c.name.toLowerCase())
-      )
+    ? CERTIFICATIONS.filter(function(c) {
+        return c.name.toLowerCase().includes(prefilledCert.toLowerCase()) ||
+               prefilledCert.toLowerCase().includes(c.name.toLowerCase())
+      })
     : []
 
   const domainList = domainCerts.sort(function(a, b) {
     return demandScore(b.demand) - demandScore(a.demand) || b.avgHike - a.avgHike
   })
 
-  // Build final list: preferred cert first, then domain, deduplicated, limit 10
   const seen = new Set()
   const finalList = []
   ;[...preferred, ...domainList, ...sorted].forEach(function(c) {
@@ -246,7 +255,7 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
         <div style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           {mappedDomain
-            ? (CERT_DOMAINS.find(d => d.id === mappedDomain)?.label || mappedDomain) + ' · Top Picks'
+            ? (CERT_DOMAINS.find(function(d) { return d.id === mappedDomain })?.label || mappedDomain) + ' · Top Picks'
             : 'Highest Demand Certs'}
         </div>
         {mappedDomain && (
@@ -272,29 +281,20 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
               whileHover={{ scale: 1.01, x: 2 }}
               whileTap={{ scale: 0.98 }}
               style={{
-                width: '100%',
-                padding: '12px 14px',
-                borderRadius: '11px',
+                width: '100%', padding: '12px 14px', borderRadius: '11px',
                 background: active ? (isPrefilled ? 'rgba(16,185,129,0.08)' : 'rgba(81,177,231,0.07)') : 'var(--surface)',
                 border: '1px solid ' + (active ? (isPrefilled ? 'rgba(16,185,129,0.35)' : PICTON + '33') : 'var(--border)'),
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                textAlign: 'left',
-                transition: 'all 0.18s',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
+                textAlign: 'left', transition: 'all 0.18s',
                 boxShadow: active ? '0 2px 12px rgba(0,0,0,0.1)' : 'none',
               }}
             >
-              {/* Rank or star */}
               <div style={{ width: 26, height: 26, borderRadius: '7px', flexShrink: 0, background: active ? (isPrefilled ? 'rgba(16,185,129,0.15)' : PICTON + '15') : 'var(--bg)', border: '1px solid ' + (active ? (isPrefilled ? 'rgba(16,185,129,0.3)' : PICTON + '25') : 'var(--border)'), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {isPrefilled
                   ? <Star size={11} color={EMERALD} fill={EMERALD} />
                   : <span style={{ fontFamily: FM, fontSize: '10px', fontWeight: '700', color: active ? PICTON : 'var(--text-4)' }}>#{i + 1}</span>
                 }
               </div>
-
-              {/* Name + for-who */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: FH, fontWeight: '700', fontSize: '13px', color: active ? (isPrefilled ? EMERALD : PICTON) : 'var(--text)', letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '2px' }}>
                   {cert.name}
@@ -303,8 +303,6 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
                   {cert.forWho}
                 </div>
               </div>
-
-              {/* Badges */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px', flexShrink: 0 }}>
                 <span style={{ fontFamily: FM, fontSize: '11px', fontWeight: '700', color: EMERALD }}>+{cert.avgHike}%</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -312,8 +310,6 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
                   <span style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)' }}>{cert.timeMonths}mo</span>
                 </div>
               </div>
-
-              {/* Arrow */}
               <motion.div animate={{ x: active ? 2 : 0 }} transition={{ duration: 0.15 }}>
                 <ArrowRight size={12} color={active ? (isPrefilled ? EMERALD : PICTON) : 'var(--text-4)'} />
               </motion.div>
@@ -335,8 +331,7 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
 }
 
 // ─────────────────────────────────────────────────────────
-// "GREAT CHOICE" / "INTERESTING CHOICE" banner
-// Shown immediately after user picks a cert
+// PICK MESSAGE
 // ─────────────────────────────────────────────────────────
 function PickMessage({ certName, prefilledCert, firstName }) {
   if (!certName) return null
@@ -430,25 +425,36 @@ function ChartTip({ active, payload, label }) {
   )
 }
 
-// ── AI result panel ───────────────────────────────────────
+// ─────────────────────────────────────────────────────────
+// AI RESULT PANEL
+// "AI VERDICT" renamed to "AI ASSESSMENT"
+// Honest estimate disclaimer added below bottom-line
+// ─────────────────────────────────────────────────────────
 function AIResult({ result, certName, onReset }) {
   var vc = result.verdict?.toLowerCase().includes('strong')   ? EMERALD
          : result.verdict?.toLowerCase().includes('moderate') ? AMBER
          : '#EF4444'
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={TT}
       style={{ marginTop: '14px', borderRadius: '14px', background: 'var(--surface)', border: '1px solid var(--glass-border)', overflow: 'hidden' }}
     >
+      {/* Header — "AI ASSESSMENT" not "AI VERDICT" */}
       <div style={{ padding: '14px 16px', background: vc + '0d', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
         <div>
-          <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>AI VERDICT</div>
-          <div style={{ fontSize: '13px', fontWeight: '700', color: vc, fontFamily: FH, lineHeight: '1.4' }}>{result.verdict}</div>
+          <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>
+            AI ASSESSMENT
+          </div>
+          <div style={{ fontSize: '13px', fontWeight: '700', color: vc, fontFamily: FH, lineHeight: '1.4' }}>
+            {result.verdict}
+          </div>
         </div>
         <button onClick={onReset} style={{ background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer', padding: '4px', flexShrink: 0 }}>
           <RefreshCw size={13} />
         </button>
       </div>
+
       {(result.breakEven || result.projection) && (
         <div style={{ padding: '14px 16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: '10px' }}>
           {result.breakEven && (
@@ -465,6 +471,7 @@ function AIResult({ result, certName, onReset }) {
           )}
         </div>
       )}
+
       {result.demand?.length > 0 && (
         <div style={{ padding: '0 16px 12px' }}>
           <div style={{ fontFamily: FM, fontSize: '9px', color: VIOLET, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '7px' }}>MARKET DEMAND</div>
@@ -478,6 +485,7 @@ function AIResult({ result, certName, onReset }) {
           })}
         </div>
       )}
+
       {result.risks?.length > 0 && (
         <div style={{ padding: '0 16px 12px' }}>
           <div style={{ fontFamily: FM, fontSize: '9px', color: '#EF4444', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '7px' }}>RISKS</div>
@@ -491,12 +499,21 @@ function AIResult({ result, certName, onReset }) {
           })}
         </div>
       )}
+
       {result.bottomLine && (
-        <div style={{ margin: '0 16px 16px', padding: '10px 13px', borderRadius: '9px', background: vc + '0d', border: '1px solid ' + vc + '22' }}>
+        <div style={{ margin: '0 16px 12px', padding: '10px 13px', borderRadius: '9px', background: vc + '0d', border: '1px solid ' + vc + '22' }}>
           <div style={{ fontFamily: FM, fontSize: '9px', color: vc, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>BOTTOM LINE</div>
           <div style={{ fontSize: '13px', fontWeight: '700', color: vc, fontFamily: FH }}>{result.bottomLine}</div>
         </div>
       )}
+
+      {/* ── Honest estimate disclaimer — Phase C inline trust ── */}
+      <div style={{ margin: '0 16px 16px', padding: '9px 12px', borderRadius: '8px', background: 'rgba(100,116,139,0.06)', border: '1px solid rgba(100,116,139,0.12)', display: 'flex', gap: '7px', alignItems: 'flex-start' }}>
+        <Info size={11} color="var(--text-4)" style={{ flexShrink: 0, marginTop: '1px' }} />
+        <div style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', lineHeight: '1.6', letterSpacing: '0.02em' }}>
+          These are estimates based on market medians — not guarantees. Results vary with company tier, negotiation, and market conditions. Source: LinkedIn India · Naukri · NASSCOM · Q1 2026.
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -505,21 +522,21 @@ function AIResult({ result, certName, onReset }) {
 // MAIN HERO COMPONENT
 // ─────────────────────────────────────────────────────────
 function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
-  mode         = mode         || 'professional'
+  mode          = mode          || 'professional'
   prefilledCert = prefilledCert || ''
-  resumeName   = resumeName   || ''
-  resumeCity   = resumeCity   || ''
-  resumeDomain = resumeDomain || ''
+  resumeName    = resumeName    || ''
+  resumeCity    = resumeCity    || ''
+  resumeDomain  = resumeDomain  || ''
 
   const isStudent = mode === 'student'
 
-  const [certName,      setCertName]      = useState(prefilledCert)
-  const [selectedCert,  setSelectedCert]  = useState(null)
-  const [aiResult,      setAiResult]      = useState(null)
-  const [aiLoading,     setAiLoading]     = useState(false)
-  const [aiError,       setAiError]       = useState(null)
-  const [showVerifier,  setShowVerifier]  = useState(false)
-  const [cooldown,      setCooldown]      = useState(0)
+  const [certName,     setCertName]     = useState(prefilledCert)
+  const [selectedCert, setSelectedCert] = useState(null)
+  const [aiResult,     setAiResult]     = useState(null)
+  const [aiLoading,    setAiLoading]    = useState(false)
+  const [aiError,      setAiError]      = useState(null)
+  const [showVerifier, setShowVerifier] = useState(false)
+  const [cooldown,     setCooldown]     = useState(0)
 
   const [salary,      setSalary]      = useLocalStorage('croi_salary',       isStudent ? 0 : 8)
   const [certCost,    setCertCost]    = useLocalStorage('croi_cert_cost',    2)
@@ -531,14 +548,12 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
   const firstName   = resumeName ? resumeName.split(' ')[0] : ''
   const displayCity = resumeCity
 
-  // Cooldown tick
   useEffect(function() {
     if (cooldown <= 0) return
     var t = setTimeout(function() { setCooldown(function(v) { return v - 1 }) }, 1000)
     return function() { clearTimeout(t) }
   }, [cooldown])
 
-  // Sync prefilledCert from Step 1
   useEffect(function() {
     if (!prefilledCert) return
     setCertName(prefilledCert)
@@ -569,8 +584,8 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
   }, [])
 
   const analyse = useCallback(async function() {
-    if (!certName.trim())         { setAiError('Select a certification first'); return }
-    if (!user && guest.exceeded)  { setAiError('Free limit reached — sign in for unlimited'); return }
+    if (!certName.trim())        { setAiError('Select a certification first'); return }
+    if (!user && guest.exceeded) { setAiError('Free limit reached — sign in for unlimited'); return }
     if (cooldown > 0) return
     setAiLoading(true)
     setAiResult(null)
@@ -580,7 +595,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
       setAiResult(r)
       if (!user) guest.increment()
       setCooldown(10)
-    } catch (e) {
+    } catch(e) {
       setAiError(e.message || 'Analysis failed')
     }
     setAiLoading(false)
@@ -591,7 +606,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
   return (
     <div>
 
-      {/* ── Personalization banner ─────────────────────── */}
+      {/* ── Personalisation banner ─────────────────────── */}
       {(firstName || displayCity || prefilledCert) ? (
         <motion.div
           initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={TT}
@@ -600,9 +615,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
           {firstName ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <User size={13} color={VIOLET} />
-              <span style={{ fontSize: '13px', color: 'var(--text)', fontFamily: FH, fontWeight: '700' }}>
-                {firstName}
-              </span>
+              <span style={{ fontSize: '13px', color: 'var(--text)', fontFamily: FH, fontWeight: '700' }}>{firstName}</span>
             </div>
           ) : null}
           {displayCity ? (
@@ -639,12 +652,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
       {/* ── Great / Interesting choice message ─────────── */}
       <AnimatePresence mode="wait">
         {certName ? (
-          <PickMessage
-            key={certName}
-            certName={certName}
-            prefilledCert={prefilledCert}
-            firstName={firstName}
-          />
+          <PickMessage key={certName} certName={certName} prefilledCert={prefilledCert} firstName={firstName} />
         ) : null}
       </AnimatePresence>
 
@@ -666,42 +674,58 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
         ) : null}
       </AnimatePresence>
 
-      {/* ── Sliders ────────────────────────────────────── */}
+      {/* ── Sliders + inline data notes ────────────────── */}
       <div style={{ marginBottom: '20px', padding: '20px 18px', borderRadius: '13px', background: 'var(--surface)', border: '1px solid var(--glass-border)' }}>
+
         {isStudent ? (
           <div style={{ marginBottom: '18px', padding: '11px 13px', borderRadius: '9px', background: 'rgba(129,140,248,0.07)', border: '1px solid rgba(129,140,248,0.2)' }}>
             <div style={{ fontSize: '11px', color: VIOLET, fontFamily: FM, marginBottom: '3px' }}>STUDENT MODE</div>
-            <div style={{ fontSize: '12px', color: 'var(--text-3)', fontFamily: FB }}>Target: first offer. ROI from career investment.</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-3)', fontFamily: FB }}>Target: first offer. ROI from career investment, not salary hike.</div>
           </div>
         ) : (
-          <Slider
-            label="Current Salary"
-            value={salary}
-            min={2} max={40} step={0.5}
-            onChange={setSalary}
-            prefix="₹" suffix="L/yr"
-            color={PICTON}
-            note={displayCity || ''}
-          />
+          <>
+            <Slider
+              label="Current Salary"
+              value={salary}
+              min={2} max={40} step={0.5}
+              onChange={setSalary}
+              prefix="₹" suffix="L/yr"
+              color={PICTON}
+              note={displayCity || ''}
+            />
+            {/* Inline trust signal — salary data source */}
+            <DataNote>
+              Salary benchmarks: Naukri salary insights + LinkedIn India · Median values · {displayCity || 'India'} · Q1 2026
+            </DataNote>
+          </>
         )}
-        <Slider
-          label="Cert Cost"
-          value={certCost}
-          min={0} max={6} step={0.1}
-          onChange={setCertCost}
-          prefix="₹" suffix="L"
-          color={INDIGO}
-        />
-        {!isStudent ? (
+
+        <div style={{ marginTop: isStudent ? '0' : '16px' }}>
           <Slider
-            label="Expected Hike"
-            value={hikePercent}
-            min={5} max={80} step={5}
-            onChange={setHikePercent}
-            suffix="%"
-            color={EMERALD}
-            note="India median: 25–40%"
+            label="Cert Cost"
+            value={certCost}
+            min={0} max={6} step={0.1}
+            onChange={setCertCost}
+            prefix="₹" suffix="L"
+            color={INDIGO}
           />
+        </div>
+
+        {!isStudent ? (
+          <>
+            <Slider
+              label="Expected Hike"
+              value={hikePercent}
+              min={5} max={80} step={5}
+              onChange={setHikePercent}
+              suffix="%"
+              color={EMERALD}
+            />
+            {/* Inline trust signal — hike data source */}
+            <DataNote>
+              Hike benchmarks: AmbitionBox post-cert salary data + NASSCOM 2026 · India median: 25–40% · Individual results vary by company tier and negotiation
+            </DataNote>
+          </>
         ) : null}
       </div>
 
@@ -713,32 +737,39 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
         >
           {isStudent ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '8px', marginBottom: '12px' }}>
-              <StatCard label="Target Offer" value="₹4.8L+"          color={VIOLET} delay={0} />
-              <StatCard label="Investment"   value={'₹' + certCost + 'L'} color={AMBER}  delay={0.05} />
+              <StatCard label="Target Offer"  value="₹4.8L+"               color={VIOLET} delay={0}    />
+              <StatCard label="Investment"    value={'₹' + certCost + 'L'} color={AMBER}  delay={0.05} />
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '8px', marginBottom: '12px' }}>
-              <StatCard label="New Salary"    value={'₹' + roi.newSalaryL + 'L/yr'}                                   color={PICTON}  delay={0}    />
+              <StatCard label="New Salary"    value={'₹' + roi.newSalaryL + 'L/yr'}                              color={PICTON}  delay={0}    />
               <StatCard label="Break-even"    value={roi.breakEvenMonths > 0 ? roi.breakEvenMonths + ' mo' : '--'} sub={roi.anchor} color={AMBER}  delay={0.05} />
-              <StatCard label="5-Yr Net Gain" value={'₹' + roi.fiveYearGainL + 'L'}                                   color={EMERALD} delay={0.1}  />
-              <StatCard label="Monthly +"     value={'₹' + roi.monthlyGainK + 'K'}                                    color={VIOLET}  delay={0.15} />
+              <StatCard label="5-Yr Net Gain" value={'₹' + roi.fiveYearGainL + 'L'}                              color={EMERALD} delay={0.1}  />
+              <StatCard label="Monthly +"     value={'₹' + roi.monthlyGainK + 'K'}                               color={VIOLET}  delay={0.15} />
             </div>
           )}
 
           {!isStudent ? (
-            <div style={{ marginBottom: '16px', padding: '9px 12px', borderRadius: '9px', background: roi.roiPercent > 200 ? 'rgba(16,185,129,0.07)' : 'rgba(99,102,241,0.06)', border: '1px solid ' + (roi.roiPercent > 200 ? 'rgba(16,185,129,0.2)' : 'rgba(99,102,241,0.18)'), display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ marginBottom: '12px', padding: '9px 12px', borderRadius: '9px', background: roi.roiPercent > 200 ? 'rgba(16,185,129,0.07)' : 'rgba(99,102,241,0.06)', border: '1px solid ' + (roi.roiPercent > 200 ? 'rgba(16,185,129,0.2)' : 'rgba(99,102,241,0.18)'), display: 'flex', alignItems: 'center', gap: '8px' }}>
               <TrendingUp size={13} color={roi.roiPercent > 200 ? EMERALD : VIOLET} />
               <span style={{ fontFamily: FM, fontSize: '12px', color: roi.roiPercent > 200 ? EMERALD : VIOLET, fontWeight: '700' }}>
                 5-Year ROI: {roi.roiPercent}%
               </span>
             </div>
           ) : null}
+
+          {/* Inline trust note below stat cards */}
+          {!isStudent && (
+            <DataNote>
+              All figures are estimates based on market medians. Break-even assumes you negotiate the full hike on your next job switch. 5-year gain = cumulative salary uplift minus cert cost.
+            </DataNote>
+          )}
         </motion.div>
       </AnimatePresence>
 
       {/* ── Chart ──────────────────────────────────────── */}
       {!isStudent && roi.chartData && roi.chartData.length > 0 ? (
-        <div style={{ marginBottom: '20px', padding: '16px', borderRadius: '13px', background: 'var(--surface)', border: '1px solid var(--glass-border)' }}>
+        <div style={{ marginBottom: '20px', marginTop: '16px', padding: '16px', borderRadius: '13px', background: 'var(--surface)', border: '1px solid var(--glass-border)' }}>
           <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px' }}>CUMULATIVE GAIN — 24 MONTHS</div>
           <ResponsiveContainer width="100%" height={150}>
             <LineChart data={roi.chartData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
@@ -775,7 +806,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
             ) : (
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Zap size={15} />
-                Get AI ROI Analysis
+                Get AI ROI Assessment
               </span>
             )}
           </motion.button>
@@ -785,7 +816,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
         {aiResult  ? <AIResult result={aiResult} certName={certName} onReset={function() { setAiResult(null) }} /> : null}
       </div>
 
-      {/* ── Tools row (no Study Tracker) ──────────────── */}
+      {/* ── Tools row ──────────────────────────────────── */}
       {certName ? (
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
           <button
@@ -804,11 +835,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
             key="hv"
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={TT}
           >
-            <HikeVerifier
-              certName={certName}
-              projectedHike={hikePercent}
-              onClose={function() { setShowVerifier(false) }}
-            />
+            <HikeVerifier certName={certName} projectedHike={hikePercent} onClose={function() { setShowVerifier(false) }} />
           </motion.div>
         ) : null}
       </AnimatePresence>
@@ -816,21 +843,9 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
       {/* ── Pitch Boss + Share card ─────────────────────── */}
       {certName ? (
         <div>
-          <PitchBoss
-            certName={certName}
-            salary={salary}
-            certCost={certCost}
-            hikePercent={hikePercent}
-            name={resumeName}
-            mode={mode}
-          />
+          <PitchBoss certName={certName} salary={salary} certCost={certCost} hikePercent={hikePercent} name={resumeName} mode={mode} />
           {!isStudent ? (
-  <ShareROICard
-    certName={certName}
-    domain={selectedCert ? selectedCert.domain : ''}
-    demand={selectedCert ? selectedCert.demand : 'High'}
-    name={resumeName}
-  />
+            <ShareROICard certName={certName} domain={selectedCert ? selectedCert.domain : ''} demand={selectedCert ? selectedCert.demand : 'High'} name={resumeName} />
           ) : null}
         </div>
       ) : null}
