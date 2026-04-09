@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    /* ── Color tokens ───────────────────────────────────── */
     --bg:             #0B0E14;
     --bg-secondary:   #0D1117;
     --surface:        #121826;
@@ -32,6 +33,14 @@
     --card-border:    rgba(255,255,255,0.07);
     --card-highlight: rgba(255,255,255,0.05);
     --dot-color:      rgba(99,102,241,0.12);
+
+    /* ── Font tokens — single source of truth ───────────── *
+     * Every component reads these. No hardcoded font stacks  *
+     * anywhere else in the codebase.                         *
+     * ─────────────────────────────────────────────────────── */
+    --font-head: 'Bricolage Grotesque', sans-serif;   /* headings, CTAs            */
+    --font-body: 'Inter', sans-serif;                  /* body copy, UI text        */
+    --font-mono: 'JetBrains Mono', monospace;          /* data values, labels, mono */
   }
 
   [data-theme="light"] {
@@ -63,6 +72,7 @@
     --card-border:    rgba(0,0,0,0.1);
     --card-highlight: rgba(255,255,255,0.8);
     --dot-color:      rgba(79,70,229,0.1);
+    /* font tokens are theme-independent — inherited from :root */
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -71,8 +81,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    /* FONT 1 of 3: Inter — body copy */
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
     line-height: 1.6;
@@ -119,9 +128,9 @@
 
   #root { position: relative; z-index: 1; }
 
-  /* FONT 2 of 3: Bricolage Grotesque — headings only */
+  /* Headings — Bricolage Grotesque */
   h1, h2, h3, h4 {
-    font-family: 'Bricolage Grotesque', sans-serif;
+    font-family: var(--font-head);
     font-weight: 800;
     color: var(--text);
     letter-spacing: -0.02em;
@@ -198,8 +207,7 @@
     border-radius: 10px;
     border: none;
     cursor: pointer;
-    /* FONT 2 of 3: Bricolage Grotesque for CTAs */
-    font-family: 'Bricolage Grotesque', sans-serif;
+    font-family: var(--font-head);
     font-size: 14px;
     letter-spacing: -0.01em;
     transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s;
@@ -216,8 +224,7 @@
     border-radius: 9px;
     cursor: pointer;
     font-size: 13px;
-    /* FONT 1 of 3: Inter for ghost buttons */
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
     transition: all 0.18s;
   }
   .btn-ghost:hover { background: var(--surface-high); border-color: var(--border-accent); color: var(--text); }
@@ -376,8 +383,7 @@
     border: 1px solid rgba(16,185,129,0.28);
     color: var(--emerald-light);
     letter-spacing: 0.05em; text-transform: uppercase;
-    /* FONT 3 of 3: JetBrains Mono — data labels and badges */
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
   }
 
   /* ── Theme toggle ────────────────────────────────────── */
