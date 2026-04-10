@@ -3,48 +3,58 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Upload, FileText, X, Sparkles, AlertTriangle,
   ArrowRight, RefreshCw, User, TrendingUp,
-  Zap, Target, Star, Clock, ChevronDown
+  Zap, Target, Star, Clock, ChevronDown, MapPin
 } from 'lucide-react'
 import { CERTIFICATIONS, CERT_DOMAINS } from '../tokens.js'
 import { callGroqForResume } from '../services/aiService.jsx'
-import NeonCard from './NeonCard.jsx'
 
-const PICTON  = '#51B1E7'
-const EMERALD = '#10B981'
-const AMBER   = '#F59E0B'
-const INDIGO  = '#6366F1'
-const VIOLET  = '#818CF8'
+// ── Font tokens → CSS variables ───────────────────────────
+var FM = 'var(--font-mono)'
+var FB = 'var(--font-body)'
+var FH = 'var(--font-head)'
 
-const FM = "'JetBrains Mono','Commit Mono',monospace"
-const FB = "'Inter',sans-serif"
-const FH = "'Plus Jakarta Sans','Bricolage Grotesque',sans-serif"
+// ── Color constants ───────────────────────────────────────
+var PICTON  = '#51B1E7'
+var EMERALD = '#10B981'
+var AMBER   = '#F59E0B'
+var INDIGO  = '#6366F1'
+var VIOLET  = '#818CF8'
 
 // ── Timeline options ──────────────────────────────────────
-const TIMELINE_OPTIONS = [
-  { id: 'fast',     label: 'Fast track',  sub: '1–3 months',  desc: 'Quick wins — get results fast' },
-  { id: 'medium',   label: 'Standard',    sub: '3–6 months',  desc: 'Balanced depth and speed'      },
-  { id: 'flexible', label: 'No rush',     sub: 'Open',        desc: 'Best cert regardless of time'  },
+var TIMELINE_OPTIONS = [
+  { id: 'fast',     label: 'Fast track', sub: '1–3 months', desc: 'Quick wins — get results fast' },
+  { id: 'medium',   label: 'Standard',   sub: '3–6 months', desc: 'Balanced depth and speed'      },
+  { id: 'flexible', label: 'No rush',    sub: 'Open',       desc: 'Best cert regardless of time'  },
 ]
 
-// ── Domain options for non-switchers ─────────────────────
-const DOMAIN_CHOICES = [
-  { id: 'auto',          label: 'Auto-detect',              sub: 'AI picks from your resume' },
-  { id: 'tech',          label: 'Cloud / Tech',             sub: 'AWS, Azure, DevOps'        },
-  { id: 'data',          label: 'Data & AI',                sub: 'Analytics, ML, BI'         },
-  { id: 'cybersecurity', label: 'Cybersecurity',            sub: 'CEH, CISSP, CISM'          },
-  { id: 'finance',       label: 'Finance',                  sub: 'CFA, CA, CMA, NISM'        },
-  { id: 'management',    label: 'Management',               sub: 'PMP, CSM, Six Sigma'       },
-  { id: 'marketing',     label: 'Marketing',                sub: 'Google, Meta, HubSpot'     },
-  { id: 'hr',            label: 'HR & People',              sub: 'SHRM, Analytics'           },
-  { id: 'government',    label: 'Govt / PSU',               sub: 'GATE, IBPS, SSC'           },
-  { id: 'medical',       label: 'Medical',                  sub: 'DNB, USMLE, ACRP'          },
+// ── Domain options ────────────────────────────────────────
+var DOMAIN_CHOICES = [
+  { id: 'auto',          label: 'Auto-detect',  sub: 'AI picks from your resume' },
+  { id: 'tech',          label: 'Cloud / Tech', sub: 'AWS, Azure, DevOps'        },
+  { id: 'data',          label: 'Data & AI',    sub: 'Analytics, ML, BI'         },
+  { id: 'cybersecurity', label: 'Cybersecurity',sub: 'CEH, CISSP, CISM'          },
+  { id: 'finance',       label: 'Finance',      sub: 'CFA, CA, CMA, NISM'        },
+  { id: 'management',    label: 'Management',   sub: 'PMP, CSM, Six Sigma'       },
+  { id: 'marketing',     label: 'Marketing',    sub: 'Google, Meta, HubSpot'     },
+  { id: 'hr',            label: 'HR & People',  sub: 'SHRM, Analytics'           },
+  { id: 'government',    label: 'Govt / PSU',   sub: 'GATE, IBPS, SSC'           },
+  { id: 'medical',       label: 'Medical',      sub: 'DNB, USMLE, ACRP'          },
+]
+
+// ── Loader steps — defined OUTSIDE component so the array
+//    reference is stable and won't re-trigger useEffect ────
+var LOADER_STEPS = [
+  'Reading your resume...',
+  'Matching India job market 2026...',
+  'Ranking certification ROI...',
+  'Writing your recommendation...',
 ]
 
 // ── Document validator ────────────────────────────────────
-const validateDocument = (text) => {
-  const t    = text.toLowerCase()
-  const tRaw = text
-  const hardRejectRules = [
+var validateDocument = function(text) {
+  var t    = text.toLowerCase()
+  var tRaw = text
+  var hardRejectRules = [
     { label: 'fee receipt',    patterns: ['fee receipt', 'bill no', 'gst no'],                        min: 2 },
     { label: 'fee receipt',    patterns: ['annual fee', 'total amount', 'amount in words'],           min: 2 },
     { label: 'fee receipt',    patterns: ['billdesk', 'mode of transfer', 'total amount'],            min: 2 },
@@ -61,40 +71,41 @@ const validateDocument = (text) => {
     { label: 'research report',patterns: ['null hypothesis', 'p-value', 'chi-square', 'anova'],      min: 3 },
     { label: 'academic paper', patterns: ['table of contents', 'literature review', 'bibliography'], min: 2 },
   ]
-  for (const rule of hardRejectRules) {
-    const matches = rule.patterns.filter(p => t.includes(p))
+  for (var ri = 0; ri < hardRejectRules.length; ri++) {
+    var rule = hardRejectRules[ri]
+    var matches = rule.patterns.filter(function(p) { return t.includes(p) })
     if (matches.length >= rule.min) return { isResume: false, rejectedBy: rule.label, score: 0 }
   }
-  let score = 0
+  var score = 0
   if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(tRaw)) score += 3
   if (/(\+91[\s\-]?)?[6-9]\d{9}/.test(tRaw))                          score += 3
   if (t.includes('linkedin'))                                            score += 3
-  const sections = ['education','experience','skills','projects','achievements','certifications','volunteering','leadership','internship','employment history','work experience','extracurricular','awards','publications','languages']
-  const sectionHits = sections.filter(s => t.includes(s))
+  var sections = ['education','experience','skills','projects','achievements','certifications','volunteering','leadership','internship','employment history','work experience','extracurricular','awards','publications','languages']
+  var sectionHits = sections.filter(function(s) { return t.includes(s) })
   score += sectionHits.length * 1.5
   if (sectionHits.length >= 3) score += 2
-  const degrees = ['bba','mba','b.tech','btech','m.tech','mtech','bsc','msc','bca','mca','bcom','mcom','pgdm','diploma','cbse','icse']
-  if (degrees.filter(d => t.includes(d)).length >= 1) score += 2
-  const institutions = ['university','college','institute','iit','nit','bits','vit','srm','manipal','christ','symbiosis','amity']
-  if (institutions.filter(i => t.includes(i)).length >= 1) score += 1
+  var degrees = ['bba','mba','b.tech','btech','m.tech','mtech','bsc','msc','bca','mca','bcom','mcom','pgdm','diploma','cbse','icse']
+  if (degrees.filter(function(d) { return t.includes(d) }).length >= 1) score += 2
+  var institutions = ['university','college','institute','iit','nit','bits','vit','srm','manipal','christ','symbiosis','amity']
+  if (institutions.filter(function(i) { return t.includes(i) }).length >= 1) score += 1
   if (/\b20\d{2}\s*[–\-]\s*(20\d{2}|present)/i.test(tRaw)) score += 2
   if (/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*'?\d{2,4}/i.test(tRaw)) score += 1
-  const actionVerbs = ['managed','led ','developed','built ','handled','coordinated','organized','achieved','launched','mentored','conducted','reduced','increased','collaborated','spearheaded','implemented','delivered','designed','created','trained','secured','boosted']
-  const verbHits = actionVerbs.filter(v => t.includes(v))
+  var actionVerbs = ['managed','led ','developed','built ','handled','coordinated','organized','achieved','launched','mentored','conducted','reduced','increased','collaborated','spearheaded','implemented','delivered','designed','created','trained','secured','boosted']
+  var verbHits = actionVerbs.filter(function(v) { return t.includes(v) })
   if (verbHits.length >= 2) score += 2
   if (verbHits.length >= 4) score += 1
-  const tools = ['excel','powerpoint','canva','python','java','sql','tableau','figma','aws','azure','docker','git','tally','powerbi']
-  if (tools.filter(t2 => t.includes(t2)).length >= 2) score += 2
-  if (text.trim().length < 150) return { isResume: false, rejectedBy: 'too short', score }
-  return { isResume: score >= 8, score, sectionHits, verbHits }
+  var tools = ['excel','powerpoint','canva','python','java','sql','tableau','figma','aws','azure','docker','git','tally','powerbi']
+  if (tools.filter(function(t2) { return t.includes(t2) }).length >= 2) score += 2
+  if (text.trim().length < 150) return { isResume: false, rejectedBy: 'too short', score: score }
+  return { isResume: score >= 8, score: score, sectionHits: sectionHits, verbHits: verbHits }
 }
 
 // ── PDF reader ────────────────────────────────────────────
-const readPdfFile = async (file) => {
+var readPdfFile = async function(file) {
   if (!window.pdfjsLib) {
-    await new Promise((resolve, reject) => {
-      const script = document.createElement('script')
-      script.src   = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
+    await new Promise(function(resolve, reject) {
+      var script = document.createElement('script')
+      script.src     = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
       script.onload  = resolve
       script.onerror = reject
       document.head.appendChild(script)
@@ -102,19 +113,19 @@ const readPdfFile = async (file) => {
   }
   window.pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
-  const arrayBuffer = await file.arrayBuffer()
-  const pdf         = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise
-  let fullText = ''
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page    = await pdf.getPage(i)
-    const content = await page.getTextContent()
-    fullText += content.items.map(item => item.str).join(' ') + '\n'
+  var arrayBuffer = await file.arrayBuffer()
+  var pdf         = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise
+  var fullText = ''
+  for (var i = 1; i <= pdf.numPages; i++) {
+    var page    = await pdf.getPage(i)
+    var content = await page.getTextContent()
+    fullText += content.items.map(function(item) { return item.str }).join(' ') + '\n'
   }
   return fullText.trim()
 }
 
 // ── Prompt builder ────────────────────────────────────────
-const buildPrompt = (resumeText, mode, timeline, domainIntent, switchTarget) => {
+var buildPrompt = function(resumeText, mode, timeline, domainIntent, switchTarget) {
   var timelineNote = timeline === 'fast'
     ? 'IMPORTANT: User needs FAST-TRACK only — certs completable in 1-3 months. Never recommend anything longer.'
     : timeline === 'medium'
@@ -127,66 +138,22 @@ const buildPrompt = (resumeText, mode, timeline, domainIntent, switchTarget) => 
     ? 'User wants to grow in: ' + domainIntent + '. Prioritise certs in that domain.'
     : 'Auto-detect best domain from resume.'
 
-  return `You are CertifyROI, a career advisor for Indian professionals (2026).
-User mode: ${mode}
-Timeline: ${timelineNote}
-Domain: ${domainNote}
-
-Resume:
-${resumeText.slice(0, 2200)}
-
-Reply in EXACTLY this format, no extra text:
-
-**NAME:** [full name or "Not found"]
-**PROFILE SUMMARY:** 2-3 specific sentences about their background and biggest career opportunity
-**CITY:** [city from resume or "Not specified"]
-**DOMAIN:** [primary: tech/data/management/business/finance/marketing/product/design/hr]
-
-**SKILL GAPS:**
-- gap one
-- gap two
-- gap three
-
-**TOP CERT #1 (PRIMARY MOVE):**
-Name: exact name
-Why: specific reason tied to their resume
-ROI: hike %
-Timeline: X months
-Fast Track: one concrete first step with resource name
-
-**TOP CERT #2:**
-Name: exact name
-Why: specific reason
-ROI: hike %
-Timeline: X months
-Fast Track: one concrete first step
-
-**TOP CERT #3:**
-Name: exact name
-Why: specific reason
-ROI: hike %
-Timeline: X months
-Fast Track: one concrete first step
-
-**IMMEDIATE ACTION:** one thing to do THIS WEEK with platform name
-**MARKET INSIGHT:** one sentence on India demand for top cert in their city
-
-Under 380 words. India-specific. Be specific to their actual resume.`
+  return 'You are CertifyROI, a career advisor for Indian professionals (2026).\nUser mode: ' + mode + '\nTimeline: ' + timelineNote + '\nDomain: ' + domainNote + '\n\nResume:\n' + resumeText.slice(0, 2200) + '\n\nReply in EXACTLY this format, no extra text:\n\n**NAME:** [full name or "Not found"]\n**PROFILE SUMMARY:** 2-3 specific sentences about their background and biggest career opportunity\n**CITY:** [city from resume or "Not specified"]\n**DOMAIN:** [primary: tech/data/management/business/finance/marketing/product/design/hr]\n\n**SKILL GAPS:**\n- gap one\n- gap two\n- gap three\n\n**TOP CERT #1 (PRIMARY MOVE):**\nName: exact name\nWhy: specific reason tied to their resume\nROI: hike %\nTimeline: X months\nFast Track: one concrete first step with resource name\n\n**TOP CERT #2:**\nName: exact name\nWhy: specific reason\nROI: hike %\nTimeline: X months\nFast Track: one concrete first step\n\n**TOP CERT #3:**\nName: exact name\nWhy: specific reason\nROI: hike %\nTimeline: X months\nFast Track: one concrete first step\n\n**IMMEDIATE ACTION:** one thing to do THIS WEEK with platform name\n**MARKET INSIGHT:** one sentence on India demand for top cert in their city\n\nUnder 380 words. India-specific. Be specific to their actual resume.'
 }
 
 // ── Parser ────────────────────────────────────────────────
-const parseResponse = (text) => {
-  const get = (pattern) => { const m = text.match(pattern); return m ? m[1].trim() : '' }
-  const getBullets = (pattern) => {
-    const m = text.match(pattern)
+var parseResponse = function(text) {
+  var get = function(pattern) { var m = text.match(pattern); return m ? m[1].trim() : '' }
+  var getBullets = function(pattern) {
+    var m = text.match(pattern)
     if (!m) return []
-    return m[1].split('\n').filter(l => l.trim().match(/^[•\-\*]/)).map(l => l.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean)
+    return m[1].split('\n').filter(function(l) { return l.trim().match(/^[•\-\*]/) }).map(function(l) { return l.replace(/^[•\-\*]\s*/, '').trim() }).filter(Boolean)
   }
-  const certs = []
-  for (let i = 1; i <= 3; i++) {
-    const block = text.match(new RegExp(`\\*\\*TOP CERT #${i}.*?\\*\\*([\\s\\S]+?)(?=\\*\\*TOP CERT #${i+1}|\\*\\*IMMEDIATE|$)`))
+  var certs = []
+  for (var i = 1; i <= 3; i++) {
+    var block = text.match(new RegExp('\\*\\*TOP CERT #' + i + '.*?\\*\\*([\\s\\S]+?)(?=\\*\\*TOP CERT #' + (i+1) + '|\\*\\*IMMEDIATE|$)'))
     if (block) {
-      const b = block[1]
+      var b = block[1]
       certs.push({
         name:      (b.match(/Name:\s*(.+)/)      || [])[1]?.trim() || '',
         why:       (b.match(/Why:\s*(.+)/)        || [])[1]?.trim() || '',
@@ -197,47 +164,56 @@ const parseResponse = (text) => {
       })
     }
   }
-  const nameRaw   = get(/\*\*NAME:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s)
-  const name      = (nameRaw === 'Not found' || !nameRaw) ? '' : nameRaw.split(' ').slice(0, 2).join(' ')
-  const cityRaw   = get(/\*\*CITY:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s)
-  const INDIA_CITIES = ['Bangalore','Bengaluru','Hyderabad','Pune','Mumbai','Delhi','Chennai','Kolkata','Noida','Gurgaon','Gurugram','Ahmedabad','Kochi','Vadodara','Jaipur']
-  const city      = INDIA_CITIES.find(c => cityRaw.toLowerCase().includes(c.toLowerCase())) || ''
-  const domainRaw = get(/\*\*DOMAIN:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s).toLowerCase()
-  const domainMap = ['tech','data','management','business','finance','marketing','product','design','hr']
-  const domain    = domainMap.find(k => domainRaw.includes(k)) || 'business'
+  var nameRaw   = get(/\*\*NAME:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s)
+  var name      = (nameRaw === 'Not found' || !nameRaw) ? '' : nameRaw.split(' ').slice(0, 2).join(' ')
+  var cityRaw   = get(/\*\*CITY:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s)
+  var INDIA_CITIES = ['Bangalore','Bengaluru','Hyderabad','Pune','Mumbai','Delhi','Chennai','Kolkata','Noida','Gurgaon','Gurugram','Ahmedabad','Kochi','Vadodara','Jaipur']
+  var city      = INDIA_CITIES.find(function(c) { return cityRaw.toLowerCase().includes(c.toLowerCase()) }) || ''
+  var domainRaw = get(/\*\*DOMAIN:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s).toLowerCase()
+  var domainMap = ['tech','data','management','business','finance','marketing','product','design','hr']
+  var domain    = domainMap.find(function(k) { return domainRaw.includes(k) }) || 'business'
   return {
-    name, summary: get(/\*\*PROFILE SUMMARY:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s),
-    city, domain,
+    name:            name,
+    summary:         get(/\*\*PROFILE SUMMARY:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s),
+    city:            city,
+    domain:          domain,
     gaps:            getBullets(/\*\*SKILL GAPS:\*\*\s*([\s\S]+?)(?=\n\*\*TOP CERT)/s),
-    certs:           certs.filter(c => c.name),
+    certs:           certs.filter(function(c) { return c.name }),
     immediateAction: get(/\*\*IMMEDIATE ACTION:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s),
     marketInsight:   get(/\*\*MARKET INSIGHT:\*\*\s*(.+?)(?=\n\*\*|\n\n|$)/s),
     raw:             text,
   }
 }
 
-// ── Not-a-resume error ─────────────────────────────────────
-const NotAResumeError = ({ rejectedBy, onDismiss }) => {
-  const messages = {
-    'fee receipt':    { emoji: '🧾', title: "That's a fee receipt", desc: "Please upload your CV or resume instead." },
-    'hall ticket':    { emoji: '🎫', title: "That's an exam hall ticket", desc: "Please upload your resume or LinkedIn profile." },
-    'question paper': { emoji: '📝', title: "That's a question paper", desc: "Please upload your actual resume." },
-    'study notes':    { emoji: '📚', title: "These are study notes", desc: "Please upload your resume or CV." },
+// ── Not-a-resume error ────────────────────────────────────
+var NotAResumeError = function({ rejectedBy, onDismiss }) {
+  var messages = {
+    'fee receipt':    { emoji: '🧾', title: "That's a fee receipt",       desc: "Please upload your CV or resume instead." },
+    'hall ticket':    { emoji: '🎫', title: "That's an exam hall ticket",  desc: "Please upload your resume or LinkedIn profile." },
+    'question paper': { emoji: '📝', title: "That's a question paper",     desc: "Please upload your actual resume." },
+    'study notes':    { emoji: '📚', title: "These are study notes",       desc: "Please upload your resume or CV." },
     'assignment':     { emoji: '📄', title: "That's a college assignment", desc: "Please upload your personal resume." },
     'technical doc':  { emoji: '💾', title: "That's a technical document", desc: "Please upload your resume instead." },
-    'research report':{ emoji: '📊', title: "That's a research report", desc: "Please upload your personal resume." },
-    'academic paper': { emoji: '🎓', title: "That's an academic paper", desc: "Please upload your resume." },
-    'too short':      { emoji: '🤔', title: "Too short to be a resume", desc: "Please paste more of your profile — work experience, education, skills." },
+    'research report':{ emoji: '📊', title: "That's a research report",    desc: "Please upload your personal resume." },
+    'academic paper': { emoji: '🎓', title: "That's an academic paper",    desc: "Please upload your resume." },
+    'too short':      { emoji: '🤔', title: "Too short to be a resume",    desc: "Please paste more of your profile — work experience, education, skills." },
     default:          { emoji: '🤔', title: "That doesn't look like a resume", desc: "We need your work experience, education, skills, and contact details." },
   }
-  const msg = messages[rejectedBy] || messages.default
+  var msg = messages[rejectedBy] || messages.default
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-      style={{ padding: '22px', borderRadius: '13px', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.22)', textAlign: 'center' }}>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+      style={{ padding: '22px', borderRadius: '13px', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.22)', textAlign: 'center' }}
+    >
       <div style={{ fontSize: '2.2rem', marginBottom: '10px' }}>{msg.emoji}</div>
       <h3 style={{ fontFamily: FH, fontWeight: '800', fontSize: '15px', color: '#FCA5A5', marginBottom: '7px' }}>{msg.title}</h3>
       <p style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: FB, lineHeight: '1.6', marginBottom: '14px' }}>{msg.desc}</p>
-      <button onClick={onDismiss} style={{ padding: '8px 18px', borderRadius: '8px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', color: '#FCA5A5', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: FH }}>
+      {/* FIX: onDismiss only clears rejection + fileName, NOT the textarea text.
+          Previously called clearAll() which wiped pasted text the user would need to retype. */}
+      <button
+        onClick={onDismiss}
+        style={{ padding: '8px 18px', borderRadius: '8px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', color: '#FCA5A5', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: FH }}
+      >
         Try a different file
       </button>
     </motion.div>
@@ -245,16 +221,16 @@ const NotAResumeError = ({ rejectedBy, onDismiss }) => {
 }
 
 // ── Clean loader ──────────────────────────────────────────
-const CleanLoader = function() {
+// LOADER_STEPS moved above to module scope — stable reference, no useEffect re-fires.
+var CleanLoader = function() {
   var [step, setStep] = useState(0)
-  var steps = ['Reading your resume...', 'Matching India job market 2026...', 'Ranking certification ROI...', 'Writing your recommendation...']
 
   useEffect(function() {
-    var timers = steps.map(function(_, i) {
+    var timers = LOADER_STEPS.map(function(_, i) {
       return setTimeout(function() { setStep(i) }, i * 1000)
     })
     return function() { timers.forEach(clearTimeout) }
-  }, [])
+  }, []) // stable — LOADER_STEPS is module-level constant
 
   return (
     <div style={{ padding: '22px', borderRadius: '13px', background: 'var(--surface)', border: '1px solid var(--border)' }}>
@@ -266,7 +242,7 @@ const CleanLoader = function() {
         />
         <span style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Analysing</span>
         <span style={{ marginLeft: 'auto', fontFamily: FM, fontSize: '11px', color: PICTON, fontWeight: '700' }}>
-          {Math.round(((step + 1) / steps.length) * 100)}%
+          {Math.round(((step + 1) / LOADER_STEPS.length) * 100)}%
         </span>
       </div>
       <AnimatePresence mode="wait">
@@ -278,12 +254,12 @@ const CleanLoader = function() {
           transition={{ duration: 0.28 }}
           style={{ fontFamily: FH, fontSize: '15px', fontWeight: '700', color: 'var(--text)', marginBottom: '18px', letterSpacing: '-0.02em' }}
         >
-          {steps[step]}
+          {LOADER_STEPS[step]}
         </motion.div>
       </AnimatePresence>
       <div style={{ height: '3px', borderRadius: '2px', background: 'var(--border)', overflow: 'hidden' }}>
         <motion.div
-          animate={{ width: Math.round(((step + 1) / steps.length) * 100) + '%' }}
+          animate={{ width: Math.round(((step + 1) / LOADER_STEPS.length) * 100) + '%' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
           style={{ height: '100%', background: 'linear-gradient(90deg,' + PICTON + ',' + VIOLET + ')', borderRadius: '2px' }}
         />
@@ -292,21 +268,14 @@ const CleanLoader = function() {
   )
 }
 
-// ── Preferences panel — shown ABOVE upload ────────────────
-const PreferencesPanel = function({ timeline, onTimeline, domainIntent, onDomain, mode, switchTarget }) {
-  // For switchers, domain is already set from ModeSelector follow-up — show read-only
-  // For others, show full domain selector
-
+// ── Preferences panel ─────────────────────────────────────
+var PreferencesPanel = function({ timeline, onTimeline, domainIntent, onDomain, mode, switchTarget }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px' }}>
 
       {/* Timeline */}
       <div>
-        <div style={{
-          fontFamily: FM, fontSize: '9px', color: 'var(--text-4)',
-          textTransform: 'uppercase', letterSpacing: '0.12em',
-          marginBottom: '9px', display: 'flex', alignItems: 'center', gap: '6px',
-        }}>
+        <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '9px', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Clock size={10} />
           How soon do you need results?
         </div>
@@ -328,25 +297,18 @@ const PreferencesPanel = function({ timeline, onTimeline, domainIntent, onDomain
                   textAlign: 'left',
                 }}
               >
-                <span style={{ fontSize: '13px', fontFamily: FH, fontWeight: active ? '700' : '500' }}>
-                  {opt.label}
-                </span>
-                <span style={{ fontSize: '10px', fontFamily: FM, color: active ? VIOLET + 'AA' : 'var(--text-4)' }}>
-                  {opt.sub}
-                </span>
+                <span style={{ fontSize: '13px', fontFamily: FH, fontWeight: active ? '700' : '500' }}>{opt.label}</span>
+                <span style={{ fontSize: '10px', fontFamily: FM, color: active ? VIOLET + 'AA' : 'var(--text-4)' }}>{opt.sub}</span>
               </button>
             )
           })}
         </div>
       </div>
 
-      {/* Domain — show if not switcher (switcher already chose) */}
+      {/* Domain — show if not switcher */}
       {mode !== 'switcher' && (
         <div>
-          <div style={{
-            fontFamily: FM, fontSize: '9px', color: 'var(--text-4)',
-            textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '9px',
-          }}>
+          <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '9px' }}>
             Which domain are you targeting?
           </div>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -376,37 +338,22 @@ const PreferencesPanel = function({ timeline, onTimeline, domainIntent, onDomain
 
       {/* Switcher: show their chosen domain as a badge */}
       {mode === 'switcher' && switchTarget && (
-        <div style={{
-          padding: '10px 14px', borderRadius: '9px',
-          background: 'rgba(245,158,11,0.07)',
-          border: '1px solid rgba(245,158,11,0.22)',
-          display: 'flex', alignItems: 'center', gap: '8px',
-        }}>
-          <span style={{ fontSize: '12px', color: AMBER, fontFamily: FM, letterSpacing: '0.04em', fontWeight: '700' }}>
-            Target domain:
-          </span>
-          <span style={{
-            padding: '3px 10px', borderRadius: '6px',
-            background: 'rgba(245,158,11,0.15)',
-            border: '1px solid rgba(245,158,11,0.3)',
-            fontSize: '12px', color: AMBER, fontFamily: FH, fontWeight: '700',
-          }}>
+        <div style={{ padding: '10px 14px', borderRadius: '9px', background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.22)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '12px', color: AMBER, fontFamily: FM, letterSpacing: '0.04em', fontWeight: '700' }}>Target domain:</span>
+          <span style={{ padding: '3px 10px', borderRadius: '6px', background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)', fontSize: '12px', color: AMBER, fontFamily: FH, fontWeight: '700' }}>
             {DOMAIN_CHOICES.find(function(d) { return d.id === switchTarget })?.label || switchTarget}
           </span>
-          <span style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: FB, marginLeft: '4px' }}>
-            will be prioritised
-          </span>
+          <span style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: FB, marginLeft: '4px' }}>will be prioritised</span>
         </div>
       )}
 
-      {/* Divider */}
       <div style={{ height: '1px', background: 'var(--border)' }} />
     </div>
   )
 }
 
 // ── PersonalisedHero ──────────────────────────────────────
-const PersonalisedHero = function({ name, city, domain, primaryCert, mode }) {
+var PersonalisedHero = function({ name, city, domain, primaryCert, mode }) {
   var [phase, setPhase] = useState(0)
 
   useEffect(function() {
@@ -432,9 +379,7 @@ const PersonalisedHero = function({ name, city, domain, primaryCert, mode }) {
       />
       {phase >= 0 && (
         <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
           style={{ fontFamily: FM, fontSize: '11px', color: 'var(--text-4)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '10px', lineHeight: 1.6 }}
         >
           {intro}
@@ -442,9 +387,7 @@ const PersonalisedHero = function({ name, city, domain, primaryCert, mode }) {
       )}
       {phase >= 1 && (
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           style={{ marginBottom: '14px' }}
         >
           <div style={{ fontFamily: FH, fontWeight: '800', lineHeight: 1.15, letterSpacing: '-0.025em' }}>
@@ -459,9 +402,7 @@ const PersonalisedHero = function({ name, city, domain, primaryCert, mode }) {
       )}
       {phase >= 2 && primaryCert && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.97, y: 8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, scale: 0.97, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
           <PrimaryCertHero cert={primaryCert} />
         </motion.div>
@@ -471,7 +412,7 @@ const PersonalisedHero = function({ name, city, domain, primaryCert, mode }) {
 }
 
 // ── PrimaryCertHero ───────────────────────────────────────
-const PrimaryCertHero = function({ cert }) {
+var PrimaryCertHero = function({ cert }) {
   var [hovered, setHovered] = useState(false)
   return (
     <div
@@ -517,7 +458,7 @@ const PrimaryCertHero = function({ cert }) {
 }
 
 // ── CertLeaderboardRow ────────────────────────────────────
-const CertLeaderboardRow = function({ cert, rank, onSelect }) {
+var CertLeaderboardRow = function({ cert, rank, onSelect }) {
   var [hovered, setHovered] = useState(false)
   var col = rank === 2 ? PICTON : VIOLET
   return (
@@ -555,7 +496,7 @@ const CertLeaderboardRow = function({ cert, rank, onSelect }) {
 }
 
 // ── ResultDisplay ─────────────────────────────────────────
-const ResultDisplay = function({ result, onCertSelected, mode, onClear }) {
+var ResultDisplay = function({ result, onCertSelected, mode, onClear }) {
   var [showOtherCerts, setShowOtherCerts] = useState(false)
   var primaryCert = result.certs[0]
   var otherCerts  = result.certs.slice(1)
@@ -582,25 +523,41 @@ const ResultDisplay = function({ result, onCertSelected, mode, onClear }) {
         </motion.button>
       )}
 
+      {/* Profile summary — plain border, no NeonCard */}
       {result.summary && (
-        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, duration: 0.35 }} style={{ marginBottom: '14px' }}>
-          <NeonCard color={PICTON} speed={0.014} borderRadius="11px">
-            <div style={{ padding: '13px 15px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '8px' }}>
-                <User size={11} color={PICTON} />
-                <span style={{ fontFamily: FM, fontSize: '9px', color: PICTON, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                  {firstName ? 'Profile — ' + firstName.toUpperCase() : 'Profile'}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, duration: 0.35 }}
+          style={{ marginBottom: '14px' }}
+        >
+          <div style={{
+            borderRadius: '11px',
+            border: '1px solid ' + PICTON + '25',
+            background: PICTON + '08',
+            padding: '13px 15px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '8px' }}>
+              <User size={11} color={PICTON} />
+              <span style={{ fontFamily: FM, fontSize: '9px', color: PICTON, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                {firstName ? 'Profile — ' + firstName.toUpperCase() : 'Profile'}
+              </span>
+              {result.city && (
+                <span style={{ marginLeft: 'auto', fontFamily: FM, fontSize: '9px', padding: '2px 7px', borderRadius: '5px', background: PICTON + '14', color: PICTON, display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  {/* FIX: 📍 emoji → MapPin icon */}
+                  <MapPin size={9} color={PICTON} />
+                  {result.city}
                 </span>
-                {result.city && <span style={{ marginLeft: 'auto', fontFamily: FM, fontSize: '9px', padding: '2px 7px', borderRadius: '5px', background: PICTON + '14', color: PICTON }}>📍 {result.city}</span>}
-              </div>
-              <p style={{ fontFamily: FB, fontSize: '13px', color: 'var(--text-2)', lineHeight: 1.7, margin: 0 }}>{result.summary}</p>
+              )}
             </div>
-          </NeonCard>
+            <p style={{ fontFamily: FB, fontSize: '13px', color: 'var(--text-2)', lineHeight: 1.7, margin: 0 }}>{result.summary}</p>
+          </div>
         </motion.div>
       )}
 
       {result.gaps?.length > 0 && (
-        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.0, duration: 0.35 }} style={{ marginBottom: '14px' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.0, duration: 0.35 }}
+          style={{ marginBottom: '14px' }}
+        >
           <div style={{ fontFamily: FM, fontSize: '9px', color: AMBER, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '7px', display: 'flex', alignItems: 'center', gap: '5px' }}>
             <AlertTriangle size={10} color={AMBER} /> Gaps to close
           </div>
@@ -618,17 +575,30 @@ const ResultDisplay = function({ result, onCertSelected, mode, onClear }) {
       )}
 
       {otherCerts.length > 0 && (
-        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.2, duration: 0.35 }} style={{ marginBottom: '14px' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.2, duration: 0.35 }}
+          style={{ marginBottom: '14px' }}
+        >
           <button
             onClick={function() { setShowOtherCerts(function(v) { return !v }) }}
             style={{ width: '100%', padding: '9px 13px', borderRadius: '9px', border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-4)', fontFamily: FM, fontSize: '10px', letterSpacing: '0.07em', textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: showOtherCerts ? '8px' : '0' }}
           >
             <span>Other options ({otherCerts.length} more)</span>
-            <motion.span animate={{ rotate: showOtherCerts ? 180 : 0 }} transition={{ duration: 0.2 }} style={{ display: 'inline-flex' }}>▾</motion.span>
+            {/* FIX: ▾ text char → ChevronDown icon — consistent with lucide icon system */}
+            <motion.span
+              animate={{ rotate: showOtherCerts ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ display: 'inline-flex' }}
+            >
+              <ChevronDown size={12} />
+            </motion.span>
           </button>
           <AnimatePresence>
             {showOtherCerts && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.22 }} style={{ overflow: 'hidden' }}>
+              <motion.div
+                initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.22 }}
+                style={{ overflow: 'hidden' }}
+              >
                 {otherCerts.map(function(cert, i) {
                   return <CertLeaderboardRow key={i} cert={cert} rank={i + 2} onSelect={onCertSelected ? handleSelect : null} />
                 })}
@@ -638,26 +608,37 @@ const ResultDisplay = function({ result, onCertSelected, mode, onClear }) {
         </motion.div>
       )}
 
+      {/* "Do this week" — plain border, no NeonCard */}
       {result.immediateAction && (
-        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.4, duration: 0.35 }} style={{ marginBottom: '11px' }}>
-          <NeonCard color={EMERALD} speed={0.016} borderRadius="10px">
-            <div style={{ padding: '12px 14px', display: 'flex', gap: '9px', alignItems: 'flex-start' }}>
-              <Target size={13} color={EMERALD} style={{ flexShrink: 0, marginTop: '2px' }} />
-              <div>
-                <div style={{ fontFamily: FM, fontSize: '9px', color: EMERALD, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>
-                  {firstName ? firstName + "'s action this week" : 'Do this week'}
-                </div>
-                <div style={{ fontFamily: FB, fontSize: '13px', color: 'var(--text-2)', lineHeight: 1.65 }}>{result.immediateAction}</div>
+        <motion.div
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.4, duration: 0.35 }}
+          style={{ marginBottom: '11px' }}
+        >
+          <div style={{
+            borderRadius: '10px',
+            border: '1px solid ' + EMERALD + '25',
+            background: EMERALD + '08',
+            padding: '12px 14px',
+            display: 'flex', gap: '9px', alignItems: 'flex-start',
+          }}>
+            <Target size={13} color={EMERALD} style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <div style={{ fontFamily: FM, fontSize: '9px', color: EMERALD, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>
+                {firstName ? firstName + "'s action this week" : 'Do this week'}
               </div>
+              <div style={{ fontFamily: FB, fontSize: '13px', color: 'var(--text-2)', lineHeight: 1.65 }}>{result.immediateAction}</div>
             </div>
-          </NeonCard>
+          </div>
         </motion.div>
       )}
 
+      {/* Market insight — FIX: 📊 emoji → TrendingUp icon */}
       {result.marketInsight && (
-        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.6 }}
-          style={{ padding: '11px 13px', borderRadius: '10px', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.15)', display: 'flex', gap: '8px', alignItems: 'flex-start', marginBottom: '16px' }}>
-          <span style={{ fontSize: '13px', flexShrink: 0 }}>📊</span>
+        <motion.div
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.6 }}
+          style={{ padding: '11px 13px', borderRadius: '10px', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.15)', display: 'flex', gap: '8px', alignItems: 'flex-start', marginBottom: '16px' }}
+        >
+          <TrendingUp size={13} color={VIOLET} style={{ flexShrink: 0, marginTop: '2px' }} />
           <div>
             <div style={{ fontFamily: FM, fontSize: '9px', color: VIOLET, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '3px' }}>Market Insight</div>
             <div style={{ fontFamily: FB, fontSize: '13px', color: 'var(--text-3)', lineHeight: 1.6 }}>{result.marketInsight}</div>
@@ -680,7 +661,9 @@ const ResultDisplay = function({ result, onCertSelected, mode, onClear }) {
 }
 
 // ── MAIN ──────────────────────────────────────────────────
-const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
+var ResumeAnalyzer = function({ mode, onCertSelected }) {
+  mode = mode || 'professional'
+
   var [text,         setText]         = useState('')
   var [fileName,     setFileName]     = useState('')
   var [loading,      setLoading]      = useState(false)
@@ -693,7 +676,6 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
   var [domainIntent, setDomainIntent] = useState('auto')
   var fileRef = useRef(null)
 
-  // Read switcher's domain from localStorage (set by ModeSelector)
   var switchTarget = null
   if (mode === 'switcher') {
     try { switchTarget = localStorage.getItem('certifyroi_switch_domain') || null } catch(e) {}
@@ -707,25 +689,48 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
     var ext = file.name.split('.').pop().toLowerCase()
     setError(null); setRejection(null)
     if (ext === 'pdf') {
+      // FIX: set fileName early so UI shows "reading..." state,
+      // but clear it on EITHER failure path so textarea becomes visible.
       setFileName(file.name); setText(''); setPdfLoading(true)
       try {
         var extracted = await readPdfFile(file)
-        if (!extracted) { setError('Could not extract text. Please paste your resume below.'); setFileName(''); return }
+        if (!extracted || !extracted.trim()) {
+          // FIX: clear fileName so !hasFile → textarea appears
+          setFileName('')
+          setError('Could not extract text from this PDF. Please paste your resume below.')
+          return
+        }
         setText(extracted)
       } catch(e) {
-        setError('PDF parsing failed. Please paste your resume below.'); setFileName('')
-      } finally { setPdfLoading(false) }
+        // FIX: clear fileName on parse exception too
+        setFileName('')
+        setError('PDF parsing failed. Please paste your resume text below.')
+      } finally {
+        setPdfLoading(false)
+      }
       return
     }
     setFileName(file.name); setText('')
     var reader = new FileReader()
     reader.onload  = function(e) { setText(e.target.result || '') }
-    reader.onerror = function()  { setError('Could not read file. Try pasting text instead.') }
+    reader.onerror = function()  { setError('Could not read file. Try pasting text instead.'); setFileName('') }
     reader.readAsText(file)
   }
 
   var handleDrop = function(e) { e.preventDefault(); setDragging(false); readFile(e.dataTransfer.files[0]) }
-  var clearAll   = function()  { setText(''); setFileName(''); setResult(null); setError(null); setRejection(null) }
+
+  var clearAll = function() {
+    setText(''); setFileName(''); setResult(null); setError(null); setRejection(null)
+  }
+
+  // FIX: separate dismiss-rejection from clear-all.
+  // On rejection dismiss, only clear the rejection + file — NOT the pasted text.
+  // If a user pasted text that failed, they shouldn't have to re-paste after dismissing.
+  var dismissRejection = function() {
+    setRejection(null)
+    setFileName('')   // clear any file reference
+    // setText preserved intentionally
+  }
 
   var handleAnalyse = async function() {
     if (!text.trim()) { setError('Please upload a file or paste your resume text'); return }
@@ -739,7 +744,7 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
       var parsed = parseResponse(raw)
       setResult(parsed.certs?.length ? parsed : {
         name: parsed.name, summary: 'Analysis complete', city: '', domain: 'business',
-        gaps: [], certs: [], immediateAction: raw, marketInsight: '', raw
+        gaps: [], certs: [], immediateAction: raw, marketInsight: '', raw: raw
       })
     } catch(e) {
       console.error('Resume AI error:', e)
@@ -751,7 +756,7 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
           certs: [
             { name: 'AWS Solutions Architect', why: 'Highest ROI for Indian tech professionals — 2,400+ open roles on Naukri', roi: '30-40%', timeline: '3 months', fastTrack: 'Register free on AWS Skill Builder today', primary: true },
             { name: 'Google Data Analytics',   why: 'High demand, entry-friendly', roi: '20-28%', timeline: '4 months', fastTrack: 'Enrol on Coursera — first 7 days free', primary: false },
-            { name: 'PMP Certification',        why: 'Best path to senior management', roi: '25-30%', timeline: '6 months', fastTrack: "Download PMI's free Exam Content Outline", primary: false },
+            { name: 'PMP Certification',       why: 'Best path to senior management', roi: '25-30%', timeline: '6 months', fastTrack: "Download PMI's free Exam Content Outline", primary: false },
           ],
           immediateAction: 'Check Vercel → Settings → Environment Variables → ensure GROQ_API_KEY is set.',
           marketInsight: 'AWS certified professionals in Bangalore command 35% higher salaries — 2,400+ active roles on Naukri as of March 2026.',
@@ -766,7 +771,6 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-      {/* ── Preferences — always shown at top, collapsed if result ── */}
       {!hasResult && (
         <PreferencesPanel
           timeline={timeline}
@@ -778,11 +782,22 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
         />
       )}
 
-      {/* Upload area */}
+      {/* Upload zone — FIX: NeonCard replaced with plain dashed-border div.
+          Animated border on a drag target competed with the drag interaction visually.
+          FIX: Upload icon animation removed — bouncing icon was decorative noise. */}
       <AnimatePresence>
         {!hasResult && !text.trim() && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} style={{ overflow: 'hidden' }}>
-            <NeonCard color={dragging ? PICTON : hasFile ? EMERALD : INDIGO} speed={0.022} borderRadius="11px">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{
+              borderRadius: '11px',
+              border: '1.5px dashed ' + (dragging ? PICTON : hasFile ? EMERALD : 'var(--border)'),
+              background: dragging ? PICTON + '08' : hasFile ? EMERALD + '06' : 'var(--surface)',
+              transition: 'border-color 0.2s, background 0.2s',
+            }}>
               <div
                 onDragOver={function(e) { e.preventDefault(); setDragging(true) }}
                 onDragLeave={function() { setDragging(false) }}
@@ -790,23 +805,37 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
                 onClick={function() { if (!hasFile) fileRef.current?.click() }}
                 style={{ padding: '22px', cursor: hasFile ? 'default' : 'pointer', textAlign: 'center' }}
               >
-                <input ref={fileRef} type="file" accept=".txt,.pdf,.doc,.docx" style={{ display: 'none' }} onChange={function(e) { readFile(e.target.files[0]) }} />
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept=".txt,.pdf,.doc,.docx"
+                  style={{ display: 'none' }}
+                  onChange={function(e) { readFile(e.target.files[0]) }}
+                />
                 {pdfLoading ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} style={{ width: 15, height: 15, borderRadius: '50%', border: '2px solid ' + PICTON, borderTopColor: 'transparent' }} />
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      style={{ width: 15, height: 15, borderRadius: '50%', border: '2px solid ' + PICTON, borderTopColor: 'transparent' }}
+                    />
                     <span style={{ fontSize: '13px', color: PICTON, fontFamily: FH, fontWeight: '600' }}>Reading PDF...</span>
                   </div>
                 ) : hasFile ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     <FileText size={14} color={EMERALD} />
                     <span style={{ fontSize: '13px', color: EMERALD, fontWeight: '600', fontFamily: FH }}>{fileName}</span>
-                    <button onClick={function(e) { e.stopPropagation(); clearAll() }} style={{ background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer' }}><X size={13} /></button>
+                    <button
+                      onClick={function(e) { e.stopPropagation(); clearAll() }}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer' }}
+                    >
+                      <X size={13} />
+                    </button>
                   </div>
                 ) : (
                   <>
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}>
-                      <Upload size={22} color="var(--text-4)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                    </motion.div>
+                    {/* FIX: static icon — removed animate={{ y: [0,-5,0] }} bounce animation */}
+                    <Upload size={22} color="var(--text-4)" style={{ margin: '0 auto 10px', display: 'block' }} />
                     <div style={{ fontSize: '14px', color: 'var(--text-3)', fontFamily: FH, fontWeight: '700', marginBottom: '4px' }}>
                       Drop resume or <span style={{ color: PICTON, textDecoration: 'underline' }}>browse</span>
                     </div>
@@ -814,7 +843,7 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
                   </>
                 )}
               </div>
-            </NeonCard>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -831,7 +860,11 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
       {/* Textarea */}
       <AnimatePresence>
         {!hasFile && !hasResult && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} style={{ overflow: 'hidden', position: 'relative' }}>
+          <motion.div
+            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: 'hidden', position: 'relative' }}
+          >
             <textarea
               value={text}
               onChange={function(e) { setText(e.target.value) }}
@@ -841,7 +874,9 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
             />
             {text.trim() && (
               <>
-                <button onClick={clearAll} style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer' }}><X size={13} /></button>
+                <button onClick={clearAll} style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer' }}>
+                  <X size={13} />
+                </button>
                 <div style={{ position: 'absolute', bottom: '10px', right: '12px', fontSize: '10px', color: 'var(--text-4)', fontFamily: FM }}>{text.length}c</div>
               </>
             )}
@@ -849,9 +884,15 @@ const ResumeAnalyzer = function({ mode = 'professional', onCertSelected }) {
         )}
       </AnimatePresence>
 
-      {/* Rejection */}
+      {/* Rejection — FIX: onDismiss calls dismissRejection() not clearAll().
+          Text is preserved so user doesn't re-paste after a validation failure. */}
       <AnimatePresence>
-        {rejection && <NotAResumeError rejectedBy={rejection} onDismiss={function() { setRejection(null); clearAll() }} />}
+        {rejection && (
+          <NotAResumeError
+            rejectedBy={rejection}
+            onDismiss={dismissRejection}
+          />
+        )}
       </AnimatePresence>
 
       {/* Analyse button */}
