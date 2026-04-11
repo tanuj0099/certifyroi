@@ -198,28 +198,24 @@ function ContourCluster({ rings, cx, cy, rx, ry, color, opacity, rotate }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// HORIZON BANDS — ridge silhouette divider (replaces wave curves)
+// HORIZON BANDS — ridge silhouette divider
 // ─────────────────────────────────────────────────────────
 function HorizonBands({ C }) {
   return (
     <div style={{ position: 'relative', overflow: 'hidden', pointerEvents: 'none' }}>
-      {/* Far ridge — lightest */}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
         <RidgeSilhouette C={C} variant="high" height={52} opacity={0.06} />
       </div>
-      {/* Mid ridge */}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
         <RidgeSilhouette C={C} variant="mid" height={44} opacity={0.10} />
       </div>
-      {/* Near ridge — darkest and shortest */}
       <RidgeSilhouette C={C} variant="low" height={36} opacity={0.18} />
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────
-// MOUNTAIN ROUTE MAP — the dominant hero visual
-// Full mountain with 3 labeled ascent routes
+// MOUNTAIN ROUTE MAP — FIX 2: label clipping resolved
 // ─────────────────────────────────────────────────────────
 function MountainRouteMap({ C, isDark, animate }) {
   var [drawn, setDrawn] = useState(false)
@@ -231,21 +227,16 @@ function MountainRouteMap({ C, isDark, animate }) {
     return function() { clearTimeout(t) }
   }, [animate])
 
-  // Mountain anchor points
   var SUMMIT   = { x: 278, y: 62 }
-  var BASECAMP = { x: 188, y: 430 }
 
-  // Main mountain silhouette
   var mountainFill = isDark ? '#1C1A17' : '#D4CFC8'
   var mountainMid  = isDark ? '#252220' : '#C2BDB6'
   var snowFill     = isDark ? '#2A2723' : '#EBE8E3'
   var lineCol      = C.line
 
-  // Far-back ridges (atmospheric depth)
   var farRidgeL = 'M 0 440 L 20 390 L 55 370 L 90 385 L 120 375 L 150 395 L 170 440 Z'
   var farRidgeR = 'M 390 440 L 410 395 L 450 370 L 490 380 L 530 365 L 560 380 L 560 440 Z'
 
-  // Main mountain silhouette
   var mainMountain = [
     'M 0 440',
     'L 30 420 L 65 408 L 95 418 L 118 408 L 138 415',
@@ -260,14 +251,12 @@ function MountainRouteMap({ C, isDark, animate }) {
     'L 0 440 Z'
   ].join(' ')
 
-  // Snow zone (near summit)
   var snowZone = [
     'M 252 78 L 263 67 L ' + SUMMIT.x + ' ' + SUMMIT.y + ' L 293 67 L 304 78',
     'L 316 96 L 322 112 L 316 128 L 302 140 L 290 148 L 278 155',
     'L 266 148 L 254 140 L 240 128 L 234 112 Z'
   ].join(' ')
 
-  // Contour levels — approximate elevation rings
   var contours = [
     { cx: 278, cy: 135, rx: 44,  ry: 28,  rot: 0  },
     { cx: 276, cy: 180, rx: 76,  ry: 44,  rot: -2 },
@@ -276,23 +265,18 @@ function MountainRouteMap({ C, isDark, animate }) {
     { cx: 270, cy: 332, rx: 148, ry: 80,  rot: -1 },
   ]
 
-  // Route paths from basecamp
-  // Best cert route — climbs directly to summit along left face
   var routeBest    = 'M 188 430 C 185 395, 183 360, 182 328 C 181 295, 182 262, 184 232 C 186 202, 190 172, 197 145 C 203 122, 215 100, 230 85 C 245 72, 263 65, 278 62'
-  // Wrong cert — goes up then plateaus at mid-elevation
   var routeWrong   = 'M 188 430 C 200 410, 215 390, 230 368 C 244 348, 258 330, 272 316 C 284 305, 298 298, 316 294 C 330 291, 348 290, 368 290'
-  // No cert — barely rises, gradual slope right
   var routeNoCert  = 'M 188 430 C 228 428, 280 422, 336 412 C 380 404, 420 396, 460 390 C 492 384, 520 380, 540 378'
 
-  // Waypoints on best route
+  // FIX 2: waypoints with safe x positions and opaque label backgrounds
   var waypoints = [
-    { x: 188, y: 430, label: 'Basecamp',      sub: 'Your starting point',     color: C.text3,  side: 'left'  },
-    { x: 183, y: 330, label: 'Month 3',        sub: 'Cert cost paid · ₹25K',   color: C.gold,   side: 'left'  },
-    { x: 186, y: 225, label: 'Month 9',        sub: 'Break-even reached',      color: C.goldL,  side: 'left'  },
-    { x: 278, y:  62, label: 'Summit',          sub: '₹14.2L net gain',         color: C.green,  side: 'right' },
+    { x: 188, y: 430, label: 'BASECAMP', sub: 'Your starting point',   color: C.text3,  side: 'left'  },
+    { x: 183, y: 330, label: 'MONTH 3',  sub: 'Cert cost paid · ₹25K', color: C.gold,   side: 'left'  },
+    { x: 186, y: 225, label: 'MONTH 9',  sub: 'Break-even reached',    color: C.goldL,  side: 'left'  },
+    { x: 278, y:  62, label: 'SUMMIT',   sub: '₹14.2L net gain',       color: C.green,  side: 'right' },
   ]
 
-  // Route end labels
   var routeEnds = [
     { x: 368, y: 290, label: 'Plateau',   sub: 'Wrong cert · no hike', color: isDark ? '#C49A4E' : '#8B6028', dashCol: isDark ? '#C49A4E' : '#A67C3C' },
     { x: 540, y: 378, label: 'Same slope', sub: 'No cert · stagnant',  color: C.text3,                        dashCol: C.text3 },
@@ -300,7 +284,6 @@ function MountainRouteMap({ C, isDark, animate }) {
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
-      {/* Route label */}
       <div style={{ position: 'absolute', top: '-28px', left: 0, fontFamily: F_MONO, fontSize: '9px', color: C.text3, letterSpacing: '0.14em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <WaypointDot active={false} color={C.text3} size={7} />
         Route map · choose your ascent
@@ -319,14 +302,11 @@ function MountainRouteMap({ C, isDark, animate }) {
           </clipPath>
         </defs>
 
-        {/* ── Sky / atmosphere ── */}
         <rect x="0" y="0" width="560" height="460" fill={isDark ? '#0C1118' : '#DCE8F0'} opacity="0.5" rx="4" />
 
-        {/* ── Far background ridges (atmospheric depth) ── */}
         <path d={farRidgeL} fill={C.text} fillOpacity={isDark ? 0.07 : 0.06} />
         <path d={farRidgeR} fill={C.text} fillOpacity={isDark ? 0.07 : 0.06} />
 
-        {/* ── Contour rings (topographic map) — full topo effect ── */}
         {contours.map(function(ct, i) {
           return (
             <ellipse key={i} cx={ct.cx} cy={ct.cy} rx={ct.rx} ry={ct.ry}
@@ -338,24 +318,19 @@ function MountainRouteMap({ C, isDark, animate }) {
           )
         })}
 
-        {/* ── Main mountain body ── */}
         <path d={mainMountain} fill={mountainFill} opacity={isDark ? 0.95 : 0.85} />
 
-        {/* ── Mountain face shading (left face slightly lighter) ── */}
         <path d={'M 148 400 L 185 244 L 252 78 L 278 62 L 188 430 Z'}
           fill={isDark ? '#EDE9E3' : '#A8A39B'} fillOpacity={0.04} />
 
-        {/* ── Mountain edge lines (ridge outlines) ── */}
         <path d={'M 148 400 L 158 380 L 165 355 L 170 328 L 175 300 L 180 272 L 185 244 L 191 215 L 197 188 L 206 162 L 215 138 L 226 116 L 238 96 L 252 78 L 263 67 L 278 62'}
           fill="none" stroke={C.lineHeavy} strokeWidth="1" strokeOpacity={0.5} />
         <path d={'M 422 415 L 408 400 L 398 380 L 390 355 L 385 328 L 382 300 L 378 272 L 373 244 L 367 215 L 360 188 L 350 162 L 340 138 L 328 116 L 316 96 L 304 78 L 293 67 L 278 62'}
           fill="none" stroke={C.lineHeavy} strokeWidth="0.75" strokeOpacity={0.35} />
 
-        {/* ── Snow zone ── */}
         <path d={snowZone} fill={snowFill} opacity={isDark ? 0.45 : 0.6} />
         <path d={snowZone} fill="none" stroke={lineCol} strokeWidth="0.6" strokeOpacity={0.3} />
 
-        {/* ── Contour rings clipped to mountain (darker, interior topo) ── */}
         <g clipPath="url(#mountainClip)">
           {contours.map(function(ct, i) {
             return (
@@ -368,23 +343,17 @@ function MountainRouteMap({ C, isDark, animate }) {
           })}
         </g>
 
-        {/* ── Routes (drawn with clip animation) ── */}
         <g clipPath="url(#drawClip)">
-          {/* No cert — dashed gray, rightward slope */}
           <path d={routeNoCert} fill="none"
             stroke={C.text3} strokeWidth="1.5" strokeDasharray="4 5"
             strokeOpacity={hovRoute && hovRoute !== 'nocert' ? 0.15 : 0.5}
             style={{ transition: 'stroke-opacity 0.2s' }}
           />
-
-          {/* Wrong cert — dashed amber, plateau */}
           <path d={routeWrong} fill="none"
             stroke={C.gold} strokeWidth="1.75" strokeDasharray="5 4"
             strokeOpacity={hovRoute && hovRoute !== 'wrong' ? 0.15 : 0.6}
             style={{ transition: 'stroke-opacity 0.2s' }}
           />
-
-          {/* Best cert — solid green, direct to summit */}
           <path d={routeBest} fill="none"
             stroke={C.green} strokeWidth="2.5"
             strokeOpacity={hovRoute && hovRoute !== 'best' ? 0.2 : 1}
@@ -392,7 +361,6 @@ function MountainRouteMap({ C, isDark, animate }) {
           />
         </g>
 
-        {/* ── Route end markers ── */}
         {drawn && routeEnds.map(function(re, i) {
           return (
             <motion.g key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -415,7 +383,7 @@ function MountainRouteMap({ C, isDark, animate }) {
           )
         })}
 
-        {/* ── Waypoints on best-cert route ── */}
+        {/* FIX 2: Waypoints with opaque background rects to prevent clipping/readability issues */}
         {drawn && waypoints.map(function(wp, i) {
           var isLeft  = wp.side === 'left'
           var isSummit = i === waypoints.length - 1
@@ -425,18 +393,15 @@ function MountainRouteMap({ C, isDark, animate }) {
               transition={{ delay: 1.0 + i * 0.22, duration: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
               style={{ transformOrigin: wp.x + 'px ' + wp.y + 'px' }}>
 
-              {/* Outer ring */}
               <circle cx={wp.x} cy={wp.y} r={isSummit ? 14 : 10}
                 fill={wp.color} fillOpacity="0.1"
                 stroke={wp.color} strokeWidth={isSummit ? 1.2 : 0.9}
                 strokeDasharray={isSummit ? '0' : '3 2'}
                 strokeOpacity={0.6} />
 
-              {/* Inner dot */}
               <circle cx={wp.x} cy={wp.y} r={isSummit ? 6 : 4}
                 fill={wp.color} fillOpacity={isSummit ? 1 : 0.85} />
 
-              {/* Summit flag */}
               {isSummit && (
                 <g transform={'translate(' + (wp.x + 6) + ',' + (wp.y - 22) + ')'}>
                   <line x1="0" y1="0" x2="0" y2="20" stroke={C.gold} strokeWidth="1.2" />
@@ -444,7 +409,6 @@ function MountainRouteMap({ C, isDark, animate }) {
                 </g>
               )}
 
-              {/* Drop line to label */}
               {isLeft ? (
                 <line x1={wp.x - 5} y1={wp.y} x2={wp.x - 28} y2={wp.y}
                   stroke={wp.color} strokeWidth="0.6" strokeOpacity="0.4" />
@@ -453,26 +417,36 @@ function MountainRouteMap({ C, isDark, animate }) {
                   stroke={wp.color} strokeWidth="0.6" strokeOpacity="0.4" />
               )}
 
-              {/* Label box */}
+              {/* FIX 2: opaque background rect + repositioned text to avoid left-edge clip */}
               {isLeft ? (
                 <g>
-                  <text x={wp.x - 33} y={wp.y - 5} textAnchor="end"
-                    style={{ fontFamily: F_MONO, fontSize: '9px', fontWeight: '600', fill: wp.color, letterSpacing: '0.05em' }}>
-                    {wp.label.toUpperCase()}
+                  <rect
+                    x={wp.x - 148} y={wp.y - 18}
+                    width={148} height={28} rx="3"
+                    fill={isDark ? 'rgba(19,17,16,0.82)' : 'rgba(245,241,235,0.88)'}
+                  />
+                  <text x={wp.x - 8} y={wp.y - 6} textAnchor="end"
+                    style={{ fontFamily: F_MONO, fontSize: '9px', fontWeight: '600', fill: wp.color, letterSpacing: '0.06em' }}>
+                    {wp.label}
                   </text>
-                  <text x={wp.x - 33} y={wp.y + 7} textAnchor="end"
-                    style={{ fontFamily: F_SANS, fontSize: '8.5px', fill: wp.color, opacity: 0.7 }}>
+                  <text x={wp.x - 8} y={wp.y + 7} textAnchor="end"
+                    style={{ fontFamily: F_SANS, fontSize: '8px', fill: wp.color, opacity: 0.85 }}>
                     {wp.sub}
                   </text>
                 </g>
               ) : (
                 <g>
-                  <text x={wp.x + 32} y={wp.y - 24} textAnchor="start"
+                  <rect
+                    x={wp.x + 28} y={wp.y - 34}
+                    width={120} height={30} rx="3"
+                    fill={isDark ? 'rgba(19,17,16,0.82)' : 'rgba(245,241,235,0.88)'}
+                  />
+                  <text x={wp.x + 34} y={wp.y - 19} textAnchor="start"
                     style={{ fontFamily: F_MONO, fontSize: '10px', fontWeight: '700', fill: wp.color, letterSpacing: '0.06em' }}>
-                    SUMMIT
+                    {wp.label}
                   </text>
-                  <text x={wp.x + 32} y={wp.y - 12} textAnchor="start"
-                    style={{ fontFamily: F_SERIF, fontStyle: 'italic', fontSize: '12px', fill: C.gold }}>
+                  <text x={wp.x + 34} y={wp.y - 7} textAnchor="start"
+                    style={{ fontFamily: F_SERIF, fontStyle: 'italic', fontSize: '11px', fill: C.gold }}>
                     {wp.sub}
                   </text>
                 </g>
@@ -481,23 +455,19 @@ function MountainRouteMap({ C, isDark, animate }) {
           )
         })}
 
-        {/* ── Route legend — bottom of SVG ── */}
         {drawn && (
           <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ delay: 2.0, duration: 0.5 }}>
-            {/* Best cert */}
             <line x1="20" y1="450" x2="46" y2="450"
               stroke={C.green} strokeWidth="2.5" />
             <text x="51" y="454" style={{ fontFamily: F_MONO, fontSize: '9px', fill: C.green, letterSpacing: '0.05em' }}>
               Best route
             </text>
-            {/* Wrong cert */}
             <line x1="140" y1="450" x2="166" y2="450"
               stroke={C.gold} strokeWidth="1.75" strokeDasharray="5 4" />
             <text x="171" y="454" style={{ fontFamily: F_MONO, fontSize: '9px', fill: C.text3, letterSpacing: '0.05em' }}>
               Wrong cert
             </text>
-            {/* No cert */}
             <line x1="270" y1="450" x2="296" y2="450"
               stroke={C.text3} strokeWidth="1.5" strokeDasharray="4 5" />
             <text x="301" y="454" style={{ fontFamily: F_MONO, fontSize: '9px', fill: C.text3, letterSpacing: '0.05em' }}>
@@ -512,7 +482,7 @@ function MountainRouteMap({ C, isDark, animate }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// CERT ASSEMBLY — sticky scroll cert animation (preserved)
+// CERT ASSEMBLY — sticky scroll cert animation (unchanged)
 // ─────────────────────────────────────────────────────────
 function CertAssembly({ C, isDark }) {
   var isMobile = useIsMobile()
@@ -568,7 +538,6 @@ function CertAssembly({ C, isDark }) {
       <div style={{ position: 'sticky', top: 0, height: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: overlayBg, opacity: overlayOp }} />
 
-        {/* Background: faint mountain silhouette behind cert */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.12 }}>
           <svg viewBox="0 0 800 400" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
             <path d={'M 0 400 L 100 300 L 180 320 L 240 260 L 300 200 L 340 160 L 380 130 L 400 100 L 420 130 L 460 160 L 520 200 L 580 260 L 640 320 L 720 300 L 800 400 Z'}
@@ -688,22 +657,19 @@ function TrustStrip({ C }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// DATA COMPOSITION — numbers section with topo background
+// DATA COMPOSITION
 // ─────────────────────────────────────────────────────────
 function DataComposition({ C, isMobile }) {
   return (
     <div style={{ paddingTop:'clamp(80px,12vw,140px)', paddingBottom:'clamp(80px,12vw,140px)', position:'relative', overflow:'hidden' }}>
 
-      {/* Large topographic background — dominant contour cluster */}
       <div style={{ position:'absolute', right: isMobile ? '-80px' : '-60px', top:'50%', transform:'translateY(-50%)', pointerEvents:'none', zIndex:0 }}>
         <svg width={isMobile ? '300' : '480'} height={isMobile ? '300' : '480'} viewBox="-240 -240 480 480">
           <ContourCluster rings={10} cx={0} cy={0} rx={55} ry={36} color={C.line} opacity={0.55} rotate={18} />
-          {/* Summit dot */}
           <circle cx="0" cy="0" r="5" fill={C.green} fillOpacity="0.25" stroke={C.green} strokeWidth="1" strokeOpacity="0.3" />
         </svg>
       </div>
 
-      {/* Faint ridge at top of section */}
       <div style={{ position:'absolute', top:0, left:0, right:0, pointerEvents:'none', opacity:0.4 }}>
         <RidgeSilhouette C={C} variant="high" height={40} opacity={0.08} />
       </div>
@@ -772,7 +738,7 @@ function DataComposition({ C, isMobile }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// HOW IT WORKS — waypoint steps
+// HOW IT WORKS
 // ─────────────────────────────────────────────────────────
 function HowItWorks({ C, isMobile, onEnter }) {
   var steps = [
@@ -785,11 +751,9 @@ function HowItWorks({ C, isMobile, onEnter }) {
   return (
     <div style={{ background:C.surface, borderTop:'1px solid '+C.border, borderBottom:'1px solid '+C.border, paddingTop:'clamp(72px,10vw,120px)', paddingBottom:'clamp(72px,10vw,120px)', position:'relative', overflow:'hidden' }}>
 
-      {/* Background ridge silhouette */}
       <div style={{ position:'absolute', bottom:0, left:0, right:0, pointerEvents:'none' }}>
         <RidgeSilhouette C={C} variant="mid" height={60} opacity={0.09} />
       </div>
-      {/* Small contour cluster top-right */}
       <div style={{ position:'absolute', right:'-30px', top:'20px', pointerEvents:'none', opacity:0.3 }}>
         <svg width="200" height="200" viewBox="-100 -100 200 200">
           <ContourCluster rings={5} cx={0} cy={0} rx={35} ry={22} color={C.line} opacity={1} rotate={-10} />
@@ -806,7 +770,6 @@ function HowItWorks({ C, isMobile, onEnter }) {
         </motion.h2>
 
         <div ref={routeRef} style={{ position:'relative' }}>
-          {/* Animated route connector line */}
           {!isMobile && (
             <div style={{ position:'absolute', top:'13px', left:'13px', right:'13px', height:'2px', overflow:'visible', pointerEvents:'none', zIndex:0 }}>
               <svg width="100%" height="2" style={{ display:'block', overflow:'visible' }}>
@@ -834,7 +797,6 @@ function HowItWorks({ C, isMobile, onEnter }) {
                     borderBottom: isMobile && !isLast  ? '1px solid '+C.border : 'none',
                   }}
                 >
-                  {/* Large waypoint dot — visually dominant */}
                   <div style={{ marginBottom:'20px', display:'flex', alignItems:'center', gap:'10px' }}>
                     <WaypointDot active={true} color={C.green} size={14} />
                     <div style={{ fontFamily:F_MONO, fontSize:'9px', color:C.text3, textTransform:'uppercase', letterSpacing:'0.1em' }}>
@@ -867,7 +829,7 @@ function HowItWorks({ C, isMobile, onEnter }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// VS SECTION — wrong mountain vs right mountain
+// VS SECTION
 // ─────────────────────────────────────────────────────────
 function VsSection({ C, isMobile }) {
   var pairs = [
@@ -879,7 +841,6 @@ function VsSection({ C, isMobile }) {
 
   return (
     <div style={{ paddingTop:'clamp(72px,10vw,120px)', paddingBottom:'clamp(72px,10vw,120px)', position:'relative', overflow:'hidden' }}>
-      {/* Ridge background */}
       <div style={{ position:'absolute', top:0, left:0, right:0, pointerEvents:'none', opacity:0.5 }}>
         <RidgeSilhouette C={C} variant="low" height={32} opacity={0.07} />
       </div>
@@ -925,7 +886,7 @@ function VsSection({ C, isMobile }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// ELEVEN PM — route briefing stories
+// ELEVEN PM
 // ─────────────────────────────────────────────────────────
 function ElevenPM({ C, isMobile, onEnter }) {
   var stories = [
@@ -936,7 +897,6 @@ function ElevenPM({ C, isMobile, onEnter }) {
 
   return (
     <div style={{ background:C.surface, borderTop:'1px solid '+C.border, borderBottom:'1px solid '+C.border, paddingTop:'clamp(72px,10vw,120px)', paddingBottom:'clamp(72px,10vw,120px)', position:'relative', overflow:'hidden' }}>
-      {/* Ridge silhouette at base */}
       <div style={{ position:'absolute', bottom:0, left:0, right:0, pointerEvents:'none' }}>
         <RidgeSilhouette C={C} variant="high" height={48} opacity={0.07} />
       </div>
@@ -1042,7 +1002,7 @@ function ThreeModes({ C, isMobile, onEnter }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// SOCIAL PROOF — pull quotes
+// SOCIAL PROOF
 // ─────────────────────────────────────────────────────────
 function SocialProof({ C, isMobile }) {
   var quotes = [
@@ -1091,33 +1051,43 @@ function SocialProof({ C, isMobile }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// FINAL CTA — summit composition
-// Dominant contour cluster + mountain summit SVG
+// FINAL CTA — FIX 3: mountain shrunk to 320px, repositioned
 // ─────────────────────────────────────────────────────────
 function FinalCTA({ C, isMobile, onEnter, isDark }) {
   return (
     <div style={{ paddingTop:'clamp(100px,14vw,160px)', paddingBottom:'clamp(100px,14vw,160px)', position:'relative', overflow:'hidden' }}>
 
-      {/* Dominant summit mountain — full right side */}
-      <div style={{ position:'absolute', right: isMobile ? '-60px' : '0', bottom:'-20px', top:'-20px', width:isMobile?'280px':'460px', pointerEvents:'none', opacity: isDark ? 0.55 : 0.45 }}>
-        <svg viewBox="0 0 460 600" width="100%" height="100%" preserveAspectRatio="xMaxYMax meet">
-          {/* Multiple contour rings centered on peak */}
-          <ContourCluster rings={12} cx={230} cy={180} rx={65} ry={42} color={C.line} opacity={0.9} rotate={5} />
+      {/* FIX 3: Summit mountain — right-aligned, contained, NOT bleeding edge */}
+      <div style={{
+        position: 'absolute',
+        right:    isMobile ? '-40px' : '60px',
+        bottom:   '0',
+        top:      '0',
+        width:    isMobile ? '200px' : '320px',   /* was 460px — shrunk */
+        pointerEvents: 'none',
+        opacity:  isDark ? 0.40 : 0.32,
+        zIndex:   0,
+      }}>
+        <svg viewBox="0 0 320 600" width="100%" height="100%" preserveAspectRatio="xMaxYMax meet">
+          {/* Fewer contour rings, tighter cluster */}
+          <ContourCluster rings={8} cx={160} cy={160} rx={50} ry={32} color={C.line} opacity={0.75} rotate={5} />
           {/* Mountain silhouette */}
-          <path d={'M 0 600 L 80 520 L 130 490 L 170 500 L 200 470 L 220 420 L 228 370 L 233 320 L 237 272 L 240 228 L 243 188 L 248 155 L 253 128 L 260 105 L 270 87 L 280 75 L 290 87 L 300 105 L 307 128 L 312 155 L 317 188 L 320 228 L 323 272 L 327 320 L 332 370 L 340 420 L 360 470 L 390 500 L 430 490 L 460 500 L 460 600 Z'}
-            fill={C.text} fillOpacity={isDark ? 0.18 : 0.12} />
-          {/* Ridge lines on mountain face */}
-          <path d={'M 200 470 L 215 420 L 225 365 L 232 310 L 237 255 L 242 205 L 248 165 L 256 130 L 264 102 L 280 75'}
-            fill="none" stroke={C.lineHeavy} strokeWidth="0.8" strokeOpacity={0.4} />
+          <path d={'M 0 600 L 60 500 L 100 480 L 130 465 L 150 420 L 160 370 L 165 310 L 168 255 L 170 205 L 173 165 L 178 130 L 185 105 L 192 85 L 200 72 L 210 62 L 220 72 L 228 85 L 235 105 L 242 130 L 247 165 L 250 205 L 252 255 L 255 310 L 260 370 L 270 420 L 290 465 L 320 490 L 320 600 Z'}
+            fill={C.text} fillOpacity={isDark ? 0.20 : 0.14} />
+          {/* Ridge line on left face */}
+          <path d={'M 130 465 L 145 415 L 155 360 L 162 305 L 166 250 L 169 200 L 172 162 L 178 128 L 186 103 L 194 82 L 210 62'}
+            fill="none" stroke={C.lineHeavy} strokeWidth="0.8" strokeOpacity={0.45} />
           {/* Snow zone */}
-          <path d={'M 264 102 L 270 87 L 280 75 L 290 87 L 296 102 L 304 125 L 296 140 L 284 150 L 280 158 L 276 150 L 264 140 L 256 125 Z'}
-            fill={isDark ? '#2A2723' : '#EBE8E3'} opacity={0.7} />
+          <path d={'M 194 82 L 200 72 L 210 62 L 220 72 L 226 82 L 232 100 L 226 112 L 218 120 L 210 126 L 202 120 L 194 112 L 188 100 Z'}
+            fill={isDark ? '#2A2723' : '#EBE8E3'} opacity={0.65} />
           {/* Summit flag */}
-          <line x1="280" y1="75" x2="280" y2="48" stroke={C.gold} strokeWidth="1.2" />
-          <path d="M 280 48 L 294 54 L 280 60 Z" fill={C.gold} fillOpacity="0.9" />
-          {/* Summit label */}
-          <text x="298" y="54" style={{ fontFamily:F_MONO, fontSize:'9px', fill:C.gold, letterSpacing:'0.08em' }}>SUMMIT</text>
-          <text x="298" y="66" style={{ fontFamily:F_SERIF, fontStyle:'italic', fontSize:'11px', fill:C.gold }}>₹14.2L gain</text>
+          <line x1="210" y1="62" x2="210" y2="40" stroke={C.gold} strokeWidth="1.2" />
+          <path d="M 210 40 L 222 45 L 210 50 Z" fill={C.gold} fillOpacity="0.9" />
+          {/* Label with opaque background */}
+          <rect x="216" y="28" width="94" height="26" rx="3"
+            fill={isDark ? 'rgba(19,17,16,0.85)' : 'rgba(245,241,235,0.9)'} />
+          <text x="222" y="40" style={{ fontFamily: F_MONO, fontSize: '8px', fill: C.gold, letterSpacing: '0.08em' }}>SUMMIT</text>
+          <text x="222" y="51" style={{ fontFamily: F_SERIF, fontStyle: 'italic', fontSize: '9px', fill: C.gold }}>₹14.2L gain</text>
         </svg>
       </div>
 
@@ -1166,7 +1136,6 @@ function FinalCTA({ C, isMobile, onEnter, isDark }) {
 function PageFooter({ C, isMobile }) {
   return (
     <div style={{ borderTop:'1px solid '+C.border, padding:isMobile?'24px':'28px 80px', position:'relative', overflow:'hidden' }}>
-      {/* Faint ridge behind footer */}
       <div style={{ position:'absolute', bottom:0, left:0, right:0, pointerEvents:'none' }}>
         <RidgeSilhouette C={C} variant="low" height={24} opacity={0.05} />
       </div>
@@ -1188,7 +1157,7 @@ function PageFooter({ C, isMobile }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// MAIN LANDING PAGE
+// MAIN LANDING PAGE — FIX 1: Hero layout, z-index, headline scale
 // ─────────────────────────────────────────────────────────
 function LandingPage({ onEnter }) {
   var isDark   = useIsDark()
@@ -1210,54 +1179,59 @@ function LandingPage({ onEnter }) {
   return (
     <div style={{ minHeight:'100vh', background:C.bg, position:'relative' }}>
 
-      {/* ── HERO ── */}
+      {/* ── HERO — FIX 1 ── */}
       <div ref={heroRef} style={{ position:'relative', overflow:'hidden', minHeight:isMobile?'auto':'100vh', display:'flex', alignItems:'center' }}>
 
-        {/* Background mountain panorama — full width behind hero */}
+        {/* Background panorama — z:0, reduced height so it never covers CTAs */}
         <div style={{ position:'absolute', bottom:0, left:0, right:0, pointerEvents:'none', zIndex:0 }}>
-          <svg viewBox="0 0 1440 280" width="100%" height="280" preserveAspectRatio="xMidYMax meet"
-            style={{ display:'block' }}>
-            {/* Far ridges (atmospheric) */}
-            <path d={'M 0 280 L 0 200 L 80 185 L 160 195 L 220 175 L 290 188 L 340 165 L 400 178 L 460 168 L 520 180 L 580 160 L 640 175 L 700 162 L 760 178 L 820 155 L 880 170 L 940 158 L 1000 172 L 1060 165 L 1120 178 L 1180 168 L 1240 180 L 1300 170 L 1360 185 L 1440 175 L 1440 280 Z'}
-              fill={C.text} fillOpacity={isDark?0.06:0.05} />
-            {/* Mid mountains */}
-            <path d={'M 0 280 L 0 220 L 60 205 L 120 218 L 180 198 L 240 212 L 300 190 L 360 175 L 420 185 L 480 162 L 530 178 L 580 148 L 620 165 L 660 142 L 700 160 L 740 138 L 780 155 L 820 132 L 860 148 L 900 128 L 940 145 L 980 165 L 1020 148 L 1060 162 L 1100 178 L 1140 165 L 1200 178 L 1260 192 L 1320 205 L 1380 215 L 1440 225 L 1440 280 Z'}
-              fill={C.text} fillOpacity={isDark?0.10:0.08} />
+          <svg viewBox="0 0 1440 180" width="100%" height="180" preserveAspectRatio="xMidYMax meet" style={{ display:'block' }}>
+            {/* Far ridge */}
+            <path d={'M 0 180 L 0 130 L 80 118 L 160 128 L 220 110 L 290 122 L 340 100 L 400 115 L 460 104 L 520 116 L 580 98 L 640 112 L 700 100 L 760 114 L 820 95 L 880 108 L 940 96 L 1000 110 L 1060 104 L 1120 116 L 1440 130 L 1440 180 Z'}
+              fill={C.text} fillOpacity={isDark?0.05:0.04} />
+            {/* Mid ridge */}
+            <path d={'M 0 180 L 0 148 L 60 138 L 140 145 L 200 130 L 280 122 L 360 108 L 440 118 L 520 105 L 600 115 L 680 100 L 760 112 L 840 95 L 920 108 L 1000 118 L 1080 128 L 1200 138 L 1440 148 L 1440 180 Z'}
+              fill={C.text} fillOpacity={isDark?0.08:0.06} />
             {/* Near ridge */}
-            <path d={'M 0 280 L 0 245 L 40 238 L 80 242 L 120 230 L 160 238 L 200 222 L 240 215 L 280 220 L 320 210 L 360 215 L 400 205 L 440 212 L 480 202 L 520 210 L 560 200 L 600 208 L 640 198 L 680 205 L 720 215 L 760 208 L 800 215 L 840 225 L 880 218 L 920 228 L 980 235 L 1040 242 L 1100 248 L 1200 255 L 1300 248 L 1400 255 L 1440 260 L 1440 280 Z'}
-              fill={C.text} fillOpacity={isDark?0.15:0.12} />
-            {/* Contour cluster on main visible peak (~center-right) */}
-            <g opacity="0.3">
-              <ContourCluster rings={5} cx={860} cy={135} rx={48} ry={30} color={C.line} opacity={1} rotate={0} />
-            </g>
+            <path d={'M 0 180 L 0 162 L 80 155 L 160 160 L 240 150 L 320 155 L 400 145 L 480 152 L 560 145 L 640 150 L 720 158 L 800 152 L 900 158 L 1000 162 L 1200 168 L 1440 172 L 1440 180 Z'}
+              fill={C.text} fillOpacity={isDark?0.12:0.09} />
           </svg>
         </div>
 
+        {/* ALL CONTENT — z:1, always above background panorama */}
         <motion.div style={{ y:heroY, opacity:heroOp, width:'100%', position:'relative', zIndex:1 }}>
           <div style={{
             maxWidth:'1180px',
             margin:'0 auto',
             padding: isMobile
-              ? 'calc(var(--nav-h,64px) + 48px) 24px 60px'
-              : 'calc(var(--nav-h,64px) + 72px) 80px 80px',
+              ? 'calc(var(--nav-h,64px) + 48px) 24px 100px'
+              : 'calc(var(--nav-h,64px) + 64px) 80px 120px',
             display:'grid',
-            gridTemplateColumns: isMobile ? '1fr' : '5fr 6fr',
-            gap: isMobile ? '48px' : '72px',
-            alignItems: 'center',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap: isMobile ? '56px' : '80px',
+            alignItems: 'start',
           }}>
 
-            {/* ── LEFT: text ── */}
-            <div>
+            {/* ── LEFT: text column — single left edge, all children in flow ── */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start' }}>
+
+              {/* Eyebrow */}
               <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }}
                 transition={{ delay:0.1, duration:0.6, ease:[0.16,1,0.3,1] }}
-                style={{ fontFamily:F_MONO, fontSize:'11px', color:C.text3, letterSpacing:'0.14em', textTransform:'uppercase', marginBottom:'40px', display:'flex', alignItems:'center', gap:'10px' }}>
+                style={{ fontFamily:F_MONO, fontSize:'11px', color:C.text3, letterSpacing:'0.14em', textTransform:'uppercase', marginBottom:'32px', display:'flex', alignItems:'center', gap:'10px' }}>
                 <ElevationMark size={14} color={C.green} />
                 Career Route Analysis · India 2026
               </motion.div>
 
-              <motion.h1 initial={{ opacity:0, y:28 }} animate={{ opacity:1, y:0 }}
+              {/* FIX 1: Headline — font scale reduced, maxWidth constrains it */}
+              <motion.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }}
                 transition={{ delay:0.18, duration:0.75, ease:[0.16,1,0.3,1] }}
-                style={{ fontFamily:F_SERIF, fontWeight:'600', fontSize:'clamp(2.8rem,7vw,5.5rem)', lineHeight:0.95, letterSpacing:'-0.02em', color:C.text, marginBottom:'28px', marginTop:0, wordBreak:'break-word' }}>
+                style={{
+                  fontFamily:F_SERIF, fontWeight:'600',
+                  fontSize:'clamp(2.4rem,5.5vw,4.2rem)',
+                  lineHeight:1.0, letterSpacing:'-0.02em',
+                  color:C.text, marginBottom:'24px', marginTop:0,
+                  maxWidth:'440px',
+                }}>
                 Your next cert<br />
                 is either a{' '}
                 <span style={{ color:C.gold, fontStyle:'italic' }}>goldmine</span><br />
@@ -1265,56 +1239,60 @@ function LandingPage({ onEnter }) {
                 <span style={{ color:C.err, fontStyle:'italic' }}>mistake.</span>
               </motion.h1>
 
+              {/* Subhead */}
               <motion.p initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }}
                 transition={{ delay:0.3, duration:0.65, ease:[0.16,1,0.3,1] }}
-                style={{ fontFamily:F_SANS, fontSize:'clamp(15px,2vw,17px)', color:C.text2, maxWidth:'400px', lineHeight:'1.8', margin:'0 0 40px' }}>
+                style={{ fontFamily:F_SANS, fontSize:'clamp(14px,1.6vw,16px)', color:C.text2, maxWidth:'380px', lineHeight:'1.8', margin:'0 0 36px' }}>
                 Know the payback period before you pay the fee.
                 We map the exact month your investment turns profitable —
                 before you spend ₹50K on the wrong route.
               </motion.p>
 
+              {/* FIX 1: CTA — in flow, zIndex:2 above terrain layer */}
               <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }}
                 transition={{ delay:0.44, duration:0.6, ease:[0.16,1,0.3,1] }}
-                style={{ display:'flex', flexDirection:'column', gap:'14px', alignItems:'flex-start' }}>
-                <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', alignItems:'center' }}>
+                style={{ display:'flex', flexDirection:'column', gap:'12px', alignItems:'flex-start', position:'relative', zIndex:2 }}>
+
+                <div style={{ display:'flex', gap:'10px', flexWrap:'wrap', alignItems:'center' }}>
                   <button onClick={onEnter}
-                    style={{ padding:'0 32px', height:'48px', borderRadius:'4px', border:'none', background:C.btnFill, color:C.btnText, fontSize:'15px', fontFamily:F_SANS, fontWeight:'500', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'10px', transition:'all 0.2s', whiteSpace:'nowrap', letterSpacing:'-0.01em' }}
+                    style={{ padding:'0 28px', height:'44px', borderRadius:'4px', border:'none', background:C.btnFill, color:C.btnText, fontSize:'14px', fontFamily:F_SANS, fontWeight:'500', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'9px', transition:'all 0.2s', whiteSpace:'nowrap', letterSpacing:'-0.01em' }}
                     onMouseEnter={function(e) { e.currentTarget.style.transform='translateY(-1px)'; e.currentTarget.style.boxShadow='0 4px 14px '+(isDark?'rgba(237,233,227,0.15)':'rgba(28,26,23,0.2)') }}
                     onMouseLeave={function(e) { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='none' }}>
-                    Calculate My Route <ArrowRight size={15} />
+                    Calculate My Route <ArrowRight size={14} />
                   </button>
                   <button onClick={onEnter}
-                    style={{ padding:'0 24px', height:'48px', borderRadius:'4px', border:'1.5px solid '+C.border, background:'transparent', color:C.text2, fontSize:'14px', fontFamily:F_SANS, fontWeight:'400', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'8px', transition:'all 0.2s', whiteSpace:'nowrap' }}
+                    style={{ padding:'0 20px', height:'44px', borderRadius:'4px', border:'1.5px solid '+C.border, background:'transparent', color:C.text2, fontSize:'13px', fontFamily:F_SANS, fontWeight:'400', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'7px', transition:'all 0.2s', whiteSpace:'nowrap' }}
                     onMouseEnter={function(e) { e.currentTarget.style.borderColor=C.text2; e.currentTarget.style.color=C.text }}
                     onMouseLeave={function(e) { e.currentTarget.style.borderColor=C.border; e.currentTarget.style.color=C.text2 }}>
                     See a sample climb →
                   </button>
                 </div>
+
                 <div style={{ fontFamily:F_MONO, fontSize:'10px', color:C.text3, letterSpacing:'0.1em' }}>
-                  No signup required · Free · India salary data 2026
+                  No signup · Free · India salary data 2026
                 </div>
               </motion.div>
 
               {/* Scroll indicator */}
               <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.1, duration:0.6 }}
-                style={{ marginTop:'clamp(40px,6vw,64px)', display:'flex', alignItems:'center', gap:'12px' }}>
+                style={{ marginTop:'clamp(32px,5vw,52px)', display:'flex', alignItems:'center', gap:'10px' }}>
                 <motion.div animate={{ y:[0,6,0], opacity:[0.3,0.6,0.3] }} transition={{ duration:2, repeat:Infinity, ease:'easeInOut' }}
-                  style={{ width:'18px', height:'30px', borderRadius:'9px', border:'1.5px solid '+C.border, display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'4px' }}>
-                  <div style={{ width:'2px', height:'6px', borderRadius:'1px', background:C.text3 }} />
+                  style={{ width:'16px', height:'26px', borderRadius:'8px', border:'1.5px solid '+C.border, display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'4px' }}>
+                  <div style={{ width:'2px', height:'5px', borderRadius:'1px', background:C.text3 }} />
                 </motion.div>
                 <span style={{ fontFamily:F_MONO, fontSize:'10px', color:C.text3, letterSpacing:'0.14em', textTransform:'uppercase' }}>scroll</span>
               </motion.div>
             </div>
 
-            {/* ── RIGHT: Mountain Route Map — the dominant visual ── */}
+            {/* ── RIGHT: Mountain Route Map ── */}
             {!isMobile && (
-              <motion.div initial={{ opacity:0, x:28 }} animate={{ opacity:1, x:0 }}
-                transition={{ delay:0.4, duration:0.9, ease:[0.16,1,0.3,1] }}>
+              <motion.div initial={{ opacity:0, x:24 }} animate={{ opacity:1, x:0 }}
+                transition={{ delay:0.38, duration:0.9, ease:[0.16,1,0.3,1] }}
+                style={{ paddingTop:'8px' }}>
                 <MountainRouteMap C={C} isDark={isDark} animate={chartReady} />
               </motion.div>
             )}
 
-            {/* Mobile: mountain below text */}
             {isMobile && (
               <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
                 transition={{ delay:0.6, duration:0.8, ease:[0.16,1,0.3,1] }}>
