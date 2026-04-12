@@ -46,7 +46,7 @@ var F_SANS  = "'Inter', 'DM Sans', sans-serif"
 var F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
 // Editorial Premium Light Theme
-var L = { bg:'#FAFAF8', surface:'#F5F3EF', surfaceHigh:'#EEEBE5', text:'#1A1916', text2:'#5C5A56', text3:'#9C9A96', text4:'#C0BDB8', green:'#0D6B6F', greenL:'#0A565A', gold:'#9A7235', goldL:'#B89050', err:'#7A2C2C', line:'#E0DDD8', lineHeavy:'#C8C5BE', border:'rgba(26,25,22,0.09)', btnFill:'#0D6B6F', btnText:'#FAFAF8' }
+var L = { bg:'#FAFAF8', surface:'#F5F3EF', surfaceHigh:'#EEEBE5', text:'#1A1916', text2:'#5C5A56', text3:'#9C9A96', text4:'#C0BDB8', green:'#0D6B6F', greenL:'#0A565A', gold:'#9A7235', goldL:'#B89050', err:'#7A2C2C', line:'#E0DDD8', lineHeavy:'#C8C5BE', border:'rgba(26,25,22,0.09)', btnFill:'#1A1916', btnText:'#FAFAF8' }
 // Deep Premium Dark Theme
 var D = { bg:'#131110', surface:'#1C1A17', surfaceHigh:'#252220', text:'#EDE9E3', text2:'#9E9890', text3:'#6B6560', text4:'#4A4A4A', green:'#4A8C6A', greenL:'#5EA87E', gold:'#C49A4E', goldL:'#D4A559', err:'#9E4242', line:'#2E2B27', lineHeavy:'#3A3A3A', border:'rgba(237,233,227,0.06)', btnFill:'#EDE9E3', btnText:'#1C1A17' }
 
@@ -65,38 +65,6 @@ function ContourCluster({ rings, cx, cy, rx, ry, color, opacity, rotate }) {
         return <ellipse key={i} cx={cx} cy={cy} rx={rx+s} ry={ry+s*0.6} fill="none" stroke={color} strokeWidth="0.75" />
       })}
     </g>
-  )
-}
-
-function CompassCorner({ size }) {
-  size = size || 180
-  var cx = size / 2, cy = size / 2, R = size * 0.44, r1 = size * 0.34, r2 = size * 0.22
-  var strokeO = 'rgba(26,25,22,0.07)', strokeI = 'rgba(26,25,22,0.04)'
-  return (
-    <svg width={size} height={size} viewBox={'0 0 '+size+' '+size} fill="none" style={{ display:'block', pointerEvents:'none' }} aria-hidden="true">
-      <circle cx={cx} cy={cy} r={R} stroke={strokeO} strokeWidth="0.7"/>
-      <circle cx={cx} cy={cy} r={r1} stroke={strokeI} strokeWidth="0.55"/>
-      <circle cx={cx} cy={cy} r={r2} stroke={strokeI} strokeWidth="0.5"/>
-      {Array.from({ length: 36 }).map(function(_, i) {
-        var deg = i * 10, rad = (deg - 90) * Math.PI / 180, isCard = deg % 90 === 0, tl = isCard ? 9 : deg % 45 === 0 ? 6 : 3
-        return <line key={i} x1={cx + R * Math.cos(rad)} y1={cy + R * Math.sin(rad)} x2={cx + (R - tl) * Math.cos(rad)} y2={cy + (R - tl) * Math.sin(rad)} stroke={isCard ? strokeO : strokeI} strokeWidth={isCard ? 0.8 : 0.45} />
-      })}
-      {[{d:0,l:'N'},{d:90,l:'E'},{d:180,l:'S'},{d:270,l:'W'}].map(function(item) {
-        var rad = (item.d - 90) * Math.PI / 180
-        return <text key={item.l} x={cx + (R + 12) * Math.cos(rad)} y={cy + (R + 12) * Math.sin(rad)} textAnchor="middle" dominantBaseline="middle" fontSize={size * 0.07} fontFamily={F_MONO} fill="rgba(26,25,22,0.09)" letterSpacing="0.05em">{item.l}</text>
-      })}
-      {[0,45,90,135,180,225,270,315].map(function(deg) {
-        var rad = (deg - 90) * Math.PI / 180, isMain = deg % 90 === 0
-        return <line key={deg} x1={cx} y1={cy} x2={cx + r1 * Math.cos(rad)} y2={cy + r1 * Math.sin(rad)} stroke={isMain ? strokeO : strokeI} strokeWidth={isMain ? 0.55 : 0.35} />
-      })}
-      {[0,90,180,270].map(function(deg) {
-        var rad=(deg-90)*Math.PI/180, radL=(deg-90-5)*Math.PI/180, radR=(deg-90+5)*Math.PI/180
-        var tipX=cx+R*0.82*Math.cos(rad), tipY=cy+R*0.82*Math.sin(rad), lx=cx+r2*0.75*Math.cos(radL), ly=cy+r2*0.75*Math.sin(radL), rx=cx+r2*0.75*Math.cos(radR), ry=cy+r2*0.75*Math.sin(radR)
-        return <polygon key={deg} points={tipX+','+tipY+' '+lx+','+ly+' '+cx+','+cy+' '+rx+','+ry} fill="rgba(26,25,22,0.025)" stroke={strokeO} strokeWidth="0.4" />
-      })}
-      <circle cx={cx} cy={cy} r="3.5" fill="none" stroke={strokeO} strokeWidth="0.7"/>
-      <circle cx={cx} cy={cy} r="1.2" fill="rgba(26,25,22,0.06)"/>
-    </svg>
   )
 }
 
@@ -352,107 +320,96 @@ function LandingPage({ onEnter }) {
 
   var heroRef = useRef(null)
   var { scrollYProgress: heroSP } = useScroll({ target: heroRef, offset: ['start start','end start'] })
-  var heroY  = useTransform(heroSP, [0,1], [0, isMobile?30:55])
+  var heroY  = useTransform(heroSP, [0,1], [0, isMobile?10:20])
   var heroOp = useTransform(heroSP, [0,0.6], [1,0])
 
   return (
     <div style={{ minHeight:'100vh', background:C.bg, position:'relative' }}>
 
       {/* ── HERO ── */}
-      <div ref={heroRef} style={{ position:'relative', overflow:'hidden', minHeight:isMobile?'auto':'100vh', display:'flex', alignItems:'center' }}>
+      <div ref={heroRef} style={{ position:'relative', overflow:'hidden', minHeight:isMobile?'auto':'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>
         
-        {/* COMPASS ACCENT */}
-        <div style={{ position:'absolute', top: isMobile ? '-20px' : '-40px', right: isMobile ? '-20px' : '-40px', pointerEvents:'none', zIndex:0 }}>
-          <CompassCorner size={isMobile ? 180 : 250} />
+        {/* Abstract Contour Layer floating in background */}
+        <div style={{ position:'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents:'none', zIndex:0, opacity:0.4 }}>
+           <svg width="100%" height="100%" viewBox="0 0 1440 800" preserveAspectRatio="none">
+             <ContourCluster rings={6} cx={1400} cy={50} rx={220} ry={140} color={C.line} opacity={0.6} rotate={-10} />
+           </svg>
         </div>
 
-        <motion.div style={{ y:heroY, opacity:heroOp, width:'100%', position:'relative', zIndex:1, marginTop: isMobile ? '80px' : '0' }}>
-          <div style={{ maxWidth:'1180px', margin:'0 auto', padding:isMobile?'48px 24px 60px':'calc(var(--nav-h,64px) + 72px) 80px 80px', display:'grid', gridTemplateColumns:isMobile?'1fr':'5fr 6fr', gap:isMobile?'48px':'80px', alignItems:'center' }}>
+        <motion.div style={{ y:heroY, opacity:heroOp, width:'100%', position:'relative', zIndex:1, marginTop: isMobile ? '20px' : '-20px' }}>
+          {/* Tighter Grid to pull everything up into one viewport plane */}
+          <div style={{ maxWidth:'1180px', margin:'0 auto', padding:isMobile?'24px':'32px 80px', display:'grid', gridTemplateColumns:isMobile?'1fr':'1.2fr 0.8fr', gap:isMobile?'32px':'48px', alignItems:'center' }}>
 
             {/* LEFT: Text & CTA */}
-            <div style={{ position: 'relative', zIndex: 3 }}>
-              <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1, duration:0.6, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_MONO, fontSize:'11px', color:C.text3, letterSpacing:'0.14em', textTransform:'uppercase', marginBottom:'40px', display:'flex', alignItems:'center', gap:'10px' }}>
+            <div style={{ position: 'relative', zIndex: 3, paddingTop: isMobile ? '16px' : '0' }}>
+              <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1, duration:0.6, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_MONO, fontSize:'11px', color:C.text3, letterSpacing:'0.14em', textTransform:'uppercase', marginBottom:'24px', display:'flex', alignItems:'center', gap:'10px' }}>
                 <ElevationMark size={14} color={C.green} />
                 Career Route Analysis · India 2026
               </motion.div>
-              <motion.h1 initial={{ opacity:0, y:28 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.18, duration:0.75, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_SANS, fontWeight:'600', fontSize:'clamp(2.8rem,6.5vw,5.5rem)', lineHeight:0.95, letterSpacing:'-0.03em', color:C.text, marginBottom:'28px', marginTop:0, wordBreak:'break-word' }}>
-                Your next cert<br />
-                <span style={{ fontWeight:'400', color:C.text2, fontSize:'0.82em', letterSpacing:'-0.015em' }}>is either a{' '}</span>
-                <span style={{ fontFamily: F_SERIF, fontStyle: 'italic', fontWeight: '500', fontSize: '1.05em', color: C.gold, letterSpacing: '-0.02em' }}>goldmine</span><br />
-                <span style={{ fontWeight:'400', color:C.text2, fontSize:'0.82em', letterSpacing:'-0.015em' }}>or a{' '}</span>
-                <span style={{ fontFamily: F_SERIF, fontStyle: 'italic', fontWeight: '500', fontSize: '1.05em', color: C.err, letterSpacing: '-0.02em' }}>mistake.</span>
+              
+              {/* Single Font Style (Serif) Headline */}
+              <motion.h1 initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.18, duration:0.75, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_SERIF, fontWeight:'500', fontSize:'clamp(3rem,5.5vw,5rem)', lineHeight:0.95, letterSpacing:'-0.02em', color:C.text, marginBottom:'24px', marginTop:0, wordBreak:'break-word' }}>
+                Your next cert<br />is either a <span style={{ color:C.gold }}>goldmine</span><br />or a <span style={{ color:C.err }}>mistake.</span>
               </motion.h1>
-              <motion.p initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3, duration:0.65, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_SANS, fontSize:'clamp(15px,2vw,17px)', color:C.text2, maxWidth:'420px', lineHeight:'1.8', margin:'0 0 40px' }}>
+              
+              <motion.p initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3, duration:0.65, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_SANS, fontSize:'clamp(15px,2vw,16px)', color:C.text2, maxWidth:'420px', lineHeight:'1.75', margin:'0 0 32px' }}>
                 Know the payback period before you pay the fee. We calculate the exact month your investment turns profitable — before you spend ₹50K and 6 months on the wrong route.
               </motion.p>
+              
               <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.44, duration:0.6, ease:[0.16,1,0.3,1] }} style={{ display:'flex', flexDirection:'column', gap:'14px', alignItems:'flex-start' }}>
-                <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', alignItems:'center' }}>
-                  <button onClick={onEnter} style={{ padding:'0 32px', height:'48px', borderRadius:'4px', border:'none', background:C.btnFill, color:C.btnText, fontSize:'15px', fontFamily:F_SANS, fontWeight:'500', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'10px', transition:'all 0.2s', whiteSpace:'nowrap', letterSpacing:'-0.01em', boxShadow: '0 1px 2px rgba(26,25,22,0.1)' }} onMouseEnter={function(e){e.currentTarget.style.transform='translateY(-1px)';e.currentTarget.style.boxShadow='0 4px 14px '+(isDark?'rgba(237,233,227,0.15)':'rgba(28,26,23,0.2)')}} onMouseLeave={function(e){e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 1px 2px rgba(26,25,22,0.1)'}}>Calculate ROI <ArrowRight size={15} /></button>
-                </div>
-                <div style={{ fontFamily:F_MONO, fontSize:'10px', color:C.text3, letterSpacing:'0.1em' }}>No signup required · Free · India salary data 2026</div>
+                <button onClick={onEnter} style={{ padding:'0 36px', height:'52px', borderRadius:'0px', border:'none', background:C.btnFill, color:C.btnText, fontSize:'15px', fontFamily:F_SANS, fontWeight:'500', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'10px', transition:'all 0.2s', whiteSpace:'nowrap', letterSpacing:'0.02em', boxShadow:'0 1px 2px rgba(0,0,0,0.1)' }} onMouseEnter={function(e){e.currentTarget.style.background=C.green}} onMouseLeave={function(e){e.currentTarget.style.background=C.btnFill}}>Calculate ROI <ArrowRight size={15} /></button>
               </motion.div>
             </div>
 
-            {/* RIGHT: Mountain Image + Sweeping Ribbon S-Curve (Gallery Style) */}
+            {/* RIGHT: Mountain Image + Orbit Wrapping Ribbon */}
             <motion.div 
                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.2, ease: [0.16,1,0.3,1] }}
-               style={{ position: 'relative', width: '100%', height: isMobile?'300px':'550px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+               style={{ position: 'relative', width: '100%', height: isMobile?'280px':'460px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
             >
-              {/* Back Ribbon: Enters from top-left, curves smoothly down and disappears behind the mountain */}
+              {/* Back Loop tracing behind the mountain */}
               <motion.svg 
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-                style={{ position: 'absolute', top: '5%', left: '-40%', width: '180%', height: '90%', zIndex: 0, pointerEvents: 'none' }} viewBox="0 0 100 100" preserveAspectRatio="none"
+                style={{ position: 'absolute', top: '-15%', left: '-25%', width: '150%', height: '130%', zIndex: 0, pointerEvents: 'none' }} viewBox="0 0 100 100" preserveAspectRatio="none"
               >
-                <path d="M-10,30 C30,35 45,60 60,90" fill="none" stroke="url(#ribbonBack)" strokeWidth="7" style={{ filter: 'blur(1.5px)' }} />
-                <path d="M-10,33 C33,38 48,63 60,90" fill="none" stroke="url(#ribbonBackCore)" strokeWidth="2.5" />
+                <path d="M10,80 C50,95 85,75 80,45 C75,15 45,10 25,30" fill="none" stroke="url(#ribbonBackCore)" strokeWidth="1" style={{ filter: 'blur(0.5px)' }} />
+                <path d="M10,80 C50,95 85,75 80,45 C75,15 45,10 25,30" fill="none" stroke="rgba(13,107,111,0.12)" strokeWidth="5" style={{ filter: 'blur(3px)' }} />
+                
                 <defs>
-                  <linearGradient id="ribbonBack" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient id="ribbonBackCore" x1="0" y1="1" x2="1" y2="0">
                     <stop offset="0%" stopColor="rgba(13,107,111,0)" />
-                    <stop offset="40%" stopColor="rgba(13,107,111,0.4)" />
-                    <stop offset="80%" stopColor={'rgba(10,86,90,0.5)'} />
-                    <stop offset="100%" stopColor="rgba(13,107,111,0)" />
-                  </linearGradient>
-                  <linearGradient id="ribbonBackCore" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgba(13,107,111,0)" />
-                    <stop offset="50%" stopColor="rgba(13,107,111,0.15)" />
-                    <stop offset="100%" stopColor="rgba(13,107,111,0)" />
+                    <stop offset="50%" stopColor="rgba(13,107,111,0.3)" />
+                    <stop offset="100%" stopColor="rgba(154,114,53,0.3)" />
                   </linearGradient>
                 </defs>
               </motion.svg>
 
-              {/* MOUNTAIN */}
+              {/* MOUNTAIN. Uses typical pathing, handles cache breaking via timestamp or fallback */}
               <motion.img 
                 initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, ease: [0.16,1,0.3,1] }}
-                src="/mountain.png" alt="Mountain Ascent" 
-                style={{ position: 'relative', zIndex: 1, height: '100%', objectFit: 'contain', 
-                         filter: isDark ? 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))' : 'drop-shadow(0 20px 40px rgba(26,25,22,0.06))', mixBlendMode: isDark?'normal':'darken' }}
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                src="/mountain.png" alt="" 
+                style={{ position: 'relative', zIndex: 1, height: '100%', objectFit: 'contain', maxWidth: '100%',
+                         filter: isDark ? 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))' : 'drop-shadow(0 15px 30px rgba(26,25,22,0.06))', mixBlendMode: isDark?'normal':'darken' }}
+                onError={(e) => { 
+                  if (!e.currentTarget.src.includes('?')) {
+                     e.currentTarget.src = '/mountain.png?' + new Date().getTime(); // Break cache if stuck
+                  } else {
+                     e.currentTarget.style.display = 'none'; 
+                  }
+                }}
               />
 
-              {/* Fallback box if image is not placed yet */}
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, display: 'flex', alignItems:'center', justifyContent:'center', pointerEvents: 'none' }}>
-                <span style={{ fontFamily:F_MONO, fontSize:'10px', color:C.text3, opacity:0.3 }}>/public/mountain.png</span>
-              </div>
-              
-              {/* Front Ribbon: Emerges from the mountain mid-section and sweeps down to the bottom-right */}
+              {/* Front Loop tracing in front, intersecting back path to complete an aesthetic 3D wrap */}
               <motion.svg 
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35, duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-                style={{ position: 'absolute', top: '5%', left: '-40%', width: '180%', height: '90%', zIndex: 2, pointerEvents: 'none' }} viewBox="0 0 100 100" preserveAspectRatio="none"
+                style={{ position: 'absolute', top: '-15%', left: '-25%', width: '150%', height: '130%', zIndex: 2, pointerEvents: 'none' }} viewBox="0 0 100 100" preserveAspectRatio="none"
               >
-                <path d="M48,60 C70,105 90,85 110,100" fill="none" stroke="url(#ribbonFront)" strokeWidth="8" style={{ filter: 'blur(1.5px)' }} />
-                <path d="M50,62 C72,107 90,87 110,102" fill="none" stroke="rgba(250,250,248,0.3)" strokeWidth="1.5" />
-                <path d="M46,58 C68,103 88,83 110,98" fill="none" stroke="url(#ribbonFrontCore)" strokeWidth="3" />
+                <path d="M25,30 C5,50 15,90 100,75" fill="none" stroke="rgba(13,107,111,0.15)" strokeWidth="6" style={{ filter: 'blur(2.5px)' }} />
+                <path d="M25,30 C5,50 15,90 100,75" fill="none" stroke="url(#ribbonFront)" strokeWidth="1.5" />
+                
                 <defs>
                   <linearGradient id="ribbonFront" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgba(13,107,111,0)" />
-                    <stop offset="30%" stopColor="rgba(13,107,111,0.5)" />
-                    <stop offset="60%" stopColor="#8A9D9A" />
-                    <stop offset="100%" stopColor="rgba(13,107,111,0)" />
-                  </linearGradient>
-                  <linearGradient id="ribbonFrontCore" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgba(13,107,111,0)" />
-                    <stop offset="40%" stopColor="rgba(13,107,111,0.8)" />
-                    <stop offset="70%" stopColor="#6C8784" />
+                    <stop offset="0%" stopColor="rgba(154,114,53,0.5)" />
+                    <stop offset="30%" stopColor="rgba(13,107,111,0.7)" />
                     <stop offset="100%" stopColor="rgba(13,107,111,0)" />
                   </linearGradient>
                 </defs>
