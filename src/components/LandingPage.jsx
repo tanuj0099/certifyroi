@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { ArrowRight } from 'lucide-react'
 
@@ -39,35 +39,22 @@ function useInView(threshold) {
 }
 
 // ─────────────────────────────────────────────────────────
-// DESIGN TOKENS
+// DESIGN TOKENS (Editorial Premium)
 // ─────────────────────────────────────────────────────────
 var F_SERIF = "'EB Garamond', 'Cormorant Garamond', Georgia, serif"
 var F_SANS  = "'Inter', 'DM Sans', sans-serif"
 var F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
-// Editorial Premium Light Theme
-var L = { bg:'#FAFAF8', surface:'#F5F3EF', surfaceHigh:'#EEEBE5', text:'#1A1916', text2:'#5C5A56', text3:'#9C9A96', text4:'#C0BDB8', green:'#0D6B6F', greenL:'#0A565A', gold:'#9A7235', goldL:'#B89050', err:'#7A2C2C', line:'#E0DDD8', lineHeavy:'#C8C5BE', border:'rgba(26,25,22,0.09)', btnFill:'#1A1916', btnText:'#FAFAF8' }
-// Deep Premium Dark Theme
-var D = { bg:'#131110', surface:'#1C1A17', surfaceHigh:'#252220', text:'#EDE9E3', text2:'#9E9890', text3:'#6B6560', text4:'#4A4A4A', green:'#4A8C6A', greenL:'#5EA87E', gold:'#C49A4E', goldL:'#D4A559', err:'#9E4242', line:'#2E2B27', lineHeavy:'#3A3A3A', border:'rgba(237,233,227,0.06)', btnFill:'#EDE9E3', btnText:'#1C1A17' }
+// High contrast editorial light / deep dark
+var L = { bg:'#FAFAF8', surface:'#F5F3EF', surfaceHigh:'#EEEBE5', text:'#1C1B1A', text2:'#5C5A56', text3:'#999692', text4:'#C4C1BC', green:'#124042', greenL:'#1B5E60', gold:'#8A6932', err:'#6B2121', line:'#EAE7E1', lineHeavy:'#D4D0C9', border:'rgba(28,27,26,0.08)', btnFill:'#1C1B1A', btnText:'#FAFAF8' }
+var D = { bg:'#131211', surface:'#1A1918', surfaceHigh:'#21201E', text:'#EBE8E3', text2:'#9E9A94', text3:'#6B6862', text4:'#423F3A', green:'#4A8C6A', greenL:'#5EA87E', gold:'#BF9649', err:'#A63B3B', line:'#282725', lineHeavy:'#383633', border:'rgba(235,232,227,0.08)', btnFill:'#EBE8E3', btnText:'#1C1B1A' }
 
-var RISE = { hidden:{ y:24, opacity:0 }, show:{ y:0, opacity:1, transition:{ duration:0.7, ease:[0.16,1,0.3,1] } } }
+var RISE = { hidden:{ y:24, opacity:0 }, show:{ y:0, opacity:1, transition:{ duration:0.8, ease:[0.16,1,0.3,1] } } }
 var SLIDE_LEFT  = { hidden:{ x:-40, opacity:0 }, show:{ x:0, opacity:1, transition:{ duration:0.75, ease:[0.16,1,0.3,1] } } }
 
 // ─────────────────────────────────────────────────────────
-// COMPONENTS
+// SMALL COMPONENTS
 // ─────────────────────────────────────────────────────────
-function ContourCluster({ rings, cx, cy, rx, ry, color, opacity, rotate }) {
-  rings=rings||10; cx=cx||0; cy=cy||0; rx=rx||80; ry=ry||50; color=color||'#C8C3BB'; opacity=opacity||0.4; rotate=rotate||0
-  return (
-    <g transform={'rotate('+rotate+','+cx+','+cy+')'} opacity={opacity}>
-      {Array.from({ length: rings }).map(function(_, i) {
-        var s = i * 14
-        return <ellipse key={i} cx={cx} cy={cy} rx={rx+s} ry={ry+s*0.6} fill="none" stroke={color} strokeWidth="0.75" />
-      })}
-    </g>
-  )
-}
-
 function ElevationMark({ size, color }) {
   size=size||18; color=color||'#2D6A4F'
   var w=size, h=size*0.65
@@ -93,8 +80,19 @@ function WaypointDot({ active, color, size }) {
   active=active!==false; color=color||'#1C1A17'; size=size||10
   return (
     <svg width={size+8} height={size+8} viewBox={'0 0 '+(size+8)+' '+(size+8)} fill="none">
-      <circle cx={(size+8)/2} cy={(size+8)/2} r={size/2+3} stroke={color} strokeWidth="1.5" strokeOpacity={active?0.35:0.15} />
+      <circle cx={(size+8)/2} cy={(size+8)/2} r={size/2+3} stroke={color} strokeWidth="1" strokeOpacity={active?0.35:0.15} />
       <circle cx={(size+8)/2} cy={(size+8)/2} r={size/2-1} fill={active?color:'none'} stroke={color} strokeWidth="1.5" strokeOpacity={active?1:0.3} />
+    </svg>
+  )
+}
+
+function Crosshair({ color, size }) {
+  color=color||'#1C1B1A'; size=size||12
+  return (
+    <svg width={size} height={size} viewBox={'0 0 '+size+' '+size} fill="none" style={{ display:'block' }}>
+      <line x1={size/2} y1="0" x2={size/2} y2={size} stroke={color} strokeWidth="0.5" strokeOpacity="0.5" />
+      <line x1="0" y1={size/2} x2={size} y2={size/2} stroke={color} strokeWidth="0.5" strokeOpacity="0.5" />
+      <circle cx={size/2} cy={size/2} r="0.5" fill={color} />
     </svg>
   )
 }
@@ -102,28 +100,14 @@ function WaypointDot({ active, color, size }) {
 // ─────────────────────────────────────────────────────────
 // SECTIONS
 // ─────────────────────────────────────────────────────────
-function RidgeSilhouette({ C, inverted }) {
-  var h = 72
-  return (
-    <div style={{ position:'relative', height:h+'px', overflow:'hidden', pointerEvents:'none' }}>
-      <svg viewBox={'0 0 1440 '+h} preserveAspectRatio="none" width="100%" height={h} style={{ position:'absolute', inset:0, display:'block' }}>
-        <path d="M 0 38 Q 160 24 320 36 Q 480 48 640 32 Q 800 18 960 30 Q 1120 42 1280 28 Q 1360 22 1440 34 L 1440 72 L 0 72 Z" fill={C.surfaceHigh} opacity="0.5" />
-        <path d="M 0 46 Q 240 32 420 44 Q 520 50 600 38 Q 680 26 720 20 Q 760 14 800 22 Q 860 34 960 50 Q 1080 62 1200 46 Q 1320 32 1440 44 L 1440 72 L 0 72 Z" fill={C.surface} opacity="0.8" />
-        <path d="M 0 54 Q 200 44 360 56 Q 480 64 600 54 Q 700 44 760 36 Q 820 28 880 34 Q 960 44 1080 58 Q 1200 70 1320 58 Q 1400 50 1440 56 L 1440 72 L 0 72 Z" fill={C.surface} />
-        <path d="M 0 54 Q 200 44 360 56 Q 480 64 600 54 Q 700 44 760 36 Q 820 28 880 34 Q 960 44 1080 58 Q 1200 70 1320 58 Q 1400 50 1440 56" fill="none" stroke={C.line} strokeWidth="0.9" strokeOpacity="0.5" />
-      </svg>
-    </div>
-  )
-}
-
 function CertAssembly({ C }) {
   var isDark = useIsDark()
   var isMobile = useIsMobile()
-  var certBg    = isDark ? '#04060e' : '#FAFAF8'
-  var certText1 = isDark ? '#F0F2FF' : '#1A1916'
-  var certText2 = isDark ? 'rgba(255,255,255,0.38)' : 'rgba(26,25,22,0.5)'
-  var certMuted = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(26,25,22,0.35)'
-  var overlayBg = isDark ? '#020408' : C.bg
+  var certBg    = isDark ? '#080807' : '#FAFAF8'
+  var certText1 = isDark ? '#F5F5F3' : '#1C1B1A'
+  var certText2 = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(28,27,26,0.6)'
+  var certMuted = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(28,27,26,0.45)'
+  var overlayBg = isDark ? '#050505' : C.bg
 
   var trackRef    = useRef(null)
   var { scrollY } = useScroll()
@@ -161,7 +145,7 @@ function CertAssembly({ C }) {
   var cardW = isMobile ? 'min(300px,88vw)' : 'min(480px,88vw)'
 
   return (
-    <div ref={trackRef} style={{ height:'300vh', position:'relative' }}>
+    <div ref={trackRef} style={{ height:'300vh', position:'relative', borderBottom:'1px solid '+C.border }}>
       <div style={{ position:'sticky', top:0, height:'100vh', width:'100%', display:'flex', alignItems:'center', justifyContent:'center' }}>
         <div style={{ position:'absolute', inset:0, zIndex:2, pointerEvents:'none', background:overlayBg, opacity:overlayOp }} />
         <div style={{ position:'relative', zIndex:4 }}>
@@ -173,26 +157,29 @@ function CertAssembly({ C }) {
                     <linearGradient id="cBorder3" x1="0" y1="0" x2="1" y2="1">
                       <stop offset="0%" stopColor={C.green}/><stop offset="40%" stopColor={C.greenL}/><stop offset="100%" stopColor={C.gold}/>
                     </linearGradient>
-                    <filter id="cGlow3"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                    <filter id="cGlow3"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                   </defs>
-                  <rect x="0" y="0" width="500" height="354" rx="4" fill={certBg} fillOpacity="0.97" style={{ filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.04))' }} />
-                  <rect x="1.5" y="1.5" width="497" height="351" rx="3" fill="none" stroke="url(#cBorder3)" strokeWidth="1.5" filter="url(#cGlow3)"/>
-                  {[[22,22],[478,22],[22,332],[478,332]].map(function(arr,i){ var cx=arr[0],cy=arr[1]; return (<g key={i}><circle cx={cx} cy={cy} r="4" fill="none" stroke={C.green} strokeWidth="1.2"/><circle cx={cx} cy={cy} r="8" fill="none" stroke={C.green} strokeOpacity="0.2" strokeWidth="0.6"/><line x1={cx-10} y1={cy} x2={cx+10} y2={cy} stroke={C.green} strokeOpacity="0.35" strokeWidth="0.6"/><line x1={cx} y1={cy-10} x2={cx} y2={cy+10} stroke={C.green} strokeOpacity="0.35" strokeWidth="0.6"/></g>) })}
-                  <line x1="40" y1="1.5" x2="90" y2="1.5" stroke={C.green} strokeWidth="2.5"/>
-                  <line x1="410" y1="1.5" x2="460" y2="1.5" stroke={C.gold} strokeWidth="2.5"/>
-                  <line x1="40" y1="352.5" x2="90" y2="352.5" stroke={C.gold} strokeWidth="2.5"/>
-                  <line x1="410" y1="352.5" x2="460" y2="352.5" stroke={C.green} strokeWidth="2.5"/>
+                  <rect x="0" y="0" width="500" height="354" rx="0" fill={certBg} fillOpacity="1" style={{ filter: 'drop-shadow(0 30px 60px rgba(0,0,0,0.06))' }} />
+                  <rect x="2" y="2" width="496" height="350" rx="0" fill="none" stroke="url(#cBorder3)" strokeWidth="1.2" filter="url(#cGlow3)"/>
+                  
+                  {[[22,22],[478,22],[22,332],[478,332]].map(function(arr,i){ var cx=arr[0],cy=arr[1]; return (<g key={i}><circle cx={cx} cy={cy} r="4" fill="none" stroke={C.green} strokeWidth="1"/><circle cx={cx} cy={cy} r="8" fill="none" stroke={C.green} strokeOpacity="0.2" strokeWidth="0.6"/><line x1={cx-10} y1={cy} x2={cx+10} y2={cy} stroke={C.green} strokeOpacity="0.3" strokeWidth="0.6"/><line x1={cx} y1={cy-10} x2={cx} y2={cy+10} stroke={C.green} strokeOpacity="0.3" strokeWidth="0.6"/></g>) })}
+                  
+                  {/* Subtle decorative rules inside the cert */}
+                  <line x1="40" y1="2" x2="90" y2="2" stroke={C.green} strokeWidth="2.5"/>
+                  <line x1="410" y1="2" x2="460" y2="2" stroke={C.gold} strokeWidth="2.5"/>
+                  <line x1="40" y1="352" x2="90" y2="352" stroke={C.gold} strokeWidth="2.5"/>
+                  <line x1="410" y1="352" x2="460" y2="352" stroke={C.green} strokeWidth="2.5"/>
                 </svg>
               </div>
               <div style={{ position:'absolute', inset:0, transform:l2, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'clamp(16px,4vw,40px)' }}>
                 <div style={{ fontFamily:F_MONO, fontSize:'9px', color:C.green, letterSpacing:'0.26em', marginBottom:'11px', textTransform:'uppercase' }}>CERTIFYROI · INDIA 2026</div>
-                <div style={{ fontFamily:F_SERIF, fontWeight:'600', fontSize:'clamp(1rem,3.2vw,1.9rem)', letterSpacing:'-0.02em', color:certText1, marginBottom:'6px', textAlign:'center', lineHeight:1.1 }}>Route Briefing</div>
-                <div style={{ fontFamily:F_SANS, fontSize:'clamp(10px,1.5vw,12px)', color:certText2, marginBottom:'22px', textAlign:'center' }}>Personalised ROI Analysis · Your City</div>
-                <div style={{ display:'flex', gap:'clamp(10px,4vw,40px)', marginBottom:'18px' }}>
-                  {[{label:'SUMMIT TIME',value:'9 mo',color:C.green},{label:'5-YR GAIN',value:'₹14.2L',color:C.gold},{label:'ELEVATION',value:'+35%',color:C.greenL}].map(function(s,i){return(<div key={i} style={{textAlign:'center'}}><div style={{fontFamily:F_MONO,fontSize:'7px',color:certMuted,letterSpacing:'0.12em',marginBottom:'5px'}}>{s.label}</div><div style={{fontFamily:F_MONO,fontSize:'clamp(0.8rem,2.5vw,1.5rem)',color:s.color,fontWeight:'500',letterSpacing:'-0.03em'}}>{s.value}</div></div>)})}
+                <div style={{ fontFamily:F_SERIF, fontWeight:'400', fontSize:'clamp(1.2rem,3.2vw,2rem)', letterSpacing:'-0.01em', color:certText1, marginBottom:'6px', textAlign:'center', lineHeight:1.1 }}>Route Briefing</div>
+                <div style={{ fontFamily:F_SANS, fontSize:'clamp(10px,1.5vw,12px)', color:certText2, marginBottom:'32px', textAlign:'center', fontWeight:'400' }}>Personalised ROI Analysis · Your City</div>
+                <div style={{ display:'flex', gap:'clamp(12px,5vw,50px)', marginBottom:'24px' }}>
+                  {[{label:'SUMMIT TIME',value:'9 mo',color:C.text},{label:'5-YR GAIN',value:'₹14.2L',color:C.gold},{label:'ELEVATION',value:'+35%',color:C.text}].map(function(s,i){return(<div key={i} style={{textAlign:'center'}}><div style={{fontFamily:F_MONO,fontSize:'7.5px',color:certMuted,letterSpacing:'0.14em',marginBottom:'8px'}}>{s.label}</div><div style={{fontFamily:F_MONO,fontSize:'clamp(1rem,2.8vw,1.6rem)',color:s.color,fontWeight:'400',letterSpacing:'-0.03em'}}>{s.value}</div></div>)})}
                 </div>
-                <div style={{ width:'74%', height:'1px', background:'linear-gradient(90deg,transparent,'+C.green+',transparent)', opacity:0.3, marginBottom:'12px' }} />
-                <div style={{ fontFamily:F_MONO, fontSize:'7px', color:certMuted, letterSpacing:'0.14em', textAlign:'center' }}>VERIFIED · DATA: NAUKRI MARCH 2026</div>
+                <div style={{ width:'70%', height:'1px', background:C.border, marginBottom:'16px' }} />
+                <div style={{ fontFamily:F_MONO, fontSize:'7.5px', color:certMuted, letterSpacing:'0.16em', textAlign:'center' }}>VERIFIED · NAUKRI MARCH 2026</div>
               </div>
               <div style={{ position:'absolute', right:'6%', bottom:'8%', transform:l3 }}>
                 <SummitFlag color={C.gold} />
@@ -201,12 +188,12 @@ function CertAssembly({ C }) {
           </div>
           <div style={{ opacity:hintOp, marginTop:'44px', textAlign:'center', pointerEvents:'none', transition:'opacity 0.3s' }}>
             <motion.div animate={{ y:[0,8,0] }} transition={{ duration:1.7, repeat:Infinity, ease:'easeInOut' }}>
-              <div style={{ fontFamily:F_MONO, fontSize:'11px', color:C.text3, letterSpacing:'0.22em', textTransform:'uppercase' }}>↓  scroll to assemble  ↓</div>
+              <div style={{ fontFamily:F_MONO, fontSize:'10px', color:C.text3, letterSpacing:'0.24em', textTransform:'uppercase' }}>↓  SCROLL COMPOSITION  ↓</div>
             </motion.div>
           </div>
         </div>
         <div style={{ opacity:assembledOp, position:'absolute', bottom:'8%', left:0, right:0, textAlign:'center', pointerEvents:'none', zIndex:5, transition:'opacity 0.3s' }}>
-          <div style={{ fontFamily:F_MONO, fontSize:'12px', color:C.green, letterSpacing:'0.22em', textTransform:'uppercase' }}>↑  ROUTE BRIEFING · ASSEMBLED</div>
+          <div style={{ fontFamily:F_MONO, fontSize:'10px', color:C.text, letterSpacing:'0.24em', textTransform:'uppercase' }}>↑  ROUTE BRIEFING // ASSEMBLED</div>
         </div>
       </div>
     </div>
@@ -229,10 +216,24 @@ function CountUp({ end, prefix, suffix, duration }) {
 function TrustStrip({ C }) {
   var items=['AWS cert holders earn ₹2.4L more/yr in Bangalore','2,400+ cloud roles open on Naukri right now','Average PMP summit: 7 months','Google Analytics: ₹18K invested → ₹3.2L annual gain','CKA Kubernetes: steepest climb, highest gain — +40%','Hyderabad cloud demand up 38% in 2026']
   return (
-    <div style={{ overflow:'hidden', borderTop:'1px solid '+C.border, borderBottom:'1px solid '+C.border, padding:'11px 0', background:C.surface }}>
+    <div style={{ overflow:'hidden', borderBottom:'1px solid '+C.border, padding:'14px 0', background:C.surface }}>
       <motion.div animate={{ x:['0%','-50%'] }} transition={{ duration:44, repeat:Infinity, ease:'linear' }} style={{ display:'flex', gap:'80px', whiteSpace:'nowrap', width:'max-content' }}>
-        {[...items,...items].map(function(item,i) { return <span key={i} style={{ fontSize:'11px', color:C.text3, fontFamily:F_MONO, flexShrink:0, letterSpacing:'0.03em' }}><span style={{ color:C.green, marginRight:'14px', opacity:0.6 }}>■</span>{item}</span> })}
+        {[...items,...items].map(function(item,i) { return <span key={i} style={{ fontSize:'10.5px', color:C.text3, fontFamily:F_MONO, flexShrink:0, letterSpacing:'0.04em' }}><span style={{ color:C.border, marginRight:'16px' }}>—</span>{item}</span> })}
       </motion.div>
+    </div>
+  )
+}
+
+function RidgeSilhouette({ C, inverted }) {
+  var h = 72
+  return (
+    <div style={{ position:'relative', height:h+'px', overflow:'hidden', pointerEvents:'none' }}>
+      <svg viewBox={'0 0 1440 '+h} preserveAspectRatio="none" width="100%" height={h} style={{ position:'absolute', inset:0, display:'block' }}>
+        <path d="M 0 38 Q 160 24 320 36 Q 480 48 640 32 Q 800 18 960 30 Q 1120 42 1280 28 Q 1360 22 1440 34 L 1440 72 L 0 72 Z" fill={C.surfaceHigh} opacity="0.5" />
+        <path d="M 0 46 Q 240 32 420 44 Q 520 50 600 38 Q 680 26 720 20 Q 760 14 800 22 Q 860 34 960 50 Q 1080 62 1200 46 Q 1320 32 1440 44 L 1440 72 L 0 72 Z" fill={C.surface} opacity="0.8" />
+        <path d="M 0 54 Q 200 44 360 56 Q 480 64 600 54 Q 700 44 760 36 Q 820 28 880 34 Q 960 44 1080 58 Q 1200 70 1320 58 Q 1400 50 1440 56 L 1440 72 L 0 72 Z" fill={C.surface} />
+        <path d="M 0 54 Q 200 44 360 56 Q 480 64 600 54 Q 700 44 760 36 Q 820 28 880 34 Q 960 44 1080 58 Q 1200 70 1320 58 Q 1400 50 1440 56" fill="none" stroke={C.line} strokeWidth="0.9" strokeOpacity="0.5" />
+      </svg>
     </div>
   )
 }
@@ -297,21 +298,20 @@ function HowItWorks({ C, isMobile, onEnter }) {
 
 function PageFooter({ C, isMobile }) {
   return (
-    <div style={{ borderTop:'1px solid '+C.border, padding:isMobile?'24px':'28px 80px' }}>
-      <div style={{ maxWidth:'1180px', margin:'0 auto', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'16px' }}>
+    <div style={{ borderTop:'1px solid '+C.border, padding:isMobile?'32px 24px':'40px 80px', background:C.surface }}>
+      <div style={{ maxWidth:'1280px', margin:'0 auto', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'16px' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-          <ElevationMark size={18} color={C.green} />
-          <span style={{ fontFamily:F_SANS, fontWeight:'600', fontSize:'15px', letterSpacing:'-0.02em', color:C.text }}>Certify</span>
-          <span style={{ fontFamily:F_SERIF, fontStyle:'italic', fontSize:'16px', color:C.green, letterSpacing:'-0.01em', marginLeft:'-4px' }}>ROI</span>
+          <ElevationMark size={16} color={C.text} />
+          <span style={{ fontFamily:F_SANS, fontWeight:'500', fontSize:'14px', letterSpacing:'-0.01em', color:C.text }}>CertifyROI</span>
         </div>
-        <div style={{ fontFamily:F_MONO, fontSize:'10px', color:C.text3, letterSpacing:'0.06em', opacity:0.6 }}>LINKEDIN · NASSCOM · AMBITIONBOX · NAUKRI · 2026</div>
+        <div style={{ fontFamily:F_MONO, fontSize:'10px', color:C.text3, letterSpacing:'0.1em', opacity:0.8 }}>LINKEDIN // NASSCOM // AMBITIONBOX // NAUKRI // 2026</div>
       </div>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────
-// MAIN LANDING PAGE
+// MAIN LANDING PAGE : HYPER-CLEAN ARCHITECTURAL POSTER
 // ─────────────────────────────────────────────────────────
 function LandingPage({ onEnter }) {
   var isDark   = useIsDark()
@@ -320,113 +320,119 @@ function LandingPage({ onEnter }) {
 
   var heroRef = useRef(null)
   var { scrollYProgress: heroSP } = useScroll({ target: heroRef, offset: ['start start','end start'] })
-  var heroY  = useTransform(heroSP, [0,1], [0, isMobile?10:20])
-  var heroOp = useTransform(heroSP, [0,0.6], [1,0])
+  var mY  = useTransform(heroSP, [0,1], [0, isMobile?20:60])
+  var tY  = useTransform(heroSP, [0,1], [0, isMobile?-10:-40])
+  
+  // Background typography scaling
+  var bScale = useTransform(heroSP, [0,1], [1, 1.05])
+  var bOp    = useTransform(heroSP, [0,1], [1, 0])
 
   return (
-    <div style={{ minHeight:'100vh', background:C.bg, position:'relative' }}>
+    <div style={{ minHeight:'100vh', background:C.bg, position:'relative', overflow: 'hidden' }}>
 
-      {/* ── HERO ── */}
-      <div ref={heroRef} style={{ position:'relative', overflow:'hidden', minHeight:isMobile?'auto':'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>
+      {/* ── HERO ARCHITECTURAL LAYER ── */}
+      <div ref={heroRef} style={{ position:'relative', minHeight:isMobile?'90vh':'100vh', display:'flex', alignItems:'center', justifyContent:'center', borderBottom: '1px solid '+C.border }}>
         
-        {/* Abstract Contour Layer floating in background */}
-        <div style={{ position:'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents:'none', zIndex:0, opacity:0.4 }}>
-           <svg width="100%" height="100%" viewBox="0 0 1440 800" preserveAspectRatio="none">
-             <ContourCluster rings={6} cx={1400} cy={50} rx={220} ry={140} color={C.line} opacity={0.6} rotate={-10} />
-           </svg>
-        </div>
-
-        <motion.div style={{ y:heroY, opacity:heroOp, width:'100%', position:'relative', zIndex:1, marginTop: isMobile ? '20px' : '-20px' }}>
-          {/* Tighter Grid to pull everything up into one viewport plane */}
-          <div style={{ maxWidth:'1180px', margin:'0 auto', padding:isMobile?'24px':'32px 80px', display:'grid', gridTemplateColumns:isMobile?'1fr':'1.2fr 0.8fr', gap:isMobile?'32px':'48px', alignItems:'center' }}>
-
-            {/* LEFT: Text & CTA */}
-            <div style={{ position: 'relative', zIndex: 3, paddingTop: isMobile ? '16px' : '0' }}>
-              <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1, duration:0.6, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_MONO, fontSize:'11px', color:C.text3, letterSpacing:'0.14em', textTransform:'uppercase', marginBottom:'24px', display:'flex', alignItems:'center', gap:'10px' }}>
-                <ElevationMark size={14} color={C.green} />
-                Career Route Analysis · India 2026
-              </motion.div>
-              
-              {/* Single Font Style (Serif) Headline */}
-              <motion.h1 initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.18, duration:0.75, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_SERIF, fontWeight:'500', fontSize:'clamp(3rem,5.5vw,5rem)', lineHeight:0.95, letterSpacing:'-0.02em', color:C.text, marginBottom:'24px', marginTop:0, wordBreak:'break-word' }}>
-                Your next cert<br />is either a <span style={{ color:C.gold }}>goldmine</span><br />or a <span style={{ color:C.err }}>mistake.</span>
-              </motion.h1>
-              
-              <motion.p initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3, duration:0.65, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_SANS, fontSize:'clamp(15px,2vw,16px)', color:C.text2, maxWidth:'420px', lineHeight:'1.75', margin:'0 0 32px' }}>
-                Know the payback period before you pay the fee. We calculate the exact month your investment turns profitable — before you spend ₹50K and 6 months on the wrong route.
-              </motion.p>
-              
-              <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.44, duration:0.6, ease:[0.16,1,0.3,1] }} style={{ display:'flex', flexDirection:'column', gap:'14px', alignItems:'flex-start' }}>
-                <button onClick={onEnter} style={{ padding:'0 36px', height:'52px', borderRadius:'0px', border:'none', background:C.btnFill, color:C.btnText, fontSize:'15px', fontFamily:F_SANS, fontWeight:'500', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'10px', transition:'all 0.2s', whiteSpace:'nowrap', letterSpacing:'0.02em', boxShadow:'0 1px 2px rgba(0,0,0,0.1)' }} onMouseEnter={function(e){e.currentTarget.style.background=C.green}} onMouseLeave={function(e){e.currentTarget.style.background=C.btnFill}}>Calculate ROI <ArrowRight size={15} /></button>
-              </motion.div>
-            </div>
-
-            {/* RIGHT: Mountain Image + Orbit Wrapping Ribbon */}
-            <motion.div 
-               initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.2, ease: [0.16,1,0.3,1] }}
-               style={{ position: 'relative', width: '100%', height: isMobile?'280px':'460px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-            >
-              {/* Back Loop tracing behind the mountain */}
-              <motion.svg 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-                style={{ position: 'absolute', top: '-15%', left: '-25%', width: '150%', height: '130%', zIndex: 0, pointerEvents: 'none' }} viewBox="0 0 100 100" preserveAspectRatio="none"
-              >
-                <path d="M10,80 C50,95 85,75 80,45 C75,15 45,10 25,30" fill="none" stroke="url(#ribbonBackCore)" strokeWidth="1" style={{ filter: 'blur(0.5px)' }} />
-                <path d="M10,80 C50,95 85,75 80,45 C75,15 45,10 25,30" fill="none" stroke="rgba(13,107,111,0.12)" strokeWidth="5" style={{ filter: 'blur(3px)' }} />
-                
-                <defs>
-                  <linearGradient id="ribbonBackCore" x1="0" y1="1" x2="1" y2="0">
-                    <stop offset="0%" stopColor="rgba(13,107,111,0)" />
-                    <stop offset="50%" stopColor="rgba(13,107,111,0.3)" />
-                    <stop offset="100%" stopColor="rgba(154,114,53,0.3)" />
-                  </linearGradient>
-                </defs>
-              </motion.svg>
-
-              {/* MOUNTAIN. Uses typical pathing, handles cache breaking via timestamp or fallback */}
-              <motion.img 
-                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, ease: [0.16,1,0.3,1] }}
-                src="/mountain.png" alt="" 
-                style={{ position: 'relative', zIndex: 1, height: '100%', objectFit: 'contain', maxWidth: '100%',
-                         filter: isDark ? 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))' : 'drop-shadow(0 15px 30px rgba(26,25,22,0.06))', mixBlendMode: isDark?'normal':'darken' }}
-                onError={(e) => { 
-                  if (!e.currentTarget.src.includes('?')) {
-                     e.currentTarget.src = '/mountain.png?' + new Date().getTime(); // Break cache if stuck
-                  } else {
-                     e.currentTarget.style.display = 'none'; 
-                  }
-                }}
-              />
-
-              {/* Front Loop tracing in front, intersecting back path to complete an aesthetic 3D wrap */}
-              <motion.svg 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35, duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-                style={{ position: 'absolute', top: '-15%', left: '-25%', width: '150%', height: '130%', zIndex: 2, pointerEvents: 'none' }} viewBox="0 0 100 100" preserveAspectRatio="none"
-              >
-                <path d="M25,30 C5,50 15,90 100,75" fill="none" stroke="rgba(13,107,111,0.15)" strokeWidth="6" style={{ filter: 'blur(2.5px)' }} />
-                <path d="M25,30 C5,50 15,90 100,75" fill="none" stroke="url(#ribbonFront)" strokeWidth="1.5" />
-                
-                <defs>
-                  <linearGradient id="ribbonFront" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgba(154,114,53,0.5)" />
-                    <stop offset="30%" stopColor="rgba(13,107,111,0.7)" />
-                    <stop offset="100%" stopColor="rgba(13,107,111,0)" />
-                  </linearGradient>
-                </defs>
-              </motion.svg>
-            </motion.div>
-
+        {/* GIANT EDITORIAL GHOST TEXT */}
+        <motion.div 
+          style={{ scale: bScale, opacity: bOp, position: 'absolute', top: '50%', left: '50%', x: '-50%', y: '-50%', zIndex: 0, pointerEvents: 'none', width: '100%', textAlign: 'center' }}
+        >
+          <div style={{ 
+            fontFamily: F_SANS, fontWeight: 900, fontSize: isMobile?'28vw':'24vw', lineHeight: 0.8, letterSpacing: '-0.03em', 
+            // "TAYCAN" / Nike poster style: transparent internally, incredibly fine sharp stroke.
+            WebkitTextStroke: '1px ' + (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(28,27,26,0.05)'),
+            color: 'transparent',
+            userSelect: 'none'
+          }}>
+            CERTIFY
           </div>
         </motion.div>
+
+        {/* ── ARCHITECTURAL FRAMEWORK (Outer Border Marks) ── */}
+        {!isMobile && (
+          <div style={{ position: 'absolute', inset: '40px', pointerEvents: 'none', zIndex: 1 }}>
+             {/* 4 Corners */}
+             <div style={{ position:'absolute', top:0, left:0 }}><Crosshair color={C.text3} /></div>
+             <div style={{ position:'absolute', top:0, right:0 }}><Crosshair color={C.text3} /></div>
+             <div style={{ position:'absolute', bottom:0, left:0 }}><Crosshair color={C.text3} /></div>
+             <div style={{ position:'absolute', bottom:0, right:0 }}><Crosshair color={C.text3} /></div>
+             
+             {/* Vertical Axis Labels */}
+             <div style={{ position:'absolute', top:'10%', left:'-14px', writingMode:'vertical-rl', transform:'rotate(180deg)', fontFamily:F_MONO, fontSize:'9px', color:C.text3, letterSpacing:'0.2em' }}>
+               01 // ELEVATION BASE
+             </div>
+             <div style={{ position:'absolute', bottom:'10%', right:'-14px', writingMode:'vertical-rl', fontFamily:F_MONO, fontSize:'9px', color:C.text3, letterSpacing:'0.2em' }}>
+               INDIA MARKET DATA 2026
+             </div>
+          </div>
+        )}
+
+        {/* ── COMPOSITION GRID ── */}
+        <div style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: '1440px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column-reverse' : 'row', alignItems: 'center' }}>
+          
+          {/* LEFT: POSTER TYPOGRAPHY (OVERLAPPING) */}
+          <motion.div 
+            style={{ y: tY, flex: isMobile ? 'none' : '0 0 55%', padding: isMobile ? '0 32px 40px' : '0 0 0 120px', zIndex: 4, transform: 'translateY(-20px)' }}
+          >
+            <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2, duration:0.8, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_MONO, fontSize:'10px', color:C.text3, letterSpacing:'0.18em', textTransform:'uppercase', marginBottom:'32px', display:'flex', alignItems:'center', gap:'12px' }}>
+              <div style={{ width: '24px', height: '1px', background: C.border }} />
+              ROI ANALYSIS PLATFORM
+            </motion.div>
+            
+            <motion.h1 initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3, duration:0.9, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_SERIF, fontWeight:'400', fontSize:'clamp(3.5vw, 6vw, 6vw)', lineHeight: 0.92, letterSpacing:'-0.03em', color:C.text, marginBottom:'36px', marginTop:0, textShadow: isDark ? 'none' : '0 4px 24px rgba(250,250,248,0.8)' }}>
+              Your next cert<br />
+              is either a <span style={{ color:C.gold }}>goldmine</span><br />
+              or a <span style={{ color:C.text4, fontStyle:'italic' }}>mistake.</span>
+            </motion.h1>
+            
+            <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.45, duration:1, ease:[0.16,1,0.3,1] }} style={{ fontFamily:F_SANS, fontSize:'clamp(15px,1.5vw,16px)', color:C.text2, maxWidth:'400px', lineHeight:'1.75', margin:'0 0 44px', fontWeight:'400' }}>
+              Know the exact playback period before you transfer the exam fee. Calculated for your specific city and current salary elevation.
+            </motion.p>
+            
+            <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.6, duration:0.8 }}>
+              {/* Automotive/Luxury Solid Sharp Button */}
+              <button onClick={onEnter} style={{ padding:'0 44px', height:'56px', borderRadius:'0px', border:'none', background:C.btnFill, color:C.btnText, fontSize:'14px', fontFamily:F_SANS, fontWeight:'500', letterSpacing:'0.04em', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'12px', transition:'all 0.3s' }} onMouseEnter={function(e){e.currentTarget.style.background=C.text2; e.currentTarget.style.paddingLeft='50px'; e.currentTarget.style.paddingRight='38px';}} onMouseLeave={function(e){e.currentTarget.style.background=C.btnFill; e.currentTarget.style.paddingLeft='44px'; e.currentTarget.style.paddingRight='44px';}}>
+                CALCULATE ROI <ArrowRight size={15} strokeWidth={1.5} />
+              </button>
+              <div style={{ marginTop:'18px', fontFamily:F_MONO, fontSize:'9px', color:C.text3, letterSpacing:'0.14em' }}>[ NO ACCOUNT REQUIRED ]</div>
+            </motion.div>
+          </motion.div>
+
+          {/* RIGHT: MASSIVE PHYSICAL OBJECT (Mountain) */}
+          {/* Removing all ribbons. Scaling the mountain up enormously. Positioning it physically. */}
+          <motion.div 
+            style={{ y: mY, flex: isMobile ? 'none' : '0 0 55%', height: isMobile ? '50vh' : '85vh', position: 'relative', zIndex: 3, marginLeft: isMobile ? '0' : '-10%' }}
+          >
+             <motion.img 
+                initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.5, ease: [0.16,1,0.3,1] }}
+                src="/mountain.png" alt="Mountain Certification Terrain" 
+                style={{ 
+                  position: 'absolute', top: isMobile ? '0' : '10%', right: isMobile ? 'auto' : '5%', left: isMobile ? '5%' : 'auto', 
+                  height: isMobile ? '100%' : '110%', width: isMobile ? '90%' : '115%', objectFit: 'contain', objectPosition: 'center bottom',
+                  // Extreme architectural contrast + darken to perfectly remove white edges and make it punchy
+                  filter: isDark ? 'drop-shadow(0 40px 80px rgba(0,0,0,0.8)) contrast(1.1) grayscale(0.2)' : 'drop-shadow(0 30px 60px rgba(28,27,26,0.08)) contrast(1.15) grayscale(0.1)', 
+                  mixBlendMode: isDark ? 'normal' : 'darken',
+                  pointerEvents: 'none'
+                }}
+                onError={(e) => { 
+                  if (!e.currentTarget.src.includes('?')) e.currentTarget.src = '/mountain.png?' + new Date().getTime();
+                  else e.currentTarget.style.display = 'none'; 
+                }}
+              />
+          </motion.div>
+
+        </div>
       </div>
 
       <TrustStrip C={C} />
       <CertAssembly C={C} />
+      {/* Restored sections */}
       <RidgeSilhouette C={C} />
       <DataComposition C={C} isMobile={isMobile} />
       <RidgeSilhouette C={C} />
       <HowItWorks C={C} isMobile={isMobile} onEnter={onEnter} />
       <PageFooter C={C} isMobile={isMobile} />
+      
     </div>
   )
 }
