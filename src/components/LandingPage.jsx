@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import React, { useRef, useState, useEffect, createContext, useContext } from 'react'
-import { ArrowRight, ChevronDown, Sun, Moon, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, ChevronDown, Sun, Moon, CheckCircle2, BarChart2 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────
 // THEME SYSTEM
@@ -55,7 +55,7 @@ function useTheme() { return useContext(ThemeContext) }
 // HOOKS
 // ─────────────────────────────────────────────────────────
 function useIsMobile() {
-  const [mobile, setMobile] = useState(false)
+  const[mobile, setMobile] = useState(false)
   useEffect(() => {
     setMobile(window.innerWidth < 768)
     const check = () => setMobile(window.innerWidth < 768)
@@ -88,11 +88,11 @@ const F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
 const RISE = {
   hidden: { y: 40, opacity: 0 },
-  show:   { y: 0, opacity: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+  show:   { y: 0, opacity: 1, transition: { duration: 0.8, ease:[0.16, 1, 0.3, 1] } }
 }
 const SLIDE_L = {
   hidden: { x: -40, opacity: 0 },
-  show:   { x: 0, opacity: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+  show:   { x: 0, opacity: 1, transition: { duration: 0.8, ease:[0.16, 1, 0.3, 1] } }
 }
 
 // ─────────────────────────────────────────────────────────
@@ -266,7 +266,7 @@ function CertAssembly() {
     const unsub = scrollY.on('change', update)
     update()
     return unsub
-  }, [scrollY])
+  },[scrollY])
 
   const remap = (p, a, b, c, d) => c + (d - c) * Math.max(0, Math.min(1, (p - a) / (b - a)))
 
@@ -710,23 +710,29 @@ export default function LandingPage({ onEnter }) {
     <ThemeContext.Provider value={C}>
       <div style={{ minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'clip', transition: 'background 0.3s ease, color 0.3s ease' }}>
         
-        {/* Subtle, floating theme toggle in bottom right to avoid top-nav overlap */}
-        <button onClick={toggleTheme} style={{
-          position: 'fixed', bottom: '24px', right: '24px', zIndex: 999,
-          background: C.surface, border: `1px solid ${C.border}`, borderRadius: '50%',
-          width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', color: C.text, boxShadow: `0 4px 12px ${C.name === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.1)'}`
+        {/* Floating Controls instead of standard Navbar */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, 
+          padding: isMobile ? '24px' : '40px 8vw', 
+          display: 'flex', alignItems: 'center', justifyContent: 'flex-end', 
+          zIndex: 100, pointerEvents: 'none'
         }}>
-          {isDark ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
+          <button onClick={toggleTheme} style={{ 
+            background: C.bg, border: `1px solid ${C.border}`, borderRadius: '50%', 
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            color: C.text, padding: '12px', transition: 'all 0.2s', pointerEvents: 'auto' 
+          }}>
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        </div>
 
         {/* ── HERO ── */}
         <div style={{ position: 'relative', height: '100vh', minHeight: '700px', display: 'flex', alignItems: 'center', borderBottom: `1px solid ${C.border}` }}>
           
           {/* Subtle Watermark Text */}
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }}>
             <div style={{ 
-              fontFamily: F_SANS, fontWeight: 900, fontSize: '28vw', lineHeight: 0.8, letterSpacing: '-0.04em', 
+              fontFamily: F_SANS, fontWeight: 900, fontSize: '32vw', lineHeight: 0.8, letterSpacing: '-0.04em', 
               color: C.name === 'dark' ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.02)',
               userSelect: 'none', whiteSpace: 'nowrap'
             }}>
