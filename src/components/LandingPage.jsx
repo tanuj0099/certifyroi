@@ -17,22 +17,22 @@ const THEMES = {
     text4: '#404040',
     green: '#2A5C42',
     greenVivid: '#4A9068',
-    gold: '#D4AF37',
+    gold: '#D4AF37', // Tech Gold
     goldL: '#F4CE56',
-    err: '#9A3B3B',
+    err: '#D94848',  // Sharp Red
     line: '#262626',
     lineHeavy: '#333333',
-    border: 'rgba(255,255,255,0.08)',
-    borderMid: 'rgba(255,255,255,0.15)',
-    btnFill: '#FFFFFF',
+    border: 'rgba(255,255,255,0.1)',
+    borderMid: 'rgba(255,255,255,0.18)',
+    btnFill: '#D4AF37',
     btnText: '#000000',
     certBg: '#050505',
-    glass: 'rgba(10, 10, 10, 0.75)',
+    glass: 'rgba(10, 10, 10, 0.6)',
   },
   light: {
     name: 'light',
-    bg: '#F7F5F2',
-    bgAlt: '#EFECE6',
+    bg: '#F4F2EE',
+    bgAlt: '#EBE8E3',
     surface: '#FFFFFF',
     text: '#121212',
     text2: '#525252',
@@ -42,15 +42,15 @@ const THEMES = {
     greenVivid: '#3D7A5A',
     gold: '#B3862A',
     goldL: '#D4AF37',
-    err: '#B23A3A',
+    err: '#C93636',
     line: '#E0DCD6',
     lineHeavy: '#C2BCB3',
-    border: 'rgba(0,0,0,0.08)',
-    borderMid: 'rgba(0,0,0,0.15)',
+    border: 'rgba(0,0,0,0.1)',
+    borderMid: 'rgba(0,0,0,0.2)',
     btnFill: '#121212',
     btnText: '#FFFFFF',
     certBg: '#FAFAFA',
-    glass: 'rgba(247, 245, 242, 0.75)',
+    glass: 'rgba(244, 242, 238, 0.6)',
   }
 }
 
@@ -73,7 +73,7 @@ function useIsMobile() {
 
 function useInView(threshold = 0.15) {
   const ref = useRef(null)
-  const[inView, setInView] = useState(false)
+  const [inView, setInView] = useState(false)
   useEffect(() => {
     const el = ref.current; if (!el) return
     const obs = new IntersectionObserver(([entry]) => {
@@ -93,35 +93,17 @@ const F_SANS  = "'Inter', 'DM Sans', sans-serif"
 const F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
 const RISE = {
-  hidden: { y: 30, opacity: 0 },
-  show:   { y: 0, opacity: 1, transition: { duration: 0.8, ease:[0.16, 1, 0.3, 1] } }
+  hidden: { y: 40, opacity: 0 },
+  show:   { y: 0, opacity: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
 }
 const SLIDE_L = {
   hidden: { x: -40, opacity: 0 },
-  show:   { x: 0, opacity: 1, transition: { duration: 0.8, ease:[0.16, 1, 0.3, 1] } }
+  show:   { x: 0, opacity: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
 }
 
 // ─────────────────────────────────────────────────────────
-// SVG PRIMITIVES
+// SVG PRIMITIVES & TECH UI
 // ─────────────────────────────────────────────────────────
-function SummitFlag({ color, size = 1 }) {
-  return (
-    <svg width={14 * size} height={18 * size} viewBox="0 0 14 18" fill="none" style={{ display: 'inline-block' }}>
-      <line x1="3" y1="1" x2="3" y2="17" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
-      <path d="M 3 1 L 13 5 L 3 9 Z" fill={color} fillOpacity="0.9" />
-    </svg>
-  )
-}
-
-function WaypointDot({ active, color, size = 10 }) {
-  return (
-    <svg width={size + 8} height={size + 8} viewBox={`0 0 ${size + 8} ${size + 8}`} fill="none">
-      <circle cx={(size + 8) / 2} cy={(size + 8) / 2} r={size / 2 + 3} stroke={color} strokeWidth="1" strokeOpacity={active ? 0.3 : 0.15} />
-      <circle cx={(size + 8) / 2} cy={(size + 8) / 2} r={size / 2 - 1} fill={active ? color : 'none'} stroke={color} strokeWidth="1.5" strokeOpacity={active ? 1 : 0.3} />
-    </svg>
-  )
-}
-
 function CrosshairIcon({ color }) {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -135,27 +117,31 @@ function TechAnnotation({ label, val, align = 'left', top, left, right, bottom }
   const C = useTheme()
   const isRight = align === 'right'
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.9 }} 
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }} 
       animate={{ opacity: 1, scale: 1 }} 
       transition={{ delay: 1, duration: 0.8 }}
-      style={{ position: 'absolute', top, left, right, bottom, display: 'flex', alignItems: 'center', gap: '12px', flexDirection: isRight ? 'row-reverse' : 'row', zIndex: 10 }}
+      style={{ 
+        position: 'absolute', top, left, right, bottom, 
+        display: 'flex', alignItems: 'center', 
+        flexDirection: isRight ? 'row-reverse' : 'row', 
+        zIndex: 10 
+      }}
     >
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        {isRight && <div style={{ width: '40px', height: '1px', background: C.gold, opacity: 0.4 }} />}
         <div style={{ width: '6px', height: '6px', border: `1.5px solid ${C.gold}`, borderRadius: '50%', background: C.bg }} />
-        {!isRight && <div style={{ width: '40px', height: '1px', background: C.gold, opacity: 0.4 }} />}
+        <div style={{ width: '48px', height: '1px', background: C.gold, opacity: 0.6 }} />
       </div>
-      <div style={{ textAlign: align, background: C.glass, backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '4px', border: `1px solid ${C.border}` }}>
-        <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text, fontWeight: '600', letterSpacing: '0.05em' }}>{val}</div>
-        <div style={{ fontFamily: F_MONO, fontSize: '8px', color: C.gold, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{label}</div>
+      <div style={{ background: C.bg, border: `1px solid ${C.border}`, padding: '8px 12px' }}>
+        <div style={{ fontFamily: F_MONO, fontSize: '13px', color: C.text, fontWeight: '700', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{val}</div>
+        <div style={{ fontFamily: F_MONO, fontSize: '9px', color: C.gold, letterSpacing: '0.15em', marginTop: '2px', textTransform: 'uppercase' }}>{label}</div>
       </div>
     </motion.div>
   )
 }
 
 // ─────────────────────────────────────────────────────────
-// ARCHITECTURAL LAYOUT WRAPPER (THE TIMELINE GRID)
+// ARCHITECTURAL LAYOUT WRAPPER
 // ─────────────────────────────────────────────────────────
 function StorySection({ id, title, children, bg, noBorderTop }) {
   const C = useTheme()
@@ -165,9 +151,9 @@ function StorySection({ id, title, children, bg, noBorderTop }) {
     <div style={{ background: bg || C.bg, borderTop: noBorderTop ? 'none' : `1px solid ${C.border}`, position: 'relative' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
         
-        {/* LEFT COLUMN: Architectural Timeline */}
+        {/* Architectural Timeline */}
         {!isMobile && (
-          <div style={{ width: '200px', flexShrink: 0, borderRight: `1px solid ${C.border}`, position: 'relative' }}>
+          <div style={{ width: '160px', flexShrink: 0, borderRight: `1px solid ${C.border}`, position: 'relative' }}>
             <div style={{ position: 'sticky', top: '160px', padding: '40px 0', display: 'flex', alignItems: 'center', flexDirection: 'column', height: '400px' }}>
               <CrosshairIcon color={C.text4} />
               <div style={{ width: '1px', flex: 1, background: C.border, margin: '20px 0' }} />
@@ -180,8 +166,8 @@ function StorySection({ id, title, children, bg, noBorderTop }) {
           </div>
         )}
 
-        {/* RIGHT COLUMN: Main Content */}
-        <div style={{ flex: 1, padding: isMobile ? '60px 24px' : '120px 80px', position: 'relative', overflow: 'hidden' }}>
+        {/* Main Content */}
+        <div style={{ flex: 1, padding: isMobile ? '60px 24px' : '120px 8vw', position: 'relative', overflow: 'hidden' }}>
           {isMobile && (
             <div style={{ marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.gold, fontWeight: '600', letterSpacing: '0.15em' }}>{id}</div>
@@ -218,18 +204,25 @@ function CountUp({ end, prefix = '', suffix = '', duration = 1.8 }) {
   return <motion.span onViewportEnter={() => setOn(true)}>{prefix}{count.toLocaleString('en-IN', { maximumFractionDigits: String(end).includes('.') ? 1 : 0 })}{suffix}</motion.span>
 }
 
-function PrimaryBtn({ onClick, children, large }) {
+// Tech-inspired brutalist button
+function TechBtn({ onClick, children, large }) {
   const C = useTheme()
   return (
     <motion.button
-      onClick={onClick} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      whileHover={{ x: 4 }}
+      whileTap={{ scale: 0.98 }}
       style={{
-        display: 'inline-flex', alignItems: 'center', gap: '10px', padding: large ? '0 36px' : '0 24px', height: large ? '56px' : '48px',
-        borderRadius: '2px', border: `1px solid ${C.btnFill}`, background: C.btnFill, color: C.btnText,
-        fontSize: large ? '14px' : '13px', fontFamily: F_SANS, fontWeight: '600', letterSpacing: '0.02em', cursor: 'pointer',
-        boxShadow: `0 4px 24px ${C.name === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, transition: 'box-shadow 0.2s',
+        display: 'inline-flex', alignItems: 'center', gap: '16px',
+        padding: large ? '0 40px' : '0 24px', height: large ? '64px' : '48px',
+        background: C.btnFill, color: C.btnText,
+        border: 'none', borderRadius: '0px', // Sharp corners
+        fontSize: large ? '14px' : '12px', fontFamily: F_SANS, fontWeight: '700', 
+        letterSpacing: '0.08em', textTransform: 'uppercase',
+        cursor: 'pointer', position: 'relative', overflow: 'hidden'
       }}
     >
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: C.bg, opacity: 0.2 }} />
       {children}
     </motion.button>
   )
@@ -241,11 +234,12 @@ function GhostBtn({ onClick, children }) {
     <button onClick={onClick}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '0 24px', height: '48px',
-        borderRadius: '2px', border: `1px solid ${C.borderMid}`, background: 'transparent', color: C.text2,
-        fontSize: '13px', fontFamily: F_SANS, fontWeight: '500', cursor: 'pointer', transition: 'all 0.16s',
+        borderRadius: '0px', border: `1px solid ${C.borderMid}`, background: 'transparent', color: C.text,
+        fontSize: '12px', fontFamily: F_MONO, fontWeight: '600', letterSpacing: '0.05em', textTransform: 'uppercase',
+        cursor: 'pointer', transition: 'all 0.16s',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.text3; e.currentTarget.style.color = C.text }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.borderMid; e.currentTarget.style.color = C.text2 }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = C.text; e.currentTarget.style.color = C.bg }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.text }}
     >
       {children}
     </button>
@@ -253,40 +247,34 @@ function GhostBtn({ onClick, children }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// NAVBAR
+// FLOATING TOP BAR (Minimalist replacement for Navbar)
 // ─────────────────────────────────────────────────────────
-function Navbar({ isDark, toggleTheme }) {
+function FloatingTopBar({ isDark, toggleTheme }) {
   const C = useTheme()
   const isMobile = useIsMobile()
 
   return (
-    <nav style={{
-      position: 'fixed', top: 0, left: 0, right: 0, height: '72px', background: C.glass, backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-      borderBottom: `1px solid ${C.border}`, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 24px' : '0 48px'
+    <div style={{
+      position: 'absolute', top: 0, left: 0, right: 0, 
+      padding: isMobile ? '24px' : '40px 5vw', 
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+      zIndex: 100, pointerEvents: 'none' // Allow clicking through empty space
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <BarChart2 size={20} color={C.greenVivid} strokeWidth={2.5} />
-        <span style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: '18px', letterSpacing: '-0.02em', color: C.text }}>
+      {/* Logo */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', pointerEvents: 'auto' }}>
+        <BarChart2 size={24} color={C.gold} strokeWidth={2.5} />
+        <span style={{ fontFamily: F_SANS, fontWeight: '800', fontSize: '20px', letterSpacing: '-0.02em', color: C.text }}>
           Certify<span style={{ color: C.gold }}>ROI</span>
         </span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-        {!isMobile && (
-          <div style={{ display: 'flex', gap: '24px', fontFamily: F_MONO, fontSize: '11px', color: C.text2, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            <span style={{ cursor: 'pointer', color: C.text }}>Platform</span>
-            <span style={{ cursor: 'pointer' }}>Data</span>
-            <span style={{ cursor: 'pointer' }}>About</span>
-          </div>
-        )}
-        <div style={{ width: '1px', height: '16px', background: C.border }} />
-        <button onClick={toggleTheme} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text, padding: '8px' }}>
+
+      {/* Controls */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', pointerEvents: 'auto' }}>
+        <button onClick={toggleTheme} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text, padding: '12px', transition: 'all 0.2s' }}>
           {isDark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
-        <button style={{ background: 'transparent', border: `1px solid ${C.border}`, borderRadius: '2px', padding: '8px 16px', color: C.text, fontFamily: F_MONO, fontSize: '11px', cursor: 'pointer' }}>
-          SIGN IN
-        </button>
       </div>
-    </nav>
+    </div>
   )
 }
 
@@ -311,8 +299,8 @@ function TrustStrip() {
         <motion.div animate={{ x: ['0%', '-50%'] }} transition={{ duration: 40, repeat: Infinity, ease: 'linear' }} style={{ display: 'flex', width: 'max-content' }}>
           {[...items, ...items, ...items].map((item, i) => (
             <div key={i} style={{ display: 'inline-flex', alignItems: 'center', height: '48px', borderRight: `1px solid ${C.border}`, padding: '0 40px' }}>
-              <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.greenVivid, marginRight: '16px', letterSpacing: '0.1em' }}>[{item.tag}]</span>
-              <span style={{ fontFamily: F_SANS, fontSize: '12px', color: C.text2, letterSpacing: '0.02em' }}>{item.text}</span>
+              <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, marginRight: '16px', letterSpacing: '0.1em' }}>[{item.tag}]</span>
+              <span style={{ fontFamily: F_SANS, fontSize: '12px', color: C.text2, letterSpacing: '0.02em', fontWeight: '500' }}>{item.text}</span>
             </div>
           ))}
         </motion.div>
@@ -322,7 +310,7 @@ function TrustStrip() {
 }
 
 // ─────────────────────────────────────────────────────────
-// CERT ASSEMBLY (Sticky Scroll)
+// CERT ASSEMBLY
 // ─────────────────────────────────────────────────────────
 function CertAssembly() {
   const C = useTheme()
@@ -365,11 +353,10 @@ function CertAssembly() {
 
   return (
     <div ref={trackRef} style={{ height: '300vh', position: 'relative', borderBottom: `1px solid ${C.border}`, background: C.bg }}>
-      {/* Background Story Line extending through Cert Assembly */}
       {!isMobile && (
         <div style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }}>
            <div style={{ maxWidth: '1400px', margin: '0 auto', position: 'relative', height: '100%' }}>
-              <div style={{ position: 'absolute', left: '200px', top: 0, bottom: 0, width: '1px', background: C.border, zIndex: 0 }} />
+              <div style={{ position: 'absolute', left: '160px', top: 0, bottom: 0, width: '1px', background: C.border, zIndex: 0 }} />
            </div>
         </div>
       )}
@@ -383,31 +370,31 @@ function CertAssembly() {
                 <svg viewBox="0 0 480 340" width="100%" height="100%" style={{ position: 'absolute', inset: 0, display: 'block' }}>
                   <defs>
                     <linearGradient id="certBordX" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor={C.greenVivid} />
+                      <stop offset="0%" stopColor={C.text4} />
                       <stop offset="50%" stopColor={C.gold} />
                       <stop offset="100%" stopColor={C.gold} />
                     </linearGradient>
                   </defs>
-                  <rect x="0" y="0" width="480" height="340" rx="4" fill={C.certBg} style={{ filter: 'drop-shadow(0 32px 64px rgba(0,0,0,0.5))' }} />
-                  <rect x="1.5" y="1.5" width="477" height="337" rx="3" fill="none" stroke="url(#certBordX)" strokeWidth="1.5" />
-                  <rect x="12" y="12" width="456" height="316" rx="2" fill="none" stroke={C.borderMid} strokeWidth="0.8" />
+                  <rect x="0" y="0" width="480" height="340" rx="0" fill={C.certBg} style={{ filter: 'drop-shadow(0 32px 64px rgba(0,0,0,0.5))' }} />
+                  <rect x="1.5" y="1.5" width="477" height="337" rx="0" fill="none" stroke="url(#certBordX)" strokeWidth="1.5" />
+                  <rect x="12" y="12" width="456" height="316" rx="0" fill="none" stroke={C.borderMid} strokeWidth="0.8" />
                 </svg>
               </div>
               <div style={{ position: 'absolute', inset: 0, transform: l2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '36px' }}>
-                <div style={{ fontFamily: F_MONO, fontSize: '9px', color: C.greenVivid, letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>CERTIFYROI · SYSTEM AUTH</div>
-                <div style={{ fontFamily: F_SERIF, fontWeight: '400', fontSize: 'clamp(1.2rem,3.5vw,2rem)', color: C.text, marginBottom: '6px', textAlign: 'center', lineHeight: 1.1 }}>Route Briefing</div>
+                <div style={{ fontFamily: F_MONO, fontSize: '9px', color: C.gold, letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>CERTIFYROI · SYSTEM AUTH</div>
+                <div style={{ fontFamily: F_SERIF, fontWeight: '400', fontSize: 'clamp(1.5rem,3.5vw,2.5rem)', color: C.text, marginBottom: '6px', textAlign: 'center', lineHeight: 1.1 }}>Route Briefing</div>
                 <div style={{ fontFamily: F_SANS, fontSize: '12px', color: C.text3, marginBottom: '32px', textAlign: 'center' }}>Personalised Analysis · India 2026</div>
                 <div style={{ display: 'flex', gap: '32px', marginBottom: '24px', width: '100%', justifyContent: 'center' }}>
-                  {[{ l: 'SUMMIT TIME', v: '9 mo', c: C.text }, { l: '5-YR GAIN', v: '₹14.2L', c: C.gold }, { l: 'ELEVATION', v: '+35%', c: C.greenVivid }].map((s, i) => (
+                  {[{ l: 'SUMMIT TIME', v: '9 mo', c: C.text }, { l: '5-YR GAIN', v: '₹14.2L', c: C.gold }, { l: 'ELEVATION', v: '+35%', c: C.text }].map((s, i) => (
                     <div key={i} style={{ textAlign: 'center' }}>
                       <div style={{ fontFamily: F_MONO, fontSize: '8px', color: C.text4, letterSpacing: '0.1em', marginBottom: '8px' }}>{s.l}</div>
-                      <div style={{ fontFamily: F_MONO, fontSize: 'clamp(1rem,2.8vw,1.6rem)', color: s.c, fontWeight: '500', letterSpacing: '-0.02em' }}>{s.v}</div>
+                      <div style={{ fontFamily: F_MONO, fontSize: 'clamp(1rem,2.8vw,1.6rem)', color: s.c, fontWeight: '600', letterSpacing: '-0.02em' }}>{s.v}</div>
                     </div>
                   ))}
                 </div>
                 <div style={{ width: '80%', height: '1px', background: C.borderMid, marginBottom: '16px' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <CheckCircle2 size={12} color={C.greenVivid} />
+                  <CheckCircle2 size={12} color={C.gold} />
                   <span style={{ fontFamily: F_MONO, fontSize: '8px', color: C.text3, letterSpacing: '0.1em' }}>VERIFIED · NAUKRI MARCH 2026</span>
                 </div>
               </div>
@@ -420,7 +407,7 @@ function CertAssembly() {
           </div>
         </div>
         <div style={{ opacity: assembledOp, position: 'absolute', bottom: '10%', left: 0, right: 0, textAlign: 'center', pointerEvents: 'none', zIndex: 5, transition: 'opacity 0.3s' }}>
-          <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.greenVivid, letterSpacing: '0.2em', background: C.surface, display: 'inline-block', padding: '8px 16px', border: `1px solid ${C.border}` }}>
+          <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.gold, letterSpacing: '0.2em', background: C.surface, display: 'inline-block', padding: '8px 16px', border: `1px solid ${C.border}` }}>
             ✓ BRIEFING COMPILED
           </div>
         </div>
@@ -508,10 +495,10 @@ function HowItWorks({ onEnter }) {
         {steps.map((step, i) => (
           <motion.div key={step.id} variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-              <div style={{ fontFamily: F_MONO, fontSize: '32px', color: C.borderMid, fontWeight: '300', lineHeight: 1 }}>{step.id}</div>
+              <div style={{ fontFamily: F_MONO, fontSize: '32px', color: C.gold, fontWeight: '700', lineHeight: 1 }}>{step.id}</div>
               <div style={{ width: '100%', height: '1px', background: C.border }} />
             </div>
-            <div style={{ fontFamily: F_SANS, fontWeight: '600', fontSize: '20px', color: C.greenVivid, marginBottom: '8px' }}>{step.label}</div>
+            <div style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: '20px', color: C.text, marginBottom: '8px' }}>{step.label}</div>
             <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px' }}>{step.subtitle}</div>
             <div style={{ fontFamily: F_SANS, fontSize: '15px', color: C.text2, lineHeight: '1.7' }}>{step.desc}</div>
           </motion.div>
@@ -519,7 +506,7 @@ function HowItWorks({ onEnter }) {
       </div>
 
       <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} style={{ marginTop: '64px' }}>
-        <PrimaryBtn onClick={onEnter}>Calculate ROI <ArrowRight size={16} /></PrimaryBtn>
+        <TechBtn onClick={onEnter}>Calculate ROI <ArrowRight size={16} /></TechBtn>
       </motion.div>
     </StorySection>
   )
@@ -541,21 +528,24 @@ function VsSection() {
       <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
         <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(2rem,5vw,3.5rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, marginTop: 0, marginBottom: '64px' }}>
           Every other guide<br />
-          <span style={{ color: C.err, position: 'relative' }}>
-            is pointing you wrong.
-            <div style={{ position: 'absolute', bottom: '8px', left: 0, width: '100%', height: '4px', background: C.err, opacity: 0.3 }} />
-          </span>
+          is pointing you wrong.
         </h2>
       </motion.div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         {pairs.map((pair, i) => (
           <motion.div key={i} variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-            <div style={{ fontFamily: F_SANS, fontWeight: '500', fontSize: '18px', color: C.text, opacity: 0.3, letterSpacing: '-0.01em', textDecoration: 'line-through', marginBottom: '12px' }}>
-              {pair.wrong}
+            
+            <div style={{ fontFamily: F_SANS, fontWeight: '500', fontSize: '18px', color: C.text3, letterSpacing: '-0.01em', marginBottom: '12px' }}>
+              <span style={{ position: 'relative', display: 'inline-block' }}>
+                {pair.wrong}
+                {/* Custom sharp strike-through line */}
+                <div style={{ position: 'absolute', left: '-2%', right: '-2%', top: '50%', height: '3px', background: C.err, transform: 'translateY(-50%)' }} />
+              </span>
             </div>
+
             <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-              <div style={{ width: '4px', height: '16px', background: C.greenVivid, marginTop: '4px', flexShrink: 0 }} />
+              <div style={{ width: '4px', height: '16px', background: C.gold, marginTop: '4px', flexShrink: 0 }} />
               <div style={{ fontFamily: F_SANS, fontSize: '16px', color: C.text, lineHeight: '1.6', fontWeight: '400' }}>{pair.right}</div>
             </div>
           </motion.div>
@@ -572,8 +562,8 @@ function ElevenPM({ onEnter }) {
   const C = useTheme()
   const isMobile = useIsMobile()
   const stories =[
-    { time: '11:47 PM', name: 'Rohan', loc: 'Pune', role: '2 yrs · Backend Engineer', thought: '"Should I do AWS? Or is it too late?"', context: 'Ex-classmate promoted to Cloud Architect. ₹28L CTC.', answer: 'AWS SAA at ₹9L: payback month 6. 5-year gain ₹14.2L.', color: C.greenVivid },
-    { time: '11:12 PM', name: 'Sneha', loc: 'Bangalore', role: '6 yrs · Ops Manager', thought: '"Is the switch possible without an MBA?"', context: 'Every data job requires 3 years experience. She has zero.', answer: 'Google Data Analytics + 2 GitHub projects. 5 months. ₹8L → ₹12L.', color: C.gold },
+    { time: '11:47 PM', name: 'Rohan', loc: 'Pune', role: '2 yrs · Backend Engineer', thought: '"Should I do AWS? Or is it too late?"', context: 'Ex-classmate promoted to Cloud Architect. ₹28L CTC.', answer: 'AWS SAA at ₹9L: payback month 6. 5-year gain ₹14.2L.', color: C.gold },
+    { time: '11:12 PM', name: 'Sneha', loc: 'Bangalore', role: '6 yrs · Ops Manager', thought: '"Is the switch possible without an MBA?"', context: 'Every data job requires 3 years experience. She has zero.', answer: 'Google Data Analytics + 2 GitHub projects. 5 months. ₹8L → ₹12L.', color: C.text },
     { time: '12:03 AM', name: 'Arjun', loc: 'Pune', role: 'CS · Fresh graduate', thought: '"Which cert gets me placed here in India?"', context: 'Three articles. All recommend AWS. All in USD.', answer: 'Student Mode. GCP placed 47 Pune freshers in Q1 2026.', color: C.text3 },
   ]
 
@@ -623,7 +613,7 @@ function ThreeModes({ onEnter }) {
     <StorySection id="06" title="SYS_MODES" bg={C.bg}>
       <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
         <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(2rem,5vw,3.5rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, marginTop: 0, marginBottom: '64px' }}>
-          Three modes.<br /><span style={{ color: C.greenVivid }}>One tool.</span>
+          Three modes.<br /><span style={{ color: C.gold }}>One tool.</span>
         </h2>
       </motion.div>
 
@@ -651,16 +641,16 @@ function SocialProof() {
   const C = useTheme()
   const isMobile = useIsMobile()
   const quotes =[
-    { quote: 'CertifyROI said payback was month 8. It was month 7. Switched companies immediately. ₹6L hike.', name: 'Priya S.', detail: 'Bangalore · Engineer → Cloud Architect', hike: '+₹6L/yr', color: C.greenVivid },
-    { quote: 'Was about to spend ₹12L on an MBA. The analysis showed a different path — 5 months, 1% of the cost.', name: 'Rahul M.', detail: 'Hyderabad · Ops Manager → Data Analyst', hike: 'Saved ₹12L', color: C.gold },
-    { quote: 'Student Mode. India-specific. GCP placed 47 Pune freshers in Q1 2026. My ₹5.2L offer was one of them.', name: 'Ananya K.', detail: 'Pune · Fresh Graduate', hike: '₹5.2L offer', color: C.text2 },
+    { quote: 'CertifyROI said payback was month 8. It was month 7. Switched companies immediately. ₹6L hike.', name: 'Priya S.', detail: 'Bangalore · Engineer → Cloud Architect', hike: '+₹6L/yr', color: C.gold },
+    { quote: 'Was about to spend ₹12L on an MBA. The analysis showed a different path — 5 months, 1% of the cost.', name: 'Rahul M.', detail: 'Hyderabad · Ops Manager → Data Analyst', hike: 'Saved ₹12L', color: C.text },
+    { quote: 'Student Mode. India-specific. GCP placed 47 Pune freshers in Q1 2026. My ₹5.2L offer was one of them.', name: 'Ananya K.', detail: 'Pune · Fresh Graduate', hike: '₹5.2L offer', color: C.text3 },
   ]
 
   return (
     <StorySection id="07" title="FIELD_REPORTS" bg={C.surface}>
       <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
         <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(2rem,5vw,3.5rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, marginTop: 0, marginBottom: '64px' }}>
-          They chose the right route.<br /><span style={{ color: C.greenVivid }}>It worked.</span>
+          They chose the right route.<br /><span style={{ color: C.gold }}>It worked.</span>
         </h2>
       </motion.div>
 
@@ -681,7 +671,7 @@ function SocialProof() {
                 </div>
               </div>
               <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
-                <div style={{ fontFamily: F_MONO, fontWeight: '600', fontSize: 'clamp(1.5rem,3vw,2rem)', color: C.gold, letterSpacing: '-0.04em', lineHeight: 1 }}>{q.hike}</div>
+                <div style={{ fontFamily: F_MONO, fontWeight: '600', fontSize: 'clamp(1.5rem,3vw,2rem)', color: C.text, letterSpacing: '-0.04em', lineHeight: 1 }}>{q.hike}</div>
               </div>
             </motion.div>
           )
@@ -692,7 +682,7 @@ function SocialProof() {
 }
 
 // ─────────────────────────────────────────────────────────
-// FAQ (LOGISTICS)
+// FAQ
 // ─────────────────────────────────────────────────────────
 const FAQ_ITEMS =[
   { q: 'How accurate are the ROI calculations?', a: 'Calculations are based on median salary data from Naukri, AmbitionBox, and LinkedIn India — updated quarterly. They are directional estimates, not guarantees.' },
@@ -777,13 +767,17 @@ function FinalCTA({ onEnter }) {
         
         <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: 0.2 }}
           style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'flex-start' }}>
-          <PrimaryBtn onClick={onEnter} large>Calculate ROI <ArrowRight size={16} /></PrimaryBtn>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: C.bg, padding: '8px 16px', border: `1px solid ${C.border}` }}>
-            <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.15em' }}>[ ACCESS: FREE ]</span>
-            <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: C.gold }} />
-            <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.15em' }}>[ REQ: NO ACCOUNT ]</span>
+          <TechBtn onClick={onEnter} large>Calculate ROI <ArrowRight size={16} /></TechBtn>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', border: `1px solid ${C.borderMid}`, padding: '8px 16px', background: C.bg }}>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <div style={{ width: '4px', height: '12px', background: C.gold }} />
+              <div style={{ width: '4px', height: '12px', background: C.gold, opacity: 0.4 }} />
+            </div>
+            <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text2, letterSpacing: '0.15em' }}>FREE_ACCESS // NO_ACCT_REQ</span>
           </div>
+
         </motion.div>
       </div>
     </StorySection>
@@ -803,51 +797,51 @@ export default function LandingPage({ onEnter }) {
     <ThemeContext.Provider value={C}>
       <div style={{ minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'clip', transition: 'background 0.3s ease, color 0.3s ease' }}>
         
-        <Navbar isDark={isDark} toggleTheme={toggleTheme} />
+        {/* Replace thick navbar with minimal floating controls */}
+        <FloatingTopBar isDark={isDark} toggleTheme={toggleTheme} />
 
         {/* ── HERO ── */}
         <div style={{ position: 'relative', height: '100vh', minHeight: '700px', display: 'flex', alignItems: 'center', borderBottom: `1px solid ${C.border}` }}>
           
-          {/* Background Text */}
+          {/* Background Grid Lines to make full use of the space */}
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', justifyContent: 'space-evenly', pointerEvents: 'none', zIndex: 0 }}>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} style={{ width: '1px', height: '100%', background: C.border }} />
+            ))}
+          </div>
+
+          {/* Bold Background Text */}
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '100%', textAlign: 'center', zIndex: 0, pointerEvents: 'none' }}>
             <div style={{ 
               fontFamily: F_SANS, fontWeight: 900, fontSize: 'clamp(10rem, 28vw, 30rem)', 
-              lineHeight: 0.8, letterSpacing: '-0.04em', color: 'transparent',
-              WebkitTextStroke: `1px ${C.name === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-              userSelect: 'none'
+              lineHeight: 0.8, letterSpacing: '-0.04em', 
+              color: C.name === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+              WebkitTextStroke: `2px ${C.name === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
+              userSelect: 'none', whiteSpace: 'nowrap'
             }}>
               CERTIFY
             </div>
           </div>
 
-          {/* Grid architecture lines in Hero */}
-          {!isMobile && (
-            <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '1400px', pointerEvents: 'none', zIndex: 1 }}>
-              <div style={{ position: 'absolute', left: '200px', top: 0, bottom: 0, width: '1px', background: C.border }} />
-            </div>
-          )}
-
-          {/* Mountain Image with Tech Annotations */}
-          <div style={{ position: 'absolute', right: 0, bottom: 0, width: isMobile ? '100%' : '55%', height: isMobile ? '60%' : '85%', zIndex: 2, pointerEvents: 'none' }}>
+          {/* Mountain Image with Tech Annotations (Fixed Positions tracing diagonal ridge) */}
+          <div style={{ position: 'absolute', right: 0, bottom: 0, width: isMobile ? '100%' : '65%', height: isMobile ? '60%' : '90%', zIndex: 2, pointerEvents: 'none' }}>
              <img src="/mountain.png" alt="Mountain" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom right' }} />
              
-             {/* Tech Annotations overlaying image */}
              {!isMobile && (
                <>
-                 <TechAnnotation top="20%" right="45%" align="left" val="CERTIFY ROI" label="PEAK EST. 2026" />
-                 <TechAnnotation bottom="35%" right="55%" align="left" val="6 MONTHS" label="ELEVATION MID" />
-                 <TechAnnotation bottom="20%" right="75%" align="left" val="3 MONTHS" label="ASCENT START" />
-                 <TechAnnotation bottom="5%" right="85%" align="left" val="BASECAMP" label="COORD: CURRENT" />
+                 <TechAnnotation bottom="15%" left="20%" align="right" val="BASECAMP" label="COORD: CURRENT" />
+                 <TechAnnotation bottom="35%" left="38%" align="right" val="3 MONTHS" label="ASCENT START" />
+                 <TechAnnotation bottom="55%" left="55%" align="right" val="6 MONTHS" label="ELEVATION MID" />
+                 <TechAnnotation top="20%" left="68%" align="left" val="CERTIFY ROI" label="PEAK EST. 2026" />
                </>
              )}
           </div>
 
-          {/* Hero Content */}
+          {/* Hero Content — Pushed completely left to fill empty space */}
           <div style={{ position: 'relative', zIndex: 3, width: '100%', maxWidth: '1400px', margin: '0 auto', display: 'flex' }}>
-            {/* Left Spacer matching Grid */}
-            {!isMobile && <div style={{ width: '200px', flexShrink: 0 }} />}
             
-            <div style={{ flex: 1, padding: isMobile ? '0 24px' : '0 80px', marginTop: isMobile ? '-20vh' : '0' }}>
+            <div style={{ flex: 1, paddingLeft: isMobile ? '24px' : '8vw', paddingRight: '24px', paddingTop: isMobile ? '100px' : '0' }}>
+              
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
                 style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ width: '32px', height: '1px', background: C.gold }} />
@@ -855,10 +849,14 @@ export default function LandingPage({ onEnter }) {
               </motion.div>
 
               <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
-                style={{ fontFamily: F_SERIF, fontWeight: '400', fontSize: 'clamp(3rem, 6vw, 6.5rem)', lineHeight: 0.95, letterSpacing: '-0.02em', color: C.text, marginBottom: '32px', maxWidth: '14ch' }}>
+                style={{ fontFamily: F_SERIF, fontWeight: '400', fontSize: 'clamp(4rem, 8vw, 8rem)', lineHeight: 0.95, letterSpacing: '-0.02em', color: C.text, marginBottom: '32px', maxWidth: '14ch' }}>
                 Your next cert<br />
                 is either a <span style={{ color: C.gold, fontStyle: 'italic', paddingRight: '8px' }}>goldmine</span><br />
-                or a <span style={{ color: C.text4, fontStyle: 'italic', textDecoration: 'line-through' }}>mistake.</span>
+                or a{' '}
+                <span style={{ color: C.text4, fontStyle: 'italic', position: 'relative', display: 'inline-block' }}>
+                  mistake.
+                  <div style={{ position: 'absolute', left: '-2%', right: '-2%', top: '50%', height: '4px', background: C.err, transform: 'translateY(-50%)' }} />
+                </span>
               </motion.h1>
 
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
@@ -867,13 +865,19 @@ export default function LandingPage({ onEnter }) {
               </motion.p>
 
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.3 }}
-                style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-start' }}>
-                <PrimaryBtn onClick={onEnter} large>Calculate ROI <ArrowRight size={16} /></PrimaryBtn>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '4px' }}>
-                  <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.15em' }}>[ ACCESS: FREE ]</span>
-                  <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: C.gold }} />
-                  <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.15em' }}>[ REQ: NO ACCOUNT ]</span>
+                style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'flex-start' }}>
+                
+                <TechBtn onClick={onEnter} large>Calculate ROI <ArrowRight size={16} /></TechBtn>
+                
+                {/* Tech Status Block */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', border: `1px solid ${C.borderMid}`, padding: '8px 16px', background: C.glass }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <div style={{ width: '4px', height: '12px', background: C.gold }} />
+                    <div style={{ width: '4px', height: '12px', background: C.gold, opacity: 0.4 }} />
+                  </div>
+                  <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text2, letterSpacing: '0.15em' }}>FREE_ACCESS // NO_ACCT_REQ</span>
                 </div>
+
               </motion.div>
             </div>
           </div>
@@ -894,10 +898,10 @@ export default function LandingPage({ onEnter }) {
         {/* ── FOOTER ── */}
         <div style={{ borderTop: `1px solid ${C.border}`, padding: '40px 0', background: C.bgAlt }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
-            {!isMobile && <div style={{ width: '200px', borderRight: `1px solid ${C.border}` }} />}
-            <div style={{ flex: 1, padding: isMobile ? '0 24px' : '0 80px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '24px' }}>
+            {!isMobile && <div style={{ width: '160px', borderRight: `1px solid ${C.border}` }} />}
+            <div style={{ flex: 1, padding: isMobile ? '0 24px' : '0 8vw', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <BarChart2 size={16} color={C.greenVivid} />
+                <BarChart2 size={16} color={C.gold} />
                 <span style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: '14px', color: C.text }}>Certify<span style={{ color: C.gold }}>ROI</span></span>
               </div>
               <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text4, letterSpacing: '0.1em' }}>
