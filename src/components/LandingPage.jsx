@@ -55,7 +55,11 @@ const THEMES = {
 }
 
 const ThemeContext = createContext(THEMES.dark)
-function useTheme() { return useContext(ThemeContext) }
+
+function useTheme() { 
+  const context = useContext(ThemeContext)
+  return context || THEMES.dark 
+}
 
 // ─────────────────────────────────────────────────────────
 // HOOKS
@@ -69,20 +73,6 @@ function useIsMobile() {
     return () => window.removeEventListener('resize', check)
   },[])
   return mobile
-}
-
-function useInView(threshold = 0.15) {
-  const ref = useRef(null)
-  const [inView, setInView] = useState(false)
-  useEffect(() => {
-    const el = ref.current; if (!el) return
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setInView(true); obs.disconnect() }
-    }, { threshold })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [threshold])
-  return[ref, inView]
 }
 
 // ─────────────────────────────────────────────────────────
@@ -156,22 +146,19 @@ function TechBtn({ onClick = () => {}, children = null, large = false }) {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// PREMIUM LIQUID GLASS EFFECT
-// ─────────────────────────────────────────────────────────
 function useGlassStyle() {
   const C = useTheme()
   return {
-    background: C.glass,
+    background: C.glass || 'rgba(0,0,0,0.5)',
     backdropFilter: 'blur(16px) saturate(180%)',
     WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-    border: `1px solid ${C.borderMid}`,
+    border: `1px solid ${C.borderMid || 'rgba(255,255,255,0.1)'}`,
     boxShadow: `0 8px 32px ${C.name === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.1)'}`
   }
 }
 
 // ─────────────────────────────────────────────────────────
-// FLOATING TOP BAR (Premium Glass)
+// COMPONENTS
 // ─────────────────────────────────────────────────────────
 function FloatingTopBar({ isDark, toggleTheme }) {
   const C = useTheme()
@@ -201,9 +188,6 @@ function FloatingTopBar({ isDark, toggleTheme }) {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// ARCHITECTURAL LAYOUT WRAPPER
-// ─────────────────────────────────────────────────────────
 function StorySection({ id = '', title = '', children = null, bg = '', noBorderTop = false }) {
   const C = useTheme()
   const isMobile = useIsMobile()
@@ -241,9 +225,6 @@ function StorySection({ id = '', title = '', children = null, bg = '', noBorderT
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// TRUST STRIP
-// ─────────────────────────────────────────────────────────
 function TrustStrip() {
   const C = useTheme()
   const items =[
@@ -272,9 +253,6 @@ function TrustStrip() {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// CERT ASSEMBLY
-// ─────────────────────────────────────────────────────────
 function CertAssembly() {
   const C = useTheme()
   const isMobile = useIsMobile()
@@ -379,9 +357,6 @@ function CertAssembly() {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// DATA COMPOSITION
-// ─────────────────────────────────────────────────────────
 function DataComposition() {
   const C = useTheme()
   const isMobile = useIsMobile()
@@ -434,9 +409,6 @@ function DataComposition() {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// HOW IT WORKS
-// ─────────────────────────────────────────────────────────
 function HowItWorks({ onEnter }) {
   const C = useTheme()
   const isMobile = useIsMobile()
@@ -475,9 +447,6 @@ function HowItWorks({ onEnter }) {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// HAZARDS (VS SECTION)
-// ─────────────────────────────────────────────────────────
 function VsSection() {
   const C = useTheme()
   const pairs =[
@@ -516,9 +485,6 @@ function VsSection() {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// ELEVEN PM (FELLOW CLIMBERS)
-// ─────────────────────────────────────────────────────────
 function ElevenPM({ onEnter }) {
   const C = useTheme()
   const isMobile = useIsMobile()
@@ -558,9 +524,6 @@ function ElevenPM({ onEnter }) {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// THREE MODES
-// ─────────────────────────────────────────────────────────
 function ThreeModes() {
   const C = useTheme()
   const isMobile = useIsMobile()
@@ -591,9 +554,6 @@ function ThreeModes() {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// SOCIAL PROOF (FIELD REPORTS)
-// ─────────────────────────────────────────────────────────
 function SocialProof() {
   const C = useTheme()
   const isMobile = useIsMobile()
@@ -638,9 +598,6 @@ function SocialProof() {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// FAQ
-// ─────────────────────────────────────────────────────────
 const FAQ_ITEMS =[
   { q: 'How accurate are the ROI calculations?', a: 'Calculations are based on median salary data from Naukri, AmbitionBox, and LinkedIn India — updated quarterly. They are directional estimates, not guarantees.' },
   { q: 'Do I need to create an account?', a: 'No. The ROI calculator, comparison tool, and city demand heatmap are all free with no signup. AI features use free credits.' },
@@ -649,7 +606,7 @@ const FAQ_ITEMS =[
   { q: 'How does the Resume AI work?', a: 'Upload a resume or paste your profile. The AI reads your domain, role, and experience, then recommends the highest-ROI certifications for your specific background.' },
 ]
 
-function FAQItem({ item }) {
+function FAQItem({ item }: any) {
   const C = useTheme()
   const [open, setOpen] = useState(false)
   return (
@@ -696,9 +653,6 @@ function FAQ() {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// FINAL CTA
-// ─────────────────────────────────────────────────────────
 function FinalCTA({ onEnter }) {
   const C = useTheme()
   const glassStyle = useGlassStyle()
@@ -752,18 +706,16 @@ export default function App() {
   const C = isDark ? THEMES.dark : THEMES.light
   const isMobile = useIsMobile()
   
-  // Calculate glassStyle manually here since we are outside the provider's consumer scope
   const glassStyle = {
-    background: C.glass,
+    background: C.glass || 'rgba(0,0,0,0.5)',
     backdropFilter: 'blur(16px) saturate(180%)',
     WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-    border: `1px solid ${C.borderMid}`,
+    border: `1px solid ${C.borderMid || 'rgba(255,255,255,0.1)'}`,
     boxShadow: `0 8px 32px ${C.name === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.1)'}`
   }
 
   const onEnter = () => {
     console.log('ROI Calculation triggered')
-    // Add logic here if needed
   }
 
   return (
