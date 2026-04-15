@@ -43,6 +43,10 @@ const SLIDE_L = {
 }
 
 // ── HOOKS ─────────────────────────────────────────────────
+function useTheme() {
+  return C
+}
+
 function useIsMobile() {
   const [m, setM] = useState(false)
   useEffect(() => {
