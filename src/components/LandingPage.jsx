@@ -1,16 +1,10 @@
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, AnimatePresence } from 'framer-motion'
 import React, { useRef, useState, useEffect, createContext, useContext } from 'react'
 import { ArrowRight, ChevronDown, Sun, Moon, BarChart2, CheckCircle2 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────
 // THEME SYSTEM
 // ─────────────────────────────────────────────────────────
-const ThemeContext = createContext()
-
-function useTheme() {
-  return useContext(ThemeContext)
-}
-
 const THEMES = {
   dark: {
     name: 'dark',
@@ -23,17 +17,17 @@ const THEMES = {
     text4: '#404040',
     green: '#2A5C42',
     greenVivid: '#4A9068',
-    gold: '#D4AF37', // Tech Gold
+    gold: '#D4AF37', 
     goldL: '#F4CE56',
-    err: '#D94848',  // Sharp Red
+    err: '#D94848',
     line: '#262626',
     lineHeavy: '#333333',
     border: 'rgba(255,255,255,0.08)',
-    borderMid: 'rgba(255,255,255,0.18)',
+    borderMid: 'rgba(255,255,255,0.15)',
     btnFill: '#D4AF37',
     btnText: '#000000',
     certBg: '#050505',
-    glass: 'rgba(20, 20, 20, 0.45)', // Premium liquid glass base
+    glass: 'rgba(10, 10, 10, 0.5)',
   },
   light: {
     name: 'light',
@@ -42,9 +36,9 @@ const THEMES = {
     surface: '#FFFFFF',
     text: '#121212',
     text2: '#525252',
-    text3: '#8A8A8A',
+    text3: '#858585',
     text4: '#A3A3A3',
-    green: '#2D6A4F',
+    green: '#2A5C42',
     greenVivid: '#3D7A5A',
     gold: '#B3862A',
     goldL: '#D4AF37',
@@ -52,14 +46,20 @@ const THEMES = {
     line: '#E0DCD6',
     lineHeavy: '#C2BCB3',
     border: 'rgba(0,0,0,0.08)',
-    borderMid: 'rgba(0,0,0,0.2)',
+    borderMid: 'rgba(0,0,0,0.18)',
     btnFill: '#121212',
     btnText: '#FFFFFF',
     certBg: '#FAFAFA',
-    glass: 'rgba(255, 255, 255, 0.55)', // Premium liquid glass base
+    glass: 'rgba(244, 242, 238, 0.6)',
   }
 }
 
+const ThemeContext = createContext()
+function useTheme() { return useContext(ThemeContext) }
+
+// ─────────────────────────────────────────────────────────
+// HOOKS
+// ─────────────────────────────────────────────────────────
 function useIsMobile() {
   const [mobile, setMobile] = useState(false)
   useEffect(() => {
@@ -67,7 +67,7 @@ function useIsMobile() {
     const check = () => setMobile(window.innerWidth < 768)
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
-  }, [])
+  },[])
   return mobile
 }
 
@@ -82,7 +82,7 @@ function useInView(threshold = 0.15) {
     obs.observe(el)
     return () => obs.disconnect()
   }, [threshold])
-  return [ref, inView]
+  return[ref, inView]
 }
 
 // ─────────────────────────────────────────────────────────
@@ -94,47 +94,90 @@ const F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
 const RISE = {
   hidden: { y: 40, opacity: 0 },
-  show:   { y: 0, opacity: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+  show:   { y: 0, opacity: 1, transition: { duration: 0.8, ease:[0.16, 1, 0.3, 1] } }
 }
 const SLIDE_L = {
   hidden: { x: -40, opacity: 0 },
-  show:   { x: 0, opacity: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+  show:   { x: 0, opacity: 1, transition: { duration: 0.8, ease:[0.16, 1, 0.3, 1] } }
 }
 
 // ─────────────────────────────────────────────────────────
-// SVG PRIMITIVES & TECH UI
+// UI PRIMITIVES
 // ─────────────────────────────────────────────────────────
-function SummitFlag({ color, size = 1 }) {
-  return (
-    <svg width={14 * size} height={18 * size} viewBox="0 0 14 18" fill="none" style={{ display: 'inline-block' }}>
-      <line x1="3" y1="1" x2="3" y2="17" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
-      <path d="M 3 1 L 13 5 L 3 9 Z" fill={color} fillOpacity="0.9" />
-    </svg>
-  )
-}
-
-function WaypointDot({ active, color, size = 10 }) {
-  return (
-    <svg width={size + 8} height={size + 8} viewBox={`0 0 ${size + 8} ${size + 8}`} fill="none">
-      <circle cx={(size + 8) / 2} cy={(size + 8) / 2} r={size / 2 + 3} stroke={color} strokeWidth="1" strokeOpacity={active ? 0.3 : 0.15} />
-      <circle cx={(size + 8) / 2} cy={(size + 8) / 2} r={size / 2 - 1} fill={active ? color : 'none'} stroke={color} strokeWidth="1.5" strokeOpacity={active ? 1 : 0.3} />
-    </svg>
-  )
-}
-
 function CrosshairIcon({ color }) {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <line x1="6" y1="0" x2="6" y2="12" stroke={color} strokeWidth="1" opacity="0.4" />
-      <line x1="0" y1="6" x2="12" y2="6" stroke={color} strokeWidth="1" opacity="0.4" />
+      <line x1="6" y1="0" x2="6" y2="12" stroke={color} strokeWidth="1" opacity="0.5" />
+      <line x1="0" y1="6" x2="12" y2="6" stroke={color} strokeWidth="1" opacity="0.5" />
     </svg>
   )
 }
 
-// Glass Glass Annotation (refined to liquid glass look)
-function TechAnnotation({ top, left, right, bottom, val, label, align = 'left' }) {
+function CountUp({ end, prefix = '', suffix = '', duration = 1.8 }) {
+  const [count, setCount] = useState(0)
+  const [on, setOn] = useState(false)
+  useEffect(() => {
+    if (!on) return
+    const endVal = parseFloat(String(end).replace(/[^0-9.]/g, ''))
+    const frames = Math.round(duration * 60)
+    let f = 0
+    const t = setInterval(() => {
+      f++
+      const ease = 1 - Math.pow(1 - f / frames, 3)
+      setCount(endVal * ease)
+      if (f >= frames) { setCount(endVal); clearInterval(t) }
+    }, 1000 / 60)
+    return () => clearInterval(t)
+  }, [on, end, duration])
+  return <motion.span onViewportEnter={() => setOn(true)}>{prefix}{count.toLocaleString('en-IN', { maximumFractionDigits: String(end).includes('.') ? 1 : 0 })}{suffix}</motion.span>
+}
+
+function TechBtn({ onClick, children, large }) {
   const C = useTheme()
+  return (
+    <motion.button
+      onClick={onClick}
+      whileHover={{ x: 4 }}
+      whileTap={{ scale: 0.98 }}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: '16px',
+        padding: large ? '0 40px' : '0 24px', height: large ? '64px' : '48px',
+        background: C.btnFill, color: C.btnText,
+        border: 'none', borderRadius: '4px',
+        fontSize: large ? '14px' : '12px', fontFamily: F_SANS, fontWeight: '700', 
+        letterSpacing: '0.08em', textTransform: 'uppercase',
+        cursor: 'pointer', position: 'relative', overflow: 'hidden',
+        boxShadow: `0 8px 24px ${C.name === 'dark' ? 'rgba(212,175,55,0.15)' : 'rgba(0,0,0,0.1)'}`
+      }}
+    >
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: C.bg, opacity: 0.2 }} />
+      {children}
+    </motion.button>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// PREMIUM LIQUID GLASS EFFECT
+// ─────────────────────────────────────────────────────────
+function useGlassStyle() {
+  const C = useTheme()
+  return {
+    background: C.glass,
+    backdropFilter: 'blur(16px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+    border: `1px solid ${C.borderMid}`,
+    boxShadow: `0 8px 32px ${C.name === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.1)'}`
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// ANNOTATION UI
+// ─────────────────────────────────────────────────────────
+function TechAnnotation({ label, val, align = 'left', top, left, right, bottom }) {
+  const C = useTheme()
+  const glassStyle = useGlassStyle()
   const isRight = align === 'right'
+  
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }} 
@@ -149,17 +192,44 @@ function TechAnnotation({ top, left, right, bottom, val, label, align = 'left' }
     >
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ width: '6px', height: '6px', border: `1.5px solid ${C.gold}`, borderRadius: '50%', background: C.bg }} />
-        <div style={{ width: '32px', height: '1px', background: C.gold, opacity: 0.5 }} />
+        <div style={{ width: '48px', height: '1px', background: C.gold, opacity: 0.6 }} />
       </div>
-      <div style={{ 
-        background: C.glass, backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', 
-        border: `1px solid ${C.borderMid}`, padding: '8px 14px', borderRadius: '8px',
-        boxShadow: `0 8px 32px ${C.name === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.06)'}`
-      }}>
+      <div style={{ ...glassStyle, padding: '8px 14px', borderRadius: '8px' }}>
         <div style={{ fontFamily: F_MONO, fontSize: '13px', color: C.text, fontWeight: '700', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{val}</div>
         <div style={{ fontFamily: F_MONO, fontSize: '9px', color: C.gold, letterSpacing: '0.15em', marginTop: '2px', textTransform: 'uppercase' }}>{label}</div>
       </div>
     </motion.div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// FLOATING TOP BAR (Premium Glass)
+// ─────────────────────────────────────────────────────────
+function FloatingTopBar({ isDark, toggleTheme }) {
+  const C = useTheme()
+  const isMobile = useIsMobile()
+  const glassStyle = useGlassStyle()
+
+  return (
+    <div style={{
+      position: 'absolute', top: 0, left: 0, right: 0, 
+      padding: isMobile ? '24px' : '40px 5vw', 
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+      zIndex: 100, pointerEvents: 'none'
+    }}>
+      <div style={{ ...glassStyle, display: 'flex', alignItems: 'center', gap: '10px', pointerEvents: 'auto', padding: '10px 20px', borderRadius: '100px' }}>
+        <BarChart2 size={22} color={C.gold} strokeWidth={2.5} />
+        <span style={{ fontFamily: F_SANS, fontWeight: '800', fontSize: '18px', letterSpacing: '-0.02em', color: C.text }}>
+          Certify<span style={{ color: C.gold }}>ROI</span>
+        </span>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', pointerEvents: 'auto' }}>
+        <button onClick={toggleTheme} style={{ ...glassStyle, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text, padding: '12px', transition: 'all 0.2s' }}>
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -173,21 +243,21 @@ function StorySection({ id, title, children, bg, noBorderTop }) {
   return (
     <div style={{ background: bg || C.bg, borderTop: noBorderTop ? 'none' : `1px solid ${C.border}`, position: 'relative' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
-
-        {/* Architectural Timeline */}
+        
         {!isMobile && (
           <div style={{ width: '160px', flexShrink: 0, borderRight: `1px solid ${C.border}`, position: 'relative' }}>
             <div style={{ position: 'sticky', top: '160px', padding: '40px 0', display: 'flex', alignItems: 'center', flexDirection: 'column', height: '400px' }}>
               <CrosshairIcon color={C.text4} />
               <div style={{ width: '1px', flex: 1, background: C.border, margin: '20px 0' }} />
-              <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.2em' }}>{title}</div>
+              <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.2em' }}>
+                <span style={{ color: C.gold, fontWeight: '600' }}>{id}</span> // {title}
+              </div>
               <div style={{ width: '1px', flex: 1, background: C.border, margin: '20px 0' }} />
               <CrosshairIcon color={C.text4} />
             </div>
           </div>
         )}
 
-        {/* Main Content */}
         <div style={{ flex: 1, padding: isMobile ? '60px 24px' : '120px 8vw', position: 'relative', overflow: 'hidden' }}>
           {isMobile && (
             <div style={{ marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -196,143 +266,36 @@ function StorySection({ id, title, children, bg, noBorderTop }) {
               <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.15em' }}>{title}</div>
             </div>
           )}
-          
-          <div style={{ maxWidth: '800px' }}>
-            {children}
-          </div>
+          {children}
         </div>
-
       </div>
     </div>
   )
 }
 
-function CountUp({ end, prefix = '', suffix = '', duration = 1.8 }) {
-  const [count, setCount] = useState(0)
-  const [on, setOn] = useState(false)
-  
-  useEffect(() => {
-    if (!on) return
-    const endVal = parseFloat(String(end).replace(/[^0-9.]/g, ''))
-    const frames = Math.round(duration * 60)
-    let f = 0
-    const t = setInterval(() => {
-      f++
-      const ease = 1 - Math.pow(1 - f / frames, 3)
-      setCount(endVal * ease)
-      if (f >= frames) { setCount(endVal); clearInterval(t) }
-    }, 1000 / 60)
-    return () => clearInterval(t)
-  }, [on, end, duration])
-
-  return <motion.span onViewportEnter={() => setOn(true)}>{prefix}{count.toLocaleString('en-IN', { maximumFractionDigits: String(end).includes('.') ? 1 : 0 })}{suffix}</motion.span>
-}
-
-// Tech-inspired brutalist CTA button (highly visible and strong)
-function TechBtn({ onClick, children, large }) {
-  const C = useTheme()
-  return (
-    <motion.button
-      onClick={onClick}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      style={{
-        display: 'inline-flex', alignItems: 'center', gap: '12px',
-        padding: large ? '0 40px' : '0 24px', height: large ? '64px' : '48px',
-        background: C.btnFill, color: C.btnText,
-        border: 'none', borderRadius: '8px',
-        fontSize: large ? '14px' : '12px', fontFamily: F_SANS, fontWeight: '700', 
-        letterSpacing: '0.05em', textTransform: 'uppercase',
-        cursor: 'pointer', position: 'relative', overflow: 'hidden',
-        boxShadow: `0 12px 32px ${C.name === 'dark' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(0,0,0,0.15)'}`,
-        transition: 'box-shadow 0.2s'
-      }}
-    >
-      {children}
-    </motion.button>
-  )
-}
-
-function SecondaryBtn({ onClick, children }) {
-  const C = useTheme()
-  return (
-    <button onClick={onClick}
-      style={{
-        display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '0 24px', height: '48px',
-        borderRadius: '6px', border: `1px solid ${C.borderMid}`, background: 'transparent', color: C.text,
-        fontSize: '12px', fontFamily: F_SANS, fontWeight: '600', letterSpacing: '0.04em', textTransform: 'uppercase',
-        cursor: 'pointer', transition: 'all 0.16s',
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = C.text; e.currentTarget.style.color = C.bg }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.text }}
-    >
-      {children}
-    </button>
-  )
-}
-
 // ─────────────────────────────────────────────────────────
-// FLOATING TOP BAR (Premium Liquid Glass)
+// TRUST STRIP
 // ─────────────────────────────────────────────────────────
-function FloatingTopBar({ isDark, toggleTheme }) {
-  const C = useTheme()
-  const isMobile = useIsMobile()
-
-  return (
-    <div style={{
-      position: 'absolute', top: 0, left: 0, right: 0, 
-      padding: isMobile ? '24px' : '32px 5vw', 
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-      zIndex: 100, pointerEvents: 'none' // Allow clicking through empty space
-    }}>
-      {/* Pill Logo */}
-      <div style={{ 
-        display: 'flex', alignItems: 'center', gap: '8px', pointerEvents: 'auto',
-        background: C.glass, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-        padding: '12px 24px', borderRadius: '40px', border: `1px solid ${C.borderMid}`,
-        boxShadow: `0 8px 32px ${C.name === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.05)'}`
-      }}>
-        <BarChart2 size={22} color={C.gold} strokeWidth={2.5} />
-        <span style={{ fontFamily: F_SANS, fontWeight: '800', fontSize: '18px', letterSpacing: '-0.02em', color: C.text }}>
-          Certify<span style={{ color: C.gold }}>ROI</span>
-        </span>
-      </div>
-
-      {/* Controls */}
-      <div style={{ 
-        display: 'flex', alignItems: 'center', gap: '12px', pointerEvents: 'auto',
-        background: C.glass, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-        padding: '6px', borderRadius: '40px', border: `1px solid ${C.borderMid}`,
-        boxShadow: `0 8px 32px ${C.name === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.05)'}`
-      }}>
-        <button onClick={toggleTheme} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: '50%', width:'36px', height:'36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text, transition: 'all 0.2s' }}>
-          {isDark ? <Sun size={16} /> : <Moon size={16} />}
-        </button>
-        <button style={{ background: 'transparent', border: 'none', padding: '0 16px', color: C.text, fontFamily: F_SANS, fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>
-          SIGN IN
-        </button>
-      </div>
-    </div>
-  )
-}
-
 function TrustStrip() {
   const C = useTheme()
-  const items = [
-    { tag: 'AWS', text: '₹2.4L premium in Bangalore' },
-    { tag: 'PMP', text: '7 month median summit' },
-    { tag: 'GCP', text: '2,400+ cloud roles active' },
-    { tag: 'DATA', text: '₹3.2L annual gain average' },
-    { tag: 'K8S', text: 'Steepest climb, +40% gain' },
+  const items =[
+    { tag: 'SYS.CLOUD',   text: 'AWS cert holders earn ₹2.4L more/yr in Bangalore' },
+    { tag: 'SYS.DEMAND',  text: '2,400+ cloud roles open on Naukri right now' },
+    { tag: 'SYS.FINANCE', text: 'Average PMP payback period: 7 months' },
+    { tag: 'SYS.DATA',    text: 'Google Analytics · ₹18K invested → ₹3.2L annual gain' },
+    { tag: 'SYS.DEVOPS',  text: 'CKA Kubernetes: highest ROI cert in India 2026' },
   ]
   return (
-    <div style={{ overflow: 'hidden', borderBottom: `1px solid ${C.border}`, background: C.bg, position: 'relative', zIndex: 1, padding: '16px 0' }}>
-      <div style={{ display: 'flex', width: '100%', overflow: 'hidden' }}>
+    <div style={{ borderBottom: `1px solid ${C.border}`, background: C.bgAlt, position: 'relative', zIndex: 10, height: '48px', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, background: C.bgAlt, zIndex: 11, borderRight: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 24px', boxShadow: `20px 0 20px -10px ${C.bgAlt}` }}>
+        <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.gold, letterSpacing: '0.2em' }}>MARKET_DATA</span>
+      </div>
+      <div style={{ flex: 1, paddingLeft: '160px' }}>
         <motion.div animate={{ x: ['0%', '-50%'] }} transition={{ duration: 40, repeat: Infinity, ease: 'linear' }} style={{ display: 'flex', width: 'max-content' }}>
           {[...items, ...items, ...items].map((item, i) => (
             <div key={i} style={{ display: 'inline-flex', alignItems: 'center', height: '48px', borderRight: `1px solid ${C.border}`, padding: '0 40px' }}>
-              <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.gold, marginRight: '16px', letterSpacing: '0.1em' }}>[{item.tag}]</span>
-              <span style={{ fontFamily: F_SANS, fontSize: '13px', color: C.text2, letterSpacing: '0.02em', fontWeight: '500' }}>{item.text}</span>
+              <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, marginRight: '16px', letterSpacing: '0.1em' }}>[{item.tag}]</span>
+              <span style={{ fontFamily: F_SANS, fontSize: '12px', color: C.text2, letterSpacing: '0.02em', fontWeight: '500' }}>{item.text}</span>
             </div>
           ))}
         </motion.div>
@@ -342,48 +305,49 @@ function TrustStrip() {
 }
 
 // ─────────────────────────────────────────────────────────
-// CERT ASSEMBLY (Unchanged behavioral layout)
+// CERT ASSEMBLY
 // ─────────────────────────────────────────────────────────
 function CertAssembly() {
   const C = useTheme()
   const isMobile = useIsMobile()
   const trackRef = useRef(null)
   const { scrollY } = useScroll()
-  const [prog, setProg] = useState(0)
+  const[prog, setProg] = useState(0)
 
   useEffect(() => {
     const update = () => {
       const el = trackRef.current; if (!el) return
       const rect = el.getBoundingClientRect()
-      const p = Math.max(0, Math.min(1, -rect.top / (el.offsetHeight - window.innerHeight)))
+      const total = el.offsetHeight - window.innerHeight
+      if (total <= 0) return
+      const p = Math.max(0, Math.min(1, -rect.top / total))
       setProg(p)
     }
-    const unsub = scrollY.on('change', update); update(); return unsub
+    const unsub = scrollY.on('change', update)
+    update()
+    return unsub
   }, [scrollY])
 
   const remap = (p, a, b, c, d) => c + (d - c) * Math.max(0, Math.min(1, (p - a) / (b - a)))
-  
+
   const p8 = remap(prog, 0, 0.8, 0, 1)
-  let l1, l2, l3
+  let l1, l2
   if (isMobile) {
-    l1 = `translateY(${remap(p8, 0, 1, -50, 0)}px) rotateZ(${remap(p8, 0, 1, 3, 0)}deg)`
-    l2 = `translateY(${remap(p8, 0, 1, 50, 0)}px) rotateZ(${remap(p8, 0, 1, -2, 0)}deg)`
-    l3 = `translateY(${remap(p8, 0, 1, -25, 0)}px) scale(${remap(p8, 0, 1, 0.88, 1)})`
+    l1 = `translateY(${remap(p8, 0, 1, -45, 0)}px) rotateZ(${remap(p8, 0, 1, 2.5, 0)}deg)`
+    l2 = `translateY(${remap(p8, 0, 1, 45, 0)}px) rotateZ(${remap(p8, 0, 1, -2, 0)}deg)`
   } else {
-    l1 = `perspective(1200px) translateZ(${remap(p8, 0, 1, -280, 0)}px) translateY(${remap(p8, 0, 1, -80, 0)}px) rotateY(${remap(p8, 0, 1, 32, 0)}deg) rotateX(${remap(p8, 0, 1, 15, 0)}deg)`
-    l2 = `perspective(1200px) translateZ(${remap(p8, 0, 1, 280, 0)}px) translateY(${remap(p8, 0, 1, 80, 0)}px) rotateY(${remap(p8, 0, 1, -26, 0)}deg) rotateX(${remap(p8, 0, 1, -12, 0)}deg)`
-    l3 = `perspective(1200px) translateZ(${remap(p8, 0, 1, -140, 0)}px) translateY(${remap(p8, 0, 1, -30, 0)}px) rotateY(${remap(p8, 0, 1, 15, 0)}deg) rotateX(${remap(p8, 0, 1, 6, 0)}deg)`
+    l1 = `perspective(1200px) translateZ(${remap(p8, 0, 1, -260, 0)}px) translateY(${remap(p8, 0, 1, -75, 0)}px) rotateY(${remap(p8, 0, 1, 30, 0)}deg) rotateX(${remap(p8, 0, 1, 14, 0)}deg)`
+    l2 = `perspective(1200px) translateZ(${remap(p8, 0, 1, 260, 0)}px) translateY(${remap(p8, 0, 1, 75, 0)}px) rotateY(${remap(p8, 0, 1, -24, 0)}deg) rotateX(${remap(p8, 0, 1, -11, 0)}deg)`
   }
 
   const certScale = prog < 0.8 ? remap(prog, 0, 0.8, 0.62, 1.0) : remap(prog, 0.8, 1.0, 1.0, 0.85)
   const certOpacity = prog < 0.05 ? remap(prog, 0, 0.05, 0, 1) : prog > 0.85 ? remap(prog, 0.85, 1.0, 1, 0) : 1
-  const hintOp      = prog > 0.16 ? 0 : prog > 0.06 ? remap(prog, 0.06, 0.16, 1, 0) : 1
+  const hintOp = prog > 0.16 ? 0 : prog > 0.06 ? remap(prog, 0.06, 0.16, 1, 0) : 1
   const assembledOp = remap(prog, 0.78, 0.88, 0, 1)
-  const cardW = isMobile ? 'min(300px, 88vw)' : 'min(500px, 88vw)'
+  const cardW = isMobile ? 'min(320px,88vw)' : 'min(460px,80vw)'
 
   return (
     <div ref={trackRef} style={{ height: '300vh', position: 'relative', borderBottom: `1px solid ${C.border}`, background: C.bg }}>
-      {/* Background Story Line extending through Cert Assembly */}
       {!isMobile && (
         <div style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }}>
            <div style={{ maxWidth: '1400px', margin: '0 auto', position: 'relative', height: '100%' }}>
@@ -393,6 +357,7 @@ function CertAssembly() {
       )}
 
       <div style={{ position: 'sticky', top: 0, height: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: C.bg, opacity: 0.96 }} />
         <div style={{ position: 'relative', zIndex: 4 }}>
           <div style={{ transform: `scale(${certScale})`, opacity: certOpacity }}>
             <div style={{ position: 'relative', width: cardW, height: `calc(${cardW} / 1.414)`, transformStyle: 'preserve-3d' }}>
@@ -405,9 +370,9 @@ function CertAssembly() {
                       <stop offset="100%" stopColor={C.gold} />
                     </linearGradient>
                   </defs>
-                  <rect x="0" y="0" width="480" height="340" rx="4" fill={C.certBg} style={{ filter: 'drop-shadow(0 32px 64px rgba(0,0,0,0.5))' }} />
-                  <rect x="1.5" y="1.5" width="477" height="337" rx="3" fill="none" stroke="url(#certBordX)" strokeWidth="1.5" />
-                  <rect x="12" y="12" width="456" height="316" rx="2" fill="none" stroke={C.borderMid} strokeWidth="0.8" />
+                  <rect x="0" y="0" width="480" height="340" rx="0" fill={C.certBg} style={{ filter: 'drop-shadow(0 32px 64px rgba(0,0,0,0.5))' }} />
+                  <rect x="1.5" y="1.5" width="477" height="337" rx="0" fill="none" stroke="url(#certBordX)" strokeWidth="1.5" />
+                  <rect x="12" y="12" width="456" height="316" rx="0" fill="none" stroke={C.borderMid} strokeWidth="0.8" />
                 </svg>
               </div>
               <div style={{ position: 'absolute', inset: 0, transform: l2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '36px' }}>
@@ -428,19 +393,16 @@ function CertAssembly() {
                   <span style={{ fontFamily: F_MONO, fontSize: '8px', color: C.text3, letterSpacing: '0.1em' }}>VERIFIED · NAUKRI MARCH 2026</span>
                 </div>
               </div>
-              <div style={{ position: 'absolute', right: '8%', bottom: '10%', transform: l3 }}>
-                <SummitFlag color={C.gold} size={1.2} />
-              </div>
             </div>
           </div>
-          <div style={{ opacity: hintOp, marginTop: '64px', textAlign: 'center', pointerEvents: 'none', transition: 'opacity 0.3s' }}>
-            <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
-              <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.2em', textTransform: 'uppercase' }}>↓ Scroll Sequence ↓</div>
+          <div style={{ opacity: hintOp, marginTop: '40px', textAlign: 'center', pointerEvents: 'none', transition: 'opacity 0.3s' }}>
+            <motion.div animate={{ y: [0, 7, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
+              <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.2em' }}>↓ SCROLL TO ASSEMBLE ↓</div>
             </motion.div>
           </div>
         </div>
         <div style={{ opacity: assembledOp, position: 'absolute', bottom: '10%', left: 0, right: 0, textAlign: 'center', pointerEvents: 'none', zIndex: 5, transition: 'opacity 0.3s' }}>
-          <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.gold, letterSpacing: '0.2em', background: C.surface, display: 'inline-block', padding: '8px 16px', border: `1px solid ${C.border}`, borderRadius: '6px' }}>
+          <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.gold, letterSpacing: '0.2em', background: C.surface, display: 'inline-block', padding: '8px 16px', border: `1px solid ${C.border}` }}>
             ✓ BRIEFING COMPILED
           </div>
         </div>
@@ -450,18 +412,114 @@ function CertAssembly() {
 }
 
 // ─────────────────────────────────────────────────────────
-// STORY SECTIONS (Lower Sections)
+// DATA COMPOSITION
 // ─────────────────────────────────────────────────────────
-function FalseGuidance() {
+function DataComposition() {
   const C = useTheme()
-  const pairs = [
-    { wrong: '"Study AWS, it pays the best."', right: 'Tech changes. ROI doesn\'t. In Pune right now, GCP Architect has a 3x higher interview rate than AWS SAA.' },
-    { wrong: '"Top certifications guarantee jobs."', right: 'No. They reduce filtering risk. Without a targeted application strategy, a ₹30K cert is invisible.' },
-    { wrong: '"Follow US tech salary guides.', right: 'US data is noise. India is a segmented IT services market. We map strictly to Naukri and local CTC bands.' }
+  const isMobile = useIsMobile()
+
+  return (
+    <StorySection id="02" title="METRICS_LOG" noBorderTop>
+      <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.gold, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ width: '8px', height: '8px', background: C.gold }} />
+          The numbers behind the route
+        </div>
+      </motion.div>
+
+      <motion.div variants={SLIDE_L} initial="hidden" whileInView="show" viewport={{ once: true }} style={{ marginBottom: '64px' }}>
+        <div style={{ fontFamily: F_MONO, fontSize: 'clamp(3.5rem,10vw,8rem)', color: C.text, lineHeight: 1, letterSpacing: '-0.04em', fontWeight: '500', display: 'flex', alignItems: 'flex-start' }}>
+          <span style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', color: C.gold, marginTop: 'clamp(0.5rem, 1vw, 1rem)', marginRight: '4px' }}>₹</span>
+          <CountUp end={14.2} />
+          <span style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', color: C.gold, marginTop: 'clamp(0.5rem, 1vw, 1rem)', marginLeft: '4px' }}>L</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '16px', flexWrap: 'wrap' }}>
+          <div style={{ fontFamily: F_SANS, fontWeight: '500', fontSize: 'clamp(1rem,2vw,1.25rem)', color: C.text2 }}>5-year net gain · AWS Solutions Architect</div>
+          <div style={{ padding: '4px 8px', background: C.surface, border: `1px solid ${C.border}`, fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.1em' }}>BLR MEDIAN '26</div>
+        </div>
+      </motion.div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', borderTop: `1px solid ${C.border}` }}>
+        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}
+          style={{ padding: isMobile ? '40px 0' : '56px 64px 56px 0', borderBottom: isMobile ? `1px solid ${C.border}` : 'none', borderRight: isMobile ? 'none' : `1px solid ${C.border}` }}>
+          <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.15em', marginBottom: '16px' }}>// PAYBACK_PERIOD</div>
+          <div style={{ fontFamily: F_MONO, fontSize: 'clamp(2.5rem,6vw,4rem)', color: C.text, lineHeight: 1, letterSpacing: '-0.03em', fontWeight: '500', marginBottom: '16px' }}>
+            <CountUp end={6} suffix=" MO" />
+          </div>
+          <div style={{ fontFamily: F_SANS, fontSize: '15px', color: C.text2, lineHeight: '1.7', maxWidth: '38ch' }}>
+            Not "a few months." The exact month your investment turns profitable — calculated for your salary and city.
+          </div>
+        </motion.div>
+        
+        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: 0.1 }}
+          style={{ padding: isMobile ? '40px 0' : '56px 0 56px 64px' }}>
+          <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.15em', marginBottom: '16px' }}>// SALARY_DELTA</div>
+          <div style={{ fontFamily: F_MONO, fontSize: 'clamp(2.5rem,6vw,4rem)', color: C.text, lineHeight: 1, letterSpacing: '-0.03em', fontWeight: '500', marginBottom: '16px' }}>
+            <CountUp end={35} suffix="%" />
+          </div>
+          <div style={{ fontFamily: F_SANS, fontSize: '15px', color: C.text2, lineHeight: '1.7', maxWidth: '38ch' }}>
+            India-sourced. City-specific. Not US data converted at today's rate and called "India salary insights."
+          </div>
+        </motion.div>
+      </div>
+    </StorySection>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// HOW IT WORKS
+// ─────────────────────────────────────────────────────────
+function HowItWorks({ onEnter }) {
+  const C = useTheme()
+  const isMobile = useIsMobile()
+  const steps =[
+    { id: '01', label: 'Basecamp', subtitle: 'Where you start', desc: 'Enter your current salary, role, and city. Upload your resume to let AI set your starting elevation.' },
+    { id: '02', label: 'Route',    subtitle: 'Choose your path', desc: 'Select a cert or let AI recommend the highest-ROI route. Compare up to three paths side by side.' },
+    { id: '03', label: 'Summit',   subtitle: 'Know the outcome', desc: 'Exact payback month, 5-year net gain, monthly delta, and a verdict on whether the climb is worth making.' },
   ]
 
   return (
-    <StorySection id="05" title="FALSE_GUIDANCE" bg={C.surface}>
+    <StorySection id="03" title="SYS_ARCHITECTURE" bg={C.surface}>
+      <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(2rem,5vw,3.5rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, marginTop: 0, marginBottom: '64px' }}>
+          Three stages.<br />One clear answer.
+        </h2>
+      </motion.div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap: isMobile ? '40px' : '40px' }}>
+        {steps.map((step, i) => (
+          <motion.div key={step.id} variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+              <div style={{ fontFamily: F_MONO, fontSize: '32px', color: C.gold, fontWeight: '700', lineHeight: 1 }}>{step.id}</div>
+              <div style={{ width: '100%', height: '1px', background: C.border }} />
+            </div>
+            <div style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: '20px', color: C.text, marginBottom: '8px' }}>{step.label}</div>
+            <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px' }}>{step.subtitle}</div>
+            <div style={{ fontFamily: F_SANS, fontSize: '15px', color: C.text2, lineHeight: '1.7' }}>{step.desc}</div>
+          </motion.div>
+        ))}
+      </div>
+
+      <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} style={{ marginTop: '64px' }}>
+        <TechBtn onClick={onEnter}>Calculate ROI <ArrowRight size={16} /></TechBtn>
+      </motion.div>
+    </StorySection>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// HAZARDS (VS SECTION)
+// ─────────────────────────────────────────────────────────
+function VsSection() {
+  const C = useTheme()
+  const pairs =[
+    { wrong: '"AWS is good for cloud engineers"', right: 'AWS SAA at ₹9L salary: payback month 6. ₹14.2L net gain over 5 years. Or it isn\'t worth it.' },
+    { wrong: '"Upskill for career growth"', right: '₹23,600 extra every month from month 7 — compounding over 5 years. In rupees, not "growth."' },
+    { wrong: 'US salary data converted to rupees', right: 'Naukri · AmbitionBox · LinkedIn India. 2026 data. Not converted from San Francisco.' },
+  ]
+
+  return (
+    <StorySection id="04" title="MARKET_HAZARDS" bg={C.bg}>
       <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
         <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(2rem,5vw,3.5rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, marginTop: 0, marginBottom: '64px' }}>
           Every other guide<br />
@@ -474,9 +532,8 @@ function FalseGuidance() {
           <motion.div key={i} variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
             
             <div style={{ fontFamily: F_SANS, fontWeight: '500', fontSize: '18px', color: C.text3, letterSpacing: '-0.01em', marginBottom: '12px' }}>
-              <span style={{ position: 'relative', display: 'inline-block' }}>
+              <span style={{ display: 'inline-block', textDecoration: 'line-through', opacity: 0.6 }}>
                 {pair.wrong}
-                <div style={{ position: 'absolute', left: '-2%', right: '-2%', top: '50%', height: '2px', background: C.err, transform: 'translateY(-50%)' }} />
               </span>
             </div>
 
@@ -491,10 +548,88 @@ function FalseGuidance() {
   )
 }
 
-function FieldReports() {
+// ─────────────────────────────────────────────────────────
+// ELEVEN PM (FELLOW CLIMBERS)
+// ─────────────────────────────────────────────────────────
+function ElevenPM({ onEnter }) {
   const C = useTheme()
   const isMobile = useIsMobile()
-  const quotes = [
+  const stories =[
+    { time: '11:47 PM', name: 'Rohan', loc: 'Pune', role: '2 yrs · Backend Engineer', thought: '"Should I do AWS? Or is it too late?"', context: 'Ex-classmate promoted to Cloud Architect. ₹28L CTC.', answer: 'AWS SAA at ₹9L: payback month 6. 5-year gain ₹14.2L.', color: C.gold },
+    { time: '11:12 PM', name: 'Sneha', loc: 'Bangalore', role: '6 yrs · Ops Manager', thought: '"Is the switch possible without an MBA?"', context: 'Every data job requires 3 years experience. She has zero.', answer: 'Google Data Analytics + 2 GitHub projects. 5 months. ₹8L → ₹12L.', color: C.text },
+    { time: '12:03 AM', name: 'Arjun', loc: 'Pune', role: 'CS · Fresh graduate', thought: '"Which cert gets me placed here in India?"', context: 'Three articles. All recommend AWS. All in USD.', answer: 'Student Mode. GCP placed 47 Pune freshers in Q1 2026.', color: C.text3 },
+  ]
+
+  return (
+    <StorySection id="05" title="FELLOW_CLIMBERS" bg={C.surface}>
+      <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(2rem,5vw,3.5rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, marginTop: 0, marginBottom: '64px' }}>
+          We know what you're<br />thinking right now.
+        </h2>
+      </motion.div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', borderTop: `1px solid ${C.border}` }}>
+        {stories.map((s, i) => {
+          const isLast = i === stories.length - 1
+          return (
+            <motion.div key={i} variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+              onClick={onEnter}
+              style={{ paddingLeft: !isMobile && i > 0 ? '40px' : '0', paddingRight: !isMobile && i < 2 ? '40px' : '0', paddingTop: '40px', paddingBottom: '40px', borderRight: !isMobile && !isLast ? `1px solid ${C.border}` : 'none', borderBottom: isMobile && !isLast ? `1px solid ${C.border}` : 'none', cursor: 'pointer' }}>
+              <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.08em', marginBottom: '16px' }}>// LOG_TIME: {s.time}</div>
+              <div style={{ fontFamily: F_SERIF, fontStyle: 'italic', fontWeight: '400', fontSize: '22px', color: C.text, lineHeight: 1.4, marginBottom: '16px' }}>{s.thought}</div>
+              <div style={{ fontFamily: F_SANS, fontSize: '14px', color: C.text2, lineHeight: '1.6', marginBottom: '24px' }}>
+                <em style={{ fontStyle: 'italic' }}>{s.name}</em>, {s.loc} — {s.role}. {s.context}
+              </div>
+              <div style={{ width: '24px', height: '2px', background: s.color, marginBottom: '16px' }} />
+              <div style={{ fontFamily: F_SANS, fontWeight: '600', fontSize: '14px', color: C.text, lineHeight: '1.6' }}>{s.answer}</div>
+            </motion.div>
+          )
+        })}
+      </div>
+    </StorySection>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// THREE MODES
+// ─────────────────────────────────────────────────────────
+function ThreeModes() {
+  const C = useTheme()
+  const isMobile = useIsMobile()
+  const modes =[
+    { label: 'Student', sub: 'No salary yet', desc: 'Path to a ₹4.8L+ first offer. Reframes ROI around career investment, not salary hike.' },
+    { label: 'Switcher', sub: 'Changing domains', desc: 'Domain switch in 5–8 months. Only fast-track options shown. Long certs hidden.' },
+    { label: 'Professional', sub: 'Levelling up', desc: 'Maximum ROI on your next cert. Break-even analysis, city benchmarks, and a pitch-your-boss email.' },
+  ]
+
+  return (
+    <StorySection id="06" title="SYS_MODES" bg={C.bg}>
+      <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(2rem,5vw,3.5rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, marginTop: 0, marginBottom: '64px' }}>
+          Three modes.<br /><span style={{ color: C.gold }}>One tool.</span>
+        </h2>
+      </motion.div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap: isMobile ? '32px' : '40px', padding: '32px', background: C.surface, border: `1px solid ${C.border}` }}>
+        {modes.map((m, i) => (
+          <motion.div key={m.label} variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+            <div style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: '18px', color: C.text, letterSpacing: '-0.02em', marginBottom: '8px' }}>{m.label}</div>
+            <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px' }}>{m.sub}</div>
+            <div style={{ fontFamily: F_SANS, fontSize: '14px', color: C.text2, lineHeight: '1.7' }}>{m.desc}</div>
+          </motion.div>
+        ))}
+      </div>
+    </StorySection>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// SOCIAL PROOF (FIELD REPORTS)
+// ─────────────────────────────────────────────────────────
+function SocialProof() {
+  const C = useTheme()
+  const isMobile = useIsMobile()
+  const quotes =[
     { quote: 'CertifyROI said payback was month 8. It was month 7. Switched companies immediately. ₹6L hike.', name: 'Priya S.', detail: 'Bangalore · Engineer → Cloud Architect', hike: '+₹6L/yr', color: C.gold },
     { quote: 'Was about to spend ₹12L on an MBA. The analysis showed a different path — 5 months, 1% of the cost.', name: 'Rahul M.', detail: 'Hyderabad · Ops Manager → Data Analyst', hike: 'Saved ₹12L', color: C.text },
     { quote: 'Student Mode. India-specific. GCP placed 47 Pune freshers in Q1 2026. My ₹5.2L offer was one of them.', name: 'Ananya K.', detail: 'Pune · Fresh Graduate', hike: '₹5.2L offer', color: C.text3 },
@@ -508,53 +643,130 @@ function FieldReports() {
         </h2>
       </motion.div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-        {quotes.map((q, i) => (
-          <motion.div key={i} variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-            style={{ padding: '32px', background: C.bg, border: `1px solid ${C.border}`, display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '32px', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center' }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: F_SERIF, fontStyle: 'italic', fontSize: '20px', color: C.text, lineHeight: '1.5', marginBottom: '16px' }}>"{q.quote}"</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <WaypointDot active={true} color={q.color} size={8} />
-                <div>
-                  <div style={{ fontFamily: F_SANS, fontWeight: '600', fontSize: '13px', color: C.text }}>{q.name}</div>
-                  <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.05em', marginTop: '2px' }}>{q.detail}</div>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {quotes.map((q, i) => {
+          const isLast = i === quotes.length - 1
+          return (
+            <motion.div key={i} variants={SLIDE_L} initial="hidden" whileInView="show" viewport={{ once: true }}
+              style={{ paddingTop: i > 0 ? '48px' : '0', paddingBottom: !isLast ? '48px' : '0', borderBottom: !isLast ? `1px solid ${C.border}` : 'none', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 180px', gap: '24px', alignItems: 'end' }}>
+              <div>
+                <div style={{ fontFamily: F_SERIF, fontStyle: 'italic', fontWeight: '400', fontSize: 'clamp(1.2rem,2.5vw,1.8rem)', color: C.text, letterSpacing: '-0.01em', lineHeight: 1.35, marginBottom: '24px' }}>
+                  "{q.quote}"
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                  <div style={{ width: '20px', height: '2px', background: q.color, flexShrink: 0 }} />
+                  <span style={{ fontFamily: F_SANS, fontWeight: '600', fontSize: '14px', color: C.text }}>{q.name}</span>
+                  <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3 }}>{q.detail}</span>
                 </div>
               </div>
-            </div>
-            <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
-              <div style={{ fontFamily: F_MONO, fontWeight: '600', fontSize: 'clamp(1.5rem,3vw,2rem)', color: C.text, letterSpacing: '-0.04em', lineHeight: 1 }}>{q.hike}</div>
-            </div>
-          </motion.div>
-        ))}
+              <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
+                <div style={{ fontFamily: F_MONO, fontWeight: '600', fontSize: 'clamp(1.5rem,3vw,2rem)', color: C.text, letterSpacing: '-0.04em', lineHeight: 1 }}>{q.hike}</div>
+              </div>
+            </motion.div>
+          )
+        })}
       </div>
     </StorySection>
   )
 }
 
+// ─────────────────────────────────────────────────────────
+// FAQ
+// ─────────────────────────────────────────────────────────
+const FAQ_ITEMS =[
+  { q: 'How accurate are the ROI calculations?', a: 'Calculations are based on median salary data from Naukri, AmbitionBox, and LinkedIn India — updated quarterly. They are directional estimates, not guarantees.' },
+  { q: 'Do I need to create an account?', a: 'No. The ROI calculator, comparison tool, and city demand heatmap are all free with no signup. AI features use free credits.' },
+  { q: 'What certifications are covered?', a: '103 certifications across 17 domains — cloud, data analytics, cybersecurity, finance (CFA, CA), project management, HR, medical, and government.' },
+  { q: 'Is this only useful for India?', a: 'The salary benchmarks and demand data are India-specific. The ROI framework applies anywhere, but numbers are calibrated for India.' },
+  { q: 'How does the Resume AI work?', a: 'Upload a resume or paste your profile. The AI reads your domain, role, and experience, then recommends the highest-ROI certifications for your specific background.' },
+]
+
+function FAQItem({ item }) {
+  const C = useTheme()
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ borderBottom: `1px solid ${C.border}` }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ width: '100%', padding: '24px 0', background: 'none', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', cursor: 'pointer', textAlign: 'left' }}
+      >
+        <span style={{ fontFamily: F_SANS, fontWeight: '600', fontSize: '16px', color: C.text, letterSpacing: '-0.01em', lineHeight: 1.4 }}>{item.q}</span>
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }} style={{ flexShrink: 0 }}>
+          <ChevronDown size={18} color={C.text3} />
+        </motion.div>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div key="ans" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.26 }} style={{ overflow: 'hidden' }}>
+            <div style={{ paddingBottom: '24px', fontFamily: F_SANS, fontSize: '15px', color: C.text2, lineHeight: '1.7', maxWidth: '68ch' }}>{item.a}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function FAQ() {
+  const C = useTheme()
+  const isMobile = useIsMobile()
+  return (
+    <StorySection id="08" title="LOGISTICS" bg={C.bg}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '300px 1fr', gap: isMobile ? '40px' : '80px', alignItems: 'start' }}>
+        <div style={{ position: isMobile ? 'static' : 'sticky', top: '160px' }}>
+          <motion.h2 variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}
+            style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(2rem,3vw,2.5rem)', color: C.text, letterSpacing: '-0.025em', lineHeight: 1.15, marginTop: 0, marginBottom: 0 }}>
+            Common<br />questions<br />answered.
+          </motion.h2>
+        </div>
+        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
+          <div style={{ borderTop: `1px solid ${C.border}` }}>
+            {FAQ_ITEMS.map((item, i) => <FAQItem key={i} item={item} />)}
+          </div>
+        </motion.div>
+      </div>
+    </StorySection>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// FINAL CTA
+// ─────────────────────────────────────────────────────────
 function FinalCTA({ onEnter }) {
   const C = useTheme()
-  return (
-    <StorySection id="08" title="INITIATE" bg={C.surface}>
-      <div style={{ padding: 'clamp(40px, 8vw, 80px) 0' }}>
-        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
-          <div style={{ fontFamily: F_MONO, fontSize: '12px', color: C.gold, letterSpacing: '0.2em', marginBottom: '24px' }}>[ END OF BRIEFING ]</div>
-          <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(2.5rem,6vw,4.5rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 0, marginBottom: '32px' }}>
-            Ready to find your<br />true elevation?
-          </h2>
-        </motion.div>
+  const glassStyle = useGlassStyle()
 
+  return (
+    <StorySection id="09" title="SUMMIT_ACCESS" bg={C.surface}>
+      <div style={{ position: 'absolute', right: '0', top: '0', pointerEvents: 'none', opacity: 0.3 }}>
+        <svg width="400" height="400" viewBox="0 0 400 400">
+          {[40, 80, 120, 160, 200].map((r, i) => (
+            <circle key={i} cx="400" cy="0" r={r} fill="none" stroke={C.lineHeavy} strokeWidth="1" opacity={1 - (i * 0.15)} />
+          ))}
+        </svg>
+      </div>
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <motion.h2 variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}
+          style={{ fontFamily: F_SERIF, fontStyle: 'italic', fontWeight: '400', fontSize: 'clamp(3rem,8vw,5.5rem)', color: C.text, letterSpacing: '-0.02em', lineHeight: 0.96, marginTop: 0, marginBottom: '32px' }}>
+          You'll know<br />the answer.
+        </motion.h2>
+        <motion.p variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: 0.1 }}
+          style={{ fontFamily: F_SANS, fontSize: '16px', color: C.text2, lineHeight: '1.7', maxWidth: '44ch', margin: '0 0 48px' }}>
+          Stop reading generic advice. Stop asking Reddit.{' '}
+          <span style={{ color: C.text, fontWeight: '600' }}>Know the exact payback period before you pay the exam fee.</span>
+        </motion.p>
+        
         <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: 0.2 }}
-          style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'flex-start' }}>
+          style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'flex-start' }}>
           
           <TechBtn onClick={onEnter} large>Calculate ROI <ArrowRight size={16} /></TechBtn>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', border: `1px solid ${C.borderMid}`, padding: '10px 20px', background: C.glass, backdropFilter: 'blur(12px)', borderRadius: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', ...glassStyle, padding: '8px 20px', borderRadius: '32px' }}>
             <div style={{ display: 'flex', gap: '4px' }}>
               <div style={{ width: '4px', height: '12px', background: C.gold }} />
               <div style={{ width: '4px', height: '12px', background: C.gold, opacity: 0.4 }} />
             </div>
-            <span style={{ fontFamily: F_SANS, fontWeight: '600', fontSize: '11px', color: C.text, letterSpacing: '0.1em', textTransform: 'uppercase' }}>FREE ACCESS // NO ACCOUNT REQUIRED</span>
+            <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text, letterSpacing: '0.15em' }}>FREE_ACCESS // NO_ACCT_REQ</span>
           </div>
 
         </motion.div>
@@ -568,43 +780,39 @@ function FinalCTA({ onEnter }) {
 // ─────────────────────────────────────────────────────────
 export default function LandingPage({ onEnter }) {
   const [isDark, setIsDark] = useState(true)
-  const isMobile = useIsMobile()
-  const C = isDark ? THEMES.dark : THEMES.light
-
   const toggleTheme = () => setIsDark(!isDark)
+  const C = isDark ? THEMES.dark : THEMES.light
+  const isMobile = useIsMobile()
+  const glassStyle = useGlassStyle()
 
   return (
     <ThemeContext.Provider value={C}>
       <div style={{ minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'clip', transition: 'background 0.3s ease, color 0.3s ease' }}>
-
+        
         <FloatingTopBar isDark={isDark} toggleTheme={toggleTheme} />
 
         {/* ── HERO ── */}
         <div style={{ position: 'relative', height: '100vh', minHeight: '700px', display: 'flex', alignItems: 'center', borderBottom: `1px solid ${C.border}` }}>
-
-          {/* Bold Background Text (Cleaned up, no extra lines) */}
+          
+          {/* Bold Background Text */}
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '100%', textAlign: 'center', zIndex: 0, pointerEvents: 'none' }}>
             <div style={{ 
               fontFamily: F_SANS, fontWeight: 900, fontSize: 'clamp(10rem, 28vw, 30rem)', 
               lineHeight: 0.8, letterSpacing: '-0.04em', 
-              color: C.name === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-              WebkitTextStroke: `2px ${C.name === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}`,
+              color: C.name === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+              WebkitTextStroke: `2px ${C.name === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
               userSelect: 'none', whiteSpace: 'nowrap'
             }}>
               CERTIFY
             </div>
           </div>
 
-          {/* Mountain Image with Glass Annotations */}
+          {/* Mountain Image with Annotations */}
           <div style={{ position: 'absolute', right: 0, bottom: 0, width: isMobile ? '100%' : '65%', height: isMobile ? '60%' : '90%', zIndex: 2, pointerEvents: 'none' }}>
              <img src="/mountain.png" alt="Mountain" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom right' }} />
-
+             
              {!isMobile && (
                <>
-                 <TechAnnotation top="20%" right="45%" align="left" val="CERTIFY ROI" label="PEAK EST. 2026" />
-                 <TechAnnotation bottom="35%" right="55%" align="left" val="6 MONTHS" label="ELEVATION MID" />
-                 <TechAnnotation bottom="20%" right="75%" align="left" val="3 MONTHS" label="ASCENT START" />
-                 <TechAnnotation bottom="5%" right="85%" align="left" val="BASECAMP" label="COORD: CURRENT" />
                  <TechAnnotation bottom="15%" left="20%" align="right" val="BASECAMP" label="COORD: CURRENT" />
                  <TechAnnotation bottom="35%" left="38%" align="right" val="3 MONTHS" label="ASCENT START" />
                  <TechAnnotation bottom="55%" left="55%" align="right" val="6 MONTHS" label="ELEVATION MID" />
@@ -613,9 +821,9 @@ export default function LandingPage({ onEnter }) {
              )}
           </div>
 
-          {/* Hero Content — Pushed left to fill empty space cleanly */}
+          {/* Hero Content */}
           <div style={{ position: 'relative', zIndex: 3, width: '100%', maxWidth: '1400px', margin: '0 auto', display: 'flex' }}>
-
+            
             <div style={{ flex: 1, paddingLeft: isMobile ? '24px' : '8vw', paddingRight: '24px', paddingTop: isMobile ? '100px' : '0' }}>
               
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
@@ -632,8 +840,8 @@ export default function LandingPage({ onEnter }) {
               </motion.h1>
 
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
-                style={{ fontFamily: F_SANS, fontSize: 'clamp(16px, 1.2vw, 18px)', color: C.text2, maxWidth: '420px', lineHeight: '1.7', margin: '0 0 48px', fontWeight: '400' }}>
-                Know the exact payback period before you transfer the exam fee. Calculated for your specific city and current salary elevation.
+                style={{ fontFamily: F_SANS, fontSize: 'clamp(15px, 1.5vw, 18px)', color: C.text2, maxWidth: '420px', lineHeight: '1.6', margin: '0 0 48px' }}>
+                Know the exact payback period before you pay the fee. Calculated for your city and current salary.
               </motion.p>
 
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.3 }}
@@ -641,14 +849,13 @@ export default function LandingPage({ onEnter }) {
                 
                 <TechBtn onClick={onEnter} large>Calculate ROI <ArrowRight size={16} /></TechBtn>
                 
-                {/* Tech Status Block (Glass Pill) */}
-                <div style={{ 
-                  display: 'flex', alignItems: 'center', gap: '12px', border: `1px solid ${C.border}`, padding: '10px 20px', 
-                  background: C.glass, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderRadius: '30px', 
-                  boxShadow: `0 8px 24px ${C.name === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.05)'}`
-                }}>
-                  <CheckCircle2 size={14} color={C.gold} />
-                  <span style={{ fontFamily: F_SANS, fontWeight: '600', fontSize: '11px', color: C.text2, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Zero Account Required // Free Engine</span>
+                {/* Tech Status Pill */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', ...glassStyle, padding: '8px 20px', borderRadius: '32px' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <div style={{ width: '4px', height: '12px', background: C.gold }} />
+                    <div style={{ width: '4px', height: '12px', background: C.gold, opacity: 0.4 }} />
+                  </div>
+                  <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text, letterSpacing: '0.15em' }}>FREE_ACCESS // NO_ACCT_REQ</span>
                 </div>
 
               </motion.div>
@@ -656,11 +863,16 @@ export default function LandingPage({ onEnter }) {
           </div>
         </div>
 
+        {/* ── SECTIONS ── */}
         <TrustStrip />
         <CertAssembly />
-        
-        <FalseGuidance />
-        <FieldReports />
+        <DataComposition />
+        <HowItWorks onEnter={onEnter} />
+        <VsSection />
+        <ElevenPM onEnter={onEnter} />
+        <ThreeModes onEnter={onEnter} />
+        <SocialProof />
+        <FAQ />
         <FinalCTA onEnter={onEnter} />
 
         {/* ── FOOTER ── */}
