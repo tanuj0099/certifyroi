@@ -69,6 +69,7 @@ function useInView(threshold = 0.15) {
 }
 
 function CountUp({ end, prefix = '', suffix = '', duration = 1.8 }) {
+  const C = useTheme()
   const [count, setCount] = useState(0)
   const [on, setOn] = useState(false)
   useEffect(() => {
@@ -88,6 +89,7 @@ function CountUp({ end, prefix = '', suffix = '', duration = 1.8 }) {
 
 // ── SECTION CHROME ─────────────────────────────────────────
 function SectionChrome({ id, label, children, bg }) {
+  const C = useTheme()
   const mobile = useIsMobile()
   return (
     <div style={{ background: bg || C.bg, borderTop: `1px solid ${C.border}`, position: 'relative' }}>
@@ -136,6 +138,7 @@ function SectionChrome({ id, label, children, bg }) {
 
 // ── BUTTONS ───────────────────────────────────────────────
 function PrimaryBtn({ onClick, children, large = false }) {
+  const C = useTheme()
   return (
     <motion.button
       onClick={onClick}
@@ -161,6 +164,7 @@ function PrimaryBtn({ onClick, children, large = false }) {
 }
 
 function GhostBtn({ onClick, children }) {
+  const C = useTheme()
   const [hov, setHov] = useState(false)
   return (
     <button
@@ -415,6 +419,7 @@ function DataComposition() {
 
 // ── HOW IT WORKS ─────────────────────────────────────────
 function HowItWorks({ onEnter }) {
+  const C = useTheme()
   const mobile = useIsMobile()
   const [lineRef, lineInView] = useInView(0.3)
   const steps = [
@@ -514,6 +519,7 @@ function VsSection() {
 
 // ── ELEVEN PM ─────────────────────────────────────────────
 function ElevenPM({ onEnter }) {
+  const C = useTheme()
   const mobile = useIsMobile()
   const stories = [
     { time:'11:47 PM', name:'Rohan',  loc:'Pune',      role:'2 yrs · Backend Engineer', thought:'"Should I do AWS? Or is it too late?"', context:'Ex-classmate promoted to Cloud Architect. ₹28L CTC. Same college, same year.', answer:'AWS SAA at ₹9L: payback month 6. 5-year gain ₹14.2L. Not too late.', color:C.gold },
@@ -550,6 +556,7 @@ function ElevenPM({ onEnter }) {
 
 // ── THREE MODES ───────────────────────────────────────────
 function ThreeModes({ onEnter }) {
+  const C = useTheme()
   const mobile = useIsMobile()
   const modes = [
     { label: 'Student',      sub: 'No salary yet',    desc: 'Path to a ₹4.8L+ first offer. Reframes ROI around career investment, not salary hike. No salary slider needed.' },
@@ -640,6 +647,7 @@ const FAQ_DATA = [
 ]
 
 function FAQItem({ item }) {
+  const C = useTheme()
   const [open, setOpen] = useState(false)
   return (
     <div style={{ borderBottom: `1px solid ${C.border}` }}>
@@ -684,6 +692,7 @@ function FAQ() {
 
 // ── FINAL CTA ─────────────────────────────────────────────
 function FinalCTA({ onEnter }) {
+  const C = useTheme()
   return (
     <SectionChrome id="09" label="SUMMIT_ACCESS" bg={C.surface}>
       {/* Corner contour decoration */}
@@ -725,8 +734,9 @@ function FinalCTA({ onEnter }) {
 
 // ── HERO ──────────────────────────────────────────────────
 function Hero({ onEnter }) {
+  const C = useTheme()
   const mobile = useIsMobile()
-  const heroRef = useRef<HTMLDivElement>(null)
+  const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const textY = useTransform(scrollYProgress, [0, 1], [0, mobile ? -20 : -48])
   const heroOp = useTransform(scrollYProgress, [0, 0.7], [1, 0])
