@@ -695,7 +695,7 @@ export default function App() {
     <ThemeContext.Provider value={C}>
       <div style={{ minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'clip', transition: 'background 0.3s ease, color 0.3s ease' }}>
         
-        <DynamicIslandNav isDark={isDark} toggleTheme={toggleTheme} onEnter={onEnter} C={C} />
+        <DynamicIslandNav isDark={isDark} toggleTheme={toggleTheme} onEnter={onEnter} />
 
         {/* ── HERO ── */}
         <div style={{ position: 'relative', height: '100vh', minHeight: '700px', display: 'flex', alignItems: 'center', borderBottom: `1px solid ${C.border}` }}>
