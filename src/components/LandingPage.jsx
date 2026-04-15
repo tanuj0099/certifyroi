@@ -1,4 +1,4 @@
-import { motion, useScroll, AnimatePresence } from 'motion/react'
+import { motion, useScroll, AnimatePresence } from 'framer-motion'
 import React, { useRef, useState, useEffect, createContext, useContext } from 'react'
 import { ArrowRight, ChevronDown, Sun, Moon, BarChart2, CheckCircle2 } from 'lucide-react'
 import DynamicIslandNav from './DynamicIslandNav'

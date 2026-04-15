@@ -23,7 +23,7 @@
 //   - CTA click calls onEnter (same as "Calculate ROI" in the hero)
 // ─────────────────────────────────────────────────────────
 
-import { motion, useMotionValue, useSpring, AnimatePresence } from 'motion/react'
+import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Sun, Moon, BarChart2, Menu, X, ArrowRight } from 'lucide-react'
 
