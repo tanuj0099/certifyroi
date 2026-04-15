@@ -193,6 +193,7 @@ function GhostBtn({ onClick, children }) {
 
 // ── TRUST STRIP ───────────────────────────────────────────
 function TrustStrip() {
+  const C = useTheme()
   const items = [
     { tag: 'SYS.CLOUD',    text: 'AWS cert holders earn ₹2.4L more/yr in Bangalore'       },
     { tag: 'SYS.DEMAND',   text: '2,400+ cloud roles open on Naukri right now'              },
@@ -245,8 +246,9 @@ function TrustStrip() {
 
 // ── CERT ASSEMBLY ─────────────────────────────────────────
 function CertAssembly() {
+  const C = useTheme()
   const mobile = useIsMobile()
-  const trackRef = useRef<HTMLDivElement>(null)
+  const trackRef = useRef(null)
   const { scrollY } = useScroll()
   const [prog, setProg] = useState(0)
 
@@ -483,6 +485,7 @@ function HowItWorks({ onEnter }) {
 
 // ── VS SECTION ────────────────────────────────────────────
 function VsSection() {
+  const C = useTheme()
   const pairs = [
     { wrong: '"AWS is good for cloud engineers"',      right: 'AWS SAA at ₹9L salary: payback month 6. ₹14.2L net gain over 5 years. Or it isn\'t worth the investment.' },
     { wrong: '"Upskill for career growth"',            right: '₹23,600 extra every month from month 7 — compounding over 5 years. In rupees, not vague "career growth."' },
@@ -602,6 +605,7 @@ function ThreeModes({ onEnter }) {
 
 // ── SOCIAL PROOF ──────────────────────────────────────────
 function SocialProof() {
+  const C = useTheme()
   const mobile = useIsMobile()
   const quotes = [
     { quote: 'CertifyROI said payback was month 8. It was month 7. Switched companies immediately. ₹6L hike.', name: 'Priya S.', detail: 'Bangalore · Engineer → Cloud Architect', hike: '+₹6L/yr', color: C.gold },
@@ -674,6 +678,7 @@ function FAQItem({ item }) {
 }
 
 function FAQ() {
+  const C = useTheme()
   const mobile = useIsMobile()
   return (
     <SectionChrome id="08" label="LOGISTICS">
