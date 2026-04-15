@@ -59,7 +59,7 @@ function useIsMobile() {
 }
 
 function useInView(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef(null)
   const [inView, setInView] = useState(false)
   useEffect(() => {
     const el = ref.current; if (!el) return
@@ -918,6 +918,8 @@ export default function App() {
     document.head.appendChild(link)
   }, [])
 
+  const handleEnter = () => console.log('Enter clicked')
+
   return (
     <div style={{ background: C.bg, color: C.text, minHeight: '100vh', overflowX: 'hidden' }}>
 
@@ -952,17 +954,17 @@ export default function App() {
 
       {/* Page */}
       <div style={{ paddingTop: '64px' }}>
-        <Hero />
+        <Hero onEnter={handleEnter} />
         <TrustStrip />
         <CertAssembly />
         <DataComposition />
-        <HowItWorks />
+        <HowItWorks onEnter={handleEnter} />
         <VsSection />
-        <ElevenPM />
-        <ThreeModes />
+        <ElevenPM onEnter={handleEnter} />
+        <ThreeModes onEnter={handleEnter} />
         <SocialProof />
         <FAQ />
-        <FinalCTA />
+        <FinalCTA onEnter={handleEnter} />
 
         {/* Footer */}
         <div style={{ borderTop: `1px solid ${C.border}`, background: C.bgAlt }}>
