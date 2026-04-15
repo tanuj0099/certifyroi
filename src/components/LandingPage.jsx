@@ -606,7 +606,7 @@ const FAQ_ITEMS =[
   { q: 'How does the Resume AI work?', a: 'Upload a resume or paste your profile. The AI reads your domain, role, and experience, then recommends the highest-ROI certifications for your specific background.' },
 ]
 
-function FAQItem({ item }: any) {
+function FAQItem({ item }) {
   const C = useTheme()
   const [open, setOpen] = useState(false)
   return (
