@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import DynamicIslandNav from './components/DynamicIslandNav'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   TrendingUp, FileText, Map, LogIn, LogOut, User,

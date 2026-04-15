@@ -1,6 +1,7 @@
 import { motion, useScroll, AnimatePresence } from 'motion/react'
 import React, { useRef, useState, useEffect, createContext, useContext } from 'react'
 import { ArrowRight, ChevronDown, Sun, Moon, BarChart2, CheckCircle2 } from 'lucide-react'
+import DynamicIslandNav from './DynamicIslandNav'
 
 // ─────────────────────────────────────────────────────────
 // THEME SYSTEM
@@ -160,34 +161,6 @@ function useGlassStyle() {
 // ─────────────────────────────────────────────────────────
 // COMPONENTS
 // ─────────────────────────────────────────────────────────
-function FloatingTopBar({ isDark, toggleTheme }) {
-  const C = useTheme()
-  const isMobile = useIsMobile()
-  const glassStyle = useGlassStyle()
-
-  return (
-    <div style={{
-      position: 'absolute', top: 0, left: 0, right: 0, 
-      padding: isMobile ? '24px' : '40px 5vw', 
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-      zIndex: 100, pointerEvents: 'none'
-    }}>
-      <div style={{ ...glassStyle, display: 'flex', alignItems: 'center', gap: '10px', pointerEvents: 'auto', padding: '10px 20px', borderRadius: '100px' }}>
-        <BarChart2 size={22} color={C.gold} strokeWidth={2.5} />
-        <span style={{ fontFamily: F_SANS, fontWeight: '800', fontSize: '18px', letterSpacing: '-0.02em', color: C.text }}>
-          Certify<span style={{ color: C.gold }}>ROI</span>
-        </span>
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', pointerEvents: 'auto' }}>
-        <button onClick={toggleTheme} style={{ ...glassStyle, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text, padding: '12px', transition: 'all 0.2s' }}>
-          {isDark ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
-      </div>
-    </div>
-  )
-}
-
 function StorySection({ id = '', title = '', children = null, bg = '', noBorderTop = false }) {
   const C = useTheme()
   const isMobile = useIsMobile()
@@ -722,7 +695,7 @@ export default function App() {
     <ThemeContext.Provider value={C}>
       <div style={{ minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'clip', transition: 'background 0.3s ease, color 0.3s ease' }}>
         
-        <FloatingTopBar isDark={isDark} toggleTheme={toggleTheme} />
+        <DynamicIslandNav isDark={isDark} toggleTheme={toggleTheme} onEnter={onEnter} C={C} />
 
         {/* ── HERO ── */}
         <div style={{ position: 'relative', height: '100vh', minHeight: '700px', display: 'flex', alignItems: 'center', borderBottom: `1px solid ${C.border}` }}>
@@ -735,7 +708,7 @@ export default function App() {
           {/* Hero Content */}
           <div style={{ position: 'relative', zIndex: 3, width: '100%', maxWidth: '1400px', margin: '0 auto', display: 'flex' }}>
             
-            <div style={{ flex: 1, paddingLeft: isMobile ? '24px' : '8vw', paddingRight: '24px', paddingTop: isMobile ? '100px' : '0' }}>
+            <div style={{ flex: 1, paddingLeft: isMobile ? '24px' : '8vw', paddingRight: '24px' }}>
               
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
                 style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
