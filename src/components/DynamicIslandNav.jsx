@@ -62,8 +62,9 @@ function scrollTo(href) {
 // Has a shared animated underline using layoutId="nav-active"
 // Spring-based hover state for the background highlight
 // ─────────────────────────────────────────────────────────
-function NavItem({ label, href, isActive, onActivate, C }) {
+function NavItem({ label, href, isActive, onActivate, theme = {} }) {
   const [hovered, setHovered] = useState(false)
+  const t = theme || { name: 'dark', text: '#F5F5F5', text2: '#A3A3A3', gold: '#D4AF37' }
 
   function handleClick(e) {
     e.preventDefault()
@@ -100,7 +101,7 @@ function NavItem({ label, href, isActive, onActivate, C }) {
             style={{
               position: 'absolute', inset: 0,
               borderRadius: '100px',
-              background: C.name === 'dark'
+              background: t.name === 'dark'
                 ? 'rgba(255,255,255,0.06)'
                 : 'rgba(0,0,0,0.05)',
             }}
@@ -115,7 +116,7 @@ function NavItem({ label, href, isActive, onActivate, C }) {
         fontSize: '13px',
         fontWeight: isActive ? '600' : '400',
         letterSpacing: '-0.01em',
-        color: isActive ? C.text : C.text2,
+        color: isActive ? t.text : t.text2,
         transition: 'color 0.15s, font-weight 0.15s',
       }}>
         {label}
@@ -132,7 +133,7 @@ function NavItem({ label, href, isActive, onActivate, C }) {
             right: '12px',
             height: '1.5px',
             borderRadius: '1px',
-            background: C.gold,
+            background: t.gold,
           }}
           transition={{ type: 'spring', stiffness: 480, damping: 36 }}
         />
@@ -144,7 +145,9 @@ function NavItem({ label, href, isActive, onActivate, C }) {
 // ─────────────────────────────────────────────────────────
 // THEME TOGGLE BUTTON
 // ─────────────────────────────────────────────────────────
-function ThemeToggle({ isDark, onToggle, C }) {
+function ThemeToggle({ isDark, onToggle, theme = {} }) {
+  const t = theme || { name: 'dark', border: 'rgba(255,255,255,0.08)', text2: '#A3A3A3' }
+
   return (
     <motion.button
       onClick={onToggle}
@@ -153,22 +156,22 @@ function ThemeToggle({ isDark, onToggle, C }) {
       style={{
         width: '32px', height: '32px',
         borderRadius: '50%',
-        border: '1px solid ' + C.border,
-        background: C.name === 'dark'
+        border: '1px solid ' + t.border,
+        background: t.name === 'dark'
           ? 'rgba(255,255,255,0.06)'
           : 'rgba(0,0,0,0.04)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         cursor: 'pointer',
-        color: C.text2,
+        color: t.text2,
         flexShrink: 0,
         transition: 'background 0.15s, border-color 0.15s',
       }}
       onMouseEnter={function(e) {
-        e.currentTarget.style.background = C.name === 'dark'
+        e.currentTarget.style.background = t.name === 'dark'
           ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'
       }}
       onMouseLeave={function(e) {
-        e.currentTarget.style.background = C.name === 'dark'
+        e.currentTarget.style.background = t.name === 'dark'
           ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'
       }}
     >
@@ -194,7 +197,9 @@ function ThemeToggle({ isDark, onToggle, C }) {
 // ─────────────────────────────────────────────────────────
 // CTA BUTTON — compact version for inside the nav
 // ─────────────────────────────────────────────────────────
-function NavCTA({ onClick, C }) {
+function NavCTA({ onClick, theme = {} }) {
+  const t = theme || { name: 'dark', btnFill: '#D4AF37', btnText: '#000000' }
+
   return (
     <motion.button
       onClick={onClick}
@@ -207,26 +212,26 @@ function NavCTA({ onClick, C }) {
         height: '32px',
         borderRadius: '100px',
         border: 'none',
-        background: C.btnFill,
-        color: C.btnText,
+        background: t.btnFill,
+        color: t.btnText,
         fontFamily: F_SANS,
         fontSize: '12px',
         fontWeight: '600',
         letterSpacing: '0.02em',
         cursor: 'pointer',
         flexShrink: 0,
-        boxShadow: C.name === 'dark'
+        boxShadow: t.name === 'dark'
           ? '0 2px 8px rgba(212,175,55,0.22)'
           : '0 2px 8px rgba(0,0,0,0.14)',
         transition: 'box-shadow 0.18s',
       }}
       onMouseEnter={function(e) {
-        e.currentTarget.style.boxShadow = C.name === 'dark'
+        e.currentTarget.style.boxShadow = t.name === 'dark'
           ? '0 4px 16px rgba(212,175,55,0.36)'
           : '0 4px 14px rgba(0,0,0,0.22)'
       }}
       onMouseLeave={function(e) {
-        e.currentTarget.style.boxShadow = C.name === 'dark'
+        e.currentTarget.style.boxShadow = t.name === 'dark'
           ? '0 2px 8px rgba(212,175,55,0.22)'
           : '0 2px 8px rgba(0,0,0,0.14)'
       }}
@@ -241,7 +246,19 @@ function NavCTA({ onClick, C }) {
 // MOBILE MENU PANEL
 // Expands below the island with a spring animation
 // ─────────────────────────────────────────────────────────
-function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onToggle, onEnter, C }) {
+function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onToggle, onEnter, theme = {} }) {
+  const t = theme || { 
+    name: 'dark', 
+    borderMid: 'rgba(255,255,255,0.15)', 
+    text: '#F5F5F5', 
+    text2: '#A3A3A3', 
+    text3: '#737373', 
+    gold: '#D4AF37',
+    border: 'rgba(255,255,255,0.08)',
+    btnFill: '#D4AF37',
+    btnText: '#000000'
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -257,13 +274,13 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
             right: '16px',
             zIndex: 9998,
             borderRadius: '20px',
-            background: C.name === 'dark'
+            background: t.name === 'dark'
               ? 'rgba(14, 14, 14, 0.92)'
               : 'rgba(244, 242, 238, 0.94)',
             backdropFilter: 'blur(24px) saturate(180%)',
             WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            border: '1px solid ' + C.borderMid,
-            boxShadow: C.name === 'dark'
+            border: '1px solid ' + t.borderMid,
+            boxShadow: t.name === 'dark'
               ? '0 24px 48px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,255,255,0.04) inset'
               : '0 24px 48px rgba(0,0,0,0.18), 0 0 0 0.5px rgba(0,0,0,0.06) inset',
             padding: '8px',
@@ -294,13 +311,13 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
                     borderRadius: '12px',
                     textDecoration: 'none',
                     background: isActive
-                      ? (C.name === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)')
+                      ? (t.name === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)')
                       : 'transparent',
                     cursor: 'pointer',
                     transition: 'background 0.15s',
                   }}
                   onMouseEnter={function(e) {
-                    if (!isActive) e.currentTarget.style.background = C.name === 'dark'
+                    if (!isActive) e.currentTarget.style.background = t.name === 'dark'
                       ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'
                   }}
                   onMouseLeave={function(e) {
@@ -310,13 +327,13 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
                   <span style={{
                     fontFamily: F_SANS, fontSize: '16px',
                     fontWeight: isActive ? '600' : '400',
-                    color: isActive ? C.text : C.text2,
+                    color: isActive ? t.text : t.text2,
                     letterSpacing: '-0.01em',
                   }}>
                     {item.label}
                   </span>
                   {isActive && (
-                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: C.gold }} />
+                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: t.gold }} />
                   )}
                 </a>
               </motion.div>
@@ -324,7 +341,7 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
           })}
 
           {/* Divider */}
-          <div style={{ height: '1px', background: C.border, margin: '8px 16px' }} />
+          <div style={{ height: '1px', background: t.border, margin: '8px 16px' }} />
 
           {/* Bottom row: theme toggle + CTA */}
           <motion.div
@@ -340,15 +357,15 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
                 style={{
                   width: '38px', height: '38px',
                   borderRadius: '50%',
-                  border: '1px solid ' + C.border,
-                  background: C.name === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                  border: '1px solid ' + t.border,
+                  background: t.name === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: C.text2,
+                  cursor: 'pointer', color: t.text2,
                 }}
               >
                 {isDark ? <Sun size={16} strokeWidth={1.8} /> : <Moon size={16} strokeWidth={1.8} />}
               </motion.button>
-              <span style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.08em' }}>
+              <span style={{ fontFamily: F_MONO, fontSize: '10px', color: t.text3, letterSpacing: '0.08em' }}>
                 {isDark ? 'LIGHT_MODE' : 'DARK_MODE'}
               </span>
             </div>
@@ -361,10 +378,10 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
                 padding: '0 20px', height: '38px',
                 borderRadius: '100px',
                 border: 'none',
-                background: C.btnFill, color: C.btnText,
+                background: t.btnFill, color: t.btnText,
                 fontFamily: F_SANS, fontSize: '13px', fontWeight: '600',
                 letterSpacing: '0.01em', cursor: 'pointer',
-                boxShadow: C.name === 'dark'
+                boxShadow: t.name === 'dark'
                   ? '0 2px 10px rgba(212,175,55,0.24)'
                   : '0 2px 10px rgba(0,0,0,0.16)',
               }}
@@ -389,11 +406,11 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
 //   Max tilt: 4° (subtle, premium — not a toy)
 //   translateZ: 0 → 6px on hover for lift effect
 // ─────────────────────────────────────────────────────────
-export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, C }) {
+export default function DynamicIslandNav({ isDark, toggleTheme, onEnter }) {
 
-  // ── Theme fallback if C is not passed directly ──
-  // The component needs the color object. If the parent passes it,
-  // great. If not, derive from isDark.
+  // ── Theme management ──────────────────────────────────
+  // Always derive theme from isDark to ensure it's always defined
+  // The C prop is no longer used; we build theme internally
   const FALLBACK_DARK = {
     name: 'dark',
     bg: '#0A0A0A', bgAlt: '#111111', surface: '#141414',
@@ -414,7 +431,7 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, C }) {
     btnFill: '#121212', btnText: '#FFFFFF',
     glass: 'rgba(244,242,238,0.7)',
   }
-  const theme = C || (isDark ? FALLBACK_DARK : FALLBACK_LIGHT)
+  const theme = isDark ? FALLBACK_DARK : FALLBACK_LIGHT
 
   // ── State ─────────────────────────────────────────────
   const [activeHref, setActiveHref] = useState('')
@@ -598,7 +615,7 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, C }) {
                       href={item.href}
                       isActive={activeHref === item.href}
                       onActivate={setActiveHref}
-                      C={theme}
+                      theme={theme}
                     />
                   )
                 })}
@@ -609,12 +626,12 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, C }) {
 
               {/* Theme toggle */}
               <div style={{ padding: '0 4px', flexShrink: 0 }}>
-                <ThemeToggle isDark={isDark} onToggle={toggleTheme} C={theme} />
+                <ThemeToggle isDark={isDark} onToggle={toggleTheme} theme={theme} />
               </div>
 
               {/* Compact CTA */}
               <div style={{ padding: '0 4px 0 2px', flexShrink: 0 }}>
-                <NavCTA onClick={onEnter} C={theme} />
+                <NavCTA onClick={onEnter} theme={theme} />
               </div>
             </>
           )}
@@ -622,7 +639,7 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, C }) {
           {/* ── MOBILE: theme toggle + hamburger ── */}
           {isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', paddingLeft: '8px' }}>
-              <ThemeToggle isDark={isDark} onToggle={toggleTheme} C={theme} />
+              <ThemeToggle isDark={isDark} onToggle={toggleTheme} theme={theme} />
 
               {/* Menu trigger */}
               <motion.button
@@ -672,7 +689,7 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, C }) {
         isDark={isDark}
         onToggle={toggleTheme}
         onEnter={onEnter}
-        C={theme}
+        theme={theme}
       />
 
       {/* ── SPACER: prevents page content from going under the nav ── */}
