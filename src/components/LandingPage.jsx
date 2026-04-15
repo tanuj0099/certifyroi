@@ -1,4 +1,4 @@
-import { motion, useScroll, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, AnimatePresence } from 'motion/react'
 import React, { useRef, useState, useEffect, createContext, useContext } from 'react'
 import { ArrowRight, ChevronDown, Sun, Moon, BarChart2, CheckCircle2 } from 'lucide-react'
 
@@ -54,7 +54,7 @@ const THEMES = {
   }
 }
 
-const ThemeContext = createContext()
+const ThemeContext = createContext(THEMES.dark)
 function useTheme() { return useContext(ThemeContext) }
 
 // ─────────────────────────────────────────────────────────
@@ -132,7 +132,7 @@ function CountUp({ end, prefix = '', suffix = '', duration = 1.8 }) {
   return <motion.span onViewportEnter={() => setOn(true)}>{prefix}{count.toLocaleString('en-IN', { maximumFractionDigits: String(end).includes('.') ? 1 : 0 })}{suffix}</motion.span>
 }
 
-function TechBtn({ onClick, children, large }) {
+function TechBtn({ onClick = () => {}, children = null, large = false }) {
   const C = useTheme()
   return (
     <motion.button
@@ -171,38 +171,6 @@ function useGlassStyle() {
 }
 
 // ─────────────────────────────────────────────────────────
-// ANNOTATION UI
-// ─────────────────────────────────────────────────────────
-function TechAnnotation({ label, val, align = 'left', top, left, right, bottom }) {
-  const C = useTheme()
-  const glassStyle = useGlassStyle()
-  const isRight = align === 'right'
-  
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }} 
-      animate={{ opacity: 1, scale: 1 }} 
-      transition={{ delay: 1, duration: 0.8 }}
-      style={{ 
-        position: 'absolute', top, left, right, bottom, 
-        display: 'flex', alignItems: 'center', 
-        flexDirection: isRight ? 'row-reverse' : 'row', 
-        zIndex: 10 
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '6px', height: '6px', border: `1.5px solid ${C.gold}`, borderRadius: '50%', background: C.bg }} />
-        <div style={{ width: '48px', height: '1px', background: C.gold, opacity: 0.6 }} />
-      </div>
-      <div style={{ ...glassStyle, padding: '8px 14px', borderRadius: '8px' }}>
-        <div style={{ fontFamily: F_MONO, fontSize: '13px', color: C.text, fontWeight: '700', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{val}</div>
-        <div style={{ fontFamily: F_MONO, fontSize: '9px', color: C.gold, letterSpacing: '0.15em', marginTop: '2px', textTransform: 'uppercase' }}>{label}</div>
-      </div>
-    </motion.div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────
 // FLOATING TOP BAR (Premium Glass)
 // ─────────────────────────────────────────────────────────
 function FloatingTopBar({ isDark, toggleTheme }) {
@@ -236,7 +204,7 @@ function FloatingTopBar({ isDark, toggleTheme }) {
 // ─────────────────────────────────────────────────────────
 // ARCHITECTURAL LAYOUT WRAPPER
 // ─────────────────────────────────────────────────────────
-function StorySection({ id, title, children, bg, noBorderTop }) {
+function StorySection({ id = '', title = '', children = null, bg = '', noBorderTop = false }) {
   const C = useTheme()
   const isMobile = useIsMobile()
 
@@ -776,14 +744,27 @@ function FinalCTA({ onEnter }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// MAIN LANDING PAGE
+// MAIN APP COMPONENT
 // ─────────────────────────────────────────────────────────
-export default function LandingPage({ onEnter }) {
+export default function App() {
   const [isDark, setIsDark] = useState(true)
   const toggleTheme = () => setIsDark(!isDark)
   const C = isDark ? THEMES.dark : THEMES.light
   const isMobile = useIsMobile()
-  const glassStyle = useGlassStyle()
+  
+  // Calculate glassStyle manually here since we are outside the provider's consumer scope
+  const glassStyle = {
+    background: C.glass,
+    backdropFilter: 'blur(16px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+    border: `1px solid ${C.borderMid}`,
+    boxShadow: `0 8px 32px ${C.name === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.1)'}`
+  }
+
+  const onEnter = () => {
+    console.log('ROI Calculation triggered')
+    // Add logic here if needed
+  }
 
   return (
     <ThemeContext.Provider value={C}>
@@ -794,31 +775,9 @@ export default function LandingPage({ onEnter }) {
         {/* ── HERO ── */}
         <div style={{ position: 'relative', height: '100vh', minHeight: '700px', display: 'flex', alignItems: 'center', borderBottom: `1px solid ${C.border}` }}>
           
-          {/* Bold Background Text */}
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '100%', textAlign: 'center', zIndex: 0, pointerEvents: 'none' }}>
-            <div style={{ 
-              fontFamily: F_SANS, fontWeight: 900, fontSize: 'clamp(10rem, 28vw, 30rem)', 
-              lineHeight: 0.8, letterSpacing: '-0.04em', 
-              color: C.name === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-              WebkitTextStroke: `2px ${C.name === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
-              userSelect: 'none', whiteSpace: 'nowrap'
-            }}>
-              CERTIFY
-            </div>
-          </div>
-
-          {/* Mountain Image with Annotations */}
+          {/* Mountain Image */}
           <div style={{ position: 'absolute', right: 0, bottom: 0, width: isMobile ? '100%' : '65%', height: isMobile ? '60%' : '90%', zIndex: 2, pointerEvents: 'none' }}>
              <img src="/mountain.png" alt="Mountain" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom right' }} />
-             
-             {!isMobile && (
-               <>
-                 <TechAnnotation bottom="15%" left="20%" align="right" val="BASECAMP" label="COORD: CURRENT" />
-                 <TechAnnotation bottom="35%" left="38%" align="right" val="3 MONTHS" label="ASCENT START" />
-                 <TechAnnotation bottom="55%" left="55%" align="right" val="6 MONTHS" label="ELEVATION MID" />
-                 <TechAnnotation top="20%" left="68%" align="left" val="CERTIFY ROI" label="PEAK EST. 2026" />
-               </>
-             )}
           </div>
 
           {/* Hero Content */}
