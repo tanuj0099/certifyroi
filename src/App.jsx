@@ -1099,7 +1099,12 @@ function AppRoot() {
 
   return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
-      <DynamicIslandNav isDark={isDark} toggleDarkMode={() => setIsDark(!isDark)} onEnter={onEnter} />
+      <DynamicIslandNav
+  isDark={isDark}
+  toggleTheme={toggleTheme}
+  onEnter={function() { goToApp('resume') }}
+  onNavigate={navigate}
+/>
       <main style={{ flex:1 }}>
         <AnimatePresence mode="wait">
           <motion.div key={page+activeTab} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={T}>
