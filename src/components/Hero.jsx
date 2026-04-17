@@ -19,9 +19,6 @@ import PitchBoss from './PitchBoss.jsx'
 import ShareROICard from './ShareROICard.jsx'
 
 // ── Font constants — 3 fonts, no more ────────────────────
-// FH: Bricolage Grotesque — headings and CTAs
-// FM: JetBrains Mono      — data labels, numbers, badges
-// FB: Inter               — body copy, descriptions
 const FH = "'Bricolage Grotesque',sans-serif"
 const FM = "'JetBrains Mono',monospace"
 const FB = "'Inter',sans-serif"
@@ -40,6 +37,34 @@ function dc(d) {
   if (d === 'Medium')    return AMBER
   return '#94A3B8'
 }
+
+// ─────────────────────────────────────────────────────────
+// VERTICAL STORY LINE COMPONENT
+// ─────────────────────────────────────────────────────────
+const VerticalStoryLine = () => {
+  const storyItems = [
+    "ANALYSIS COMPLETE", "ROUTE OPTIMIZED", "ROI CONFIRMED", "FUTURE SECURED"
+  ];
+  const scrollItems = [...storyItems, ...storyItems]; // Duplicate for seamless loop
+
+  return (
+    <div className="fixed right-6 top-0 h-full hidden lg:flex items-center z-50 pointer-events-none select-none">
+      <div 
+        className="flex flex-col items-center justify-center space-y-8 animate-scroll-vertical"
+        style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+      >
+        {scrollItems.map((item, index) => (
+          <span 
+            key={index}
+            className="text-lg font-semibold tracking-[0.4em] text-gray-200 dark:text-gray-700/40"
+          >
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // ─────────────────────────────────────────────────────────
 // CUSTOM SLIDER
@@ -182,7 +207,6 @@ function Slider({ label, value, min = 0, max = 100, step = 1, onChange, prefix =
 
 // ─────────────────────────────────────────────────────────
 // INLINE DATA SOURCE NOTE
-// Shown below each slider group — trust signal at point of use
 // ─────────────────────────────────────────────────────────
 function DataNote({ children }) {
   return (
@@ -392,14 +416,22 @@ function PickMessage({ certName, prefilledCert, firstName }) {
 }
 
 // ── Stat card ─────────────────────────────────────────────
+// UPDATED: More rounded, more glow (aura)
 function StatCard({ label, value, sub, color, delay = 0 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ ...TT, delay }}
-      style={{ padding: '14px', borderRadius: '12px', background: color + '08', border: '1px solid ' + color + '22', textAlign: 'center' }}
+      style={{ 
+        padding: '16px', 
+        borderRadius: '20px', /* Changed from 12px to 20px for softer look */
+        background: color + '10', /* Slightly darker background for contrast */
+        border: '1px solid ' + color + '20',
+        textAlign: 'center',
+        boxShadow: '0 4px 20px -5px ' + color + '20', /* Added subtle aura shadow */
+      }}
     >
       <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '5px' }}>{label}</div>
-      <div style={{ fontFamily: FM, fontSize: 'clamp(0.85rem,2vw,1.35rem)', fontWeight: '700', color, letterSpacing: '-0.03em' }}>{value}</div>
+      <div style={{ fontFamily: FM, fontSize: 'clamp(0.9rem,2vw,1.4rem)', fontWeight: '800', color, letterSpacing: '-0.03em' }}>{value}</div>
       {sub && <div style={{ fontSize: '10px', color: 'var(--text-4)', marginTop: '4px', fontFamily: FB, lineHeight: '1.4' }}>{sub}</div>}
     </motion.div>
   )
@@ -427,8 +459,7 @@ function ChartTip({ active, payload, label }) {
 
 // ─────────────────────────────────────────────────────────
 // AI RESULT PANEL
-// "AI VERDICT" renamed to "AI ASSESSMENT"
-// Honest estimate disclaimer added below bottom-line
+// UPDATED: Increased border radius to match "capsule" theme
 // ─────────────────────────────────────────────────────────
 function AIResult({ result, certName, onReset }) {
   var vc = result.verdict?.toLowerCase().includes('strong')   ? EMERALD
@@ -438,9 +469,8 @@ function AIResult({ result, certName, onReset }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={TT}
-      style={{ marginTop: '14px', borderRadius: '14px', background: 'var(--surface)', border: '1px solid var(--glass-border)', overflow: 'hidden' }}
+      style={{ marginTop: '14px', borderRadius: '24px', /* Changed to rounded-pill/capsule */ background: 'var(--surface)', border: '1px solid var(--glass-border)', overflow: 'hidden', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)' }} /* Added shadow for depth */
     >
-      {/* Header — "AI ASSESSMENT" not "AI VERDICT" */}
       <div style={{ padding: '14px 16px', background: vc + '0d', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
         <div>
           <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>
@@ -458,13 +488,13 @@ function AIResult({ result, certName, onReset }) {
       {(result.breakEven || result.projection) && (
         <div style={{ padding: '14px 16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: '10px' }}>
           {result.breakEven && (
-            <div style={{ padding: '10px 12px', borderRadius: '9px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
+            <div style={{ padding: '10px 12px', borderRadius: '12px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
               <div style={{ fontFamily: FM, fontSize: '9px', color: AMBER, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>BREAK-EVEN</div>
               <div style={{ fontSize: '12px', color: 'var(--text-2)', fontFamily: FB, lineHeight: '1.6' }}>{result.breakEven}</div>
             </div>
           )}
           {result.projection && (
-            <div style={{ padding: '10px 12px', borderRadius: '9px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
+            <div style={{ padding: '10px 12px', borderRadius: '12px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
               <div style={{ fontFamily: FM, fontSize: '9px', color: EMERALD, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>5-YR PROJECTION</div>
               <div style={{ fontSize: '12px', color: 'var(--text-2)', fontFamily: FB, lineHeight: '1.6' }}>{result.projection}</div>
             </div>
@@ -507,7 +537,6 @@ function AIResult({ result, certName, onReset }) {
         </div>
       )}
 
-      {/* ── Honest estimate disclaimer — Phase C inline trust ── */}
       <div style={{ margin: '0 16px 16px', padding: '9px 12px', borderRadius: '8px', background: 'rgba(100,116,139,0.06)', border: '1px solid rgba(100,116,139,0.12)', display: 'flex', gap: '7px', alignItems: 'flex-start' }}>
         <Info size={11} color="var(--text-4)" style={{ flexShrink: 0, marginTop: '1px' }} />
         <div style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', lineHeight: '1.6', letterSpacing: '0.02em' }}>
@@ -604,7 +633,10 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
   var canAnalyse = certName && (user || !guest.exceeded) && cooldown === 0
 
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
+      
+      {/* ── RENDER VERTICAL STORY LINE ─────────────────────── */}
+      <VerticalStoryLine />
 
       {/* ── Personalisation banner ─────────────────────── */}
       {(firstName || displayCity || prefilledCert) ? (
@@ -693,7 +725,6 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
               color={PICTON}
               note={displayCity || ''}
             />
-            {/* Inline trust signal — salary data source */}
             <DataNote>
               Salary benchmarks: Naukri salary insights + LinkedIn India · Median values · {displayCity || 'India'} · Q1 2026
             </DataNote>
@@ -721,7 +752,6 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
               suffix="%"
               color={EMERALD}
             />
-            {/* Inline trust signal — hike data source */}
             <DataNote>
               Hike benchmarks: AmbitionBox post-cert salary data + NASSCOM 2026 · India median: 25–40% · Individual results vary by company tier and negotiation
             </DataNote>
@@ -758,7 +788,6 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
             </div>
           ) : null}
 
-          {/* Inline trust note below stat cards */}
           {!isStudent && (
             <DataNote>
               All figures are estimates based on market medians. Break-even assumes you negotiate the full hike on your next job switch. 5-year gain = cumulative salary uplift minus cert cost.
@@ -799,7 +828,18 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
             disabled={!canAnalyse}
             whileHover={canAnalyse ? { y: -3, scale: 1.02 } : {}}
             whileTap={canAnalyse ? { scale: 0.97 } : {}}
-            style={{ width: '100%', padding: '14px 22px', borderRadius: '12px', background: cooldown > 0 ? 'var(--surface)' : 'linear-gradient(135deg,' + INDIGO + ',#4338CA)', border: cooldown > 0 ? '1px solid var(--border)' : 'none', color: cooldown > 0 ? 'var(--text-4)' : 'white', fontSize: '14px', fontWeight: '700', cursor: canAnalyse ? 'pointer' : 'not-allowed', fontFamily: FH, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: !certName ? 0.45 : 1, letterSpacing: '-0.01em', transition: 'all 0.3s' }}
+            style={{ 
+              width: '100%', padding: '14px 22px', 
+              borderRadius: '9999px', /* Changed to CAPSULE */
+              background: cooldown > 0 ? 'var(--surface)' : 'linear-gradient(135deg,' + INDIGO + ',#4338CA)', 
+              border: cooldown > 0 ? '1px solid var(--border)' : 'none', 
+              color: cooldown > 0 ? 'var(--text-4)' : 'white', 
+              fontSize: '14px', fontWeight: '700', 
+              cursor: canAnalyse ? 'pointer' : 'not-allowed', 
+              fontFamily: FH, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', 
+              opacity: !certName ? 0.45 : 1, letterSpacing: '-0.01em', transition: 'all 0.3s',
+              boxShadow: canAnalyse ? '0 10px 25px -5px rgba(99, 102, 241, 0.4)' : 'none' /* Added Aura/Shadow */
+            }}
           >
             {cooldown > 0 ? (
               <span>Cooling down {cooldown}s</span>
