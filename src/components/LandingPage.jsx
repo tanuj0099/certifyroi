@@ -15,7 +15,7 @@ const THEMES = {
     text2: '#A8A8A8',
     text3: '#6E6E6E',
     text4: '#3A3A3A',
-    gold: '#D4AF37',
+    gold: '#D4AF37', // Brighter gold for dark mode
     goldL: '#F0D060',
     err: '#D94848',
     line: '#1E1E1E',
@@ -120,7 +120,7 @@ function PillBtn({ onClick = () => {}, children, large }) {
           ? `linear-gradient(135deg, rgba(255,255,255,${h ? 0.07 : 0.045}), rgba(255,255,255,${h ? 0.02 : 0.01}))`
           : `linear-gradient(135deg, rgba(0,0,0,${h ? 0.05 : 0.035}), rgba(0,0,0,${h ? 0.015 : 0.008}))`,
         border: `1px solid ${d ? `rgba(255,255,255,${h ? 0.13 : 0.09})` : `rgba(0,0,0,${h ? 0.1 : 0.07})`}`,
-        borderRadius: '9999px',
+        borderRadius: '9999px', // Explicit Capsule
         fontSize: large ? '12px' : '11px',
         fontFamily: F_SANS, fontWeight: '600',
         letterSpacing: '0.07em', textTransform: 'uppercase',
@@ -156,24 +156,50 @@ function GlassPill({ children }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// STORY SECTION
+// STORY SECTION — FIX: Vertical Text Scroll
 // ─────────────────────────────────────────────────────────
 function StorySection({ id = '', title = '', children, bg = '', noBorderTop = false }) {
   const C = useTheme()
   const isMobile = useIsMobile()
+  
+  // Duplicated content for seamless scroll
+  const scrollContent = [
+    <span style={{ color: C.gold, fontWeight: '700' }}>{id}</span>,
+    <span style={{ opacity: 0.5 }}>//</span>,
+    <span>{title}</span>
+  ]
+  
   return (
     <div style={{ background: bg || C.bg, borderTop: noBorderTop ? 'none' : `1px solid ${C.border}`, position: 'relative' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
         {!isMobile && (
-          <div style={{ width: '140px', flexShrink: 0, borderRight: `1px solid ${C.border}`, position: 'relative' }}>
+          <div style={{ width: '140px', flexShrink: 0, borderRight: `1px solid ${C.border}`, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'sticky', top: '120px', padding: '32px 0', display: 'flex', alignItems: 'center', flexDirection: 'column', height: '360px' }}>
               <CrosshairIcon color={C.text4} />
               <div style={{ width: '1px', flex: 1, background: C.border, margin: '16px 0' }} />
-              <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.18em' }}>
-                <span style={{ color: C.gold, fontWeight: '700' }}>{id}</span>{' '}
-                <span style={{ opacity: 0.5 }}>//</span>{' '}
-                {title}
-              </div>
+              
+              {/* VERTICAL SCROLLING TEXT */}
+              <motion.div 
+                animate={{ y: ['-50%', '0%'] }} 
+                transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+                style={{ 
+                  writingMode: 'vertical-rl', 
+                  transform: 'rotate(180deg)', 
+                  fontFamily: F_MONO, 
+                  fontSize: '13px', // Bigger font
+                  color: C.text3, 
+                  letterSpacing: '0.2em', // Tighter spacing
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  gap: '24px'
+                }}>
+                {[...scrollContent, ...scrollContent, ...scrollContent].map((item, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {item}
+                  </div>
+                ))}
+              </motion.div>
+
               <div style={{ width: '1px', flex: 1, background: C.border, margin: '16px 0' }} />
               <CrosshairIcon color={C.text4} />
             </div>
@@ -182,7 +208,7 @@ function StorySection({ id = '', title = '', children, bg = '', noBorderTop = fa
         <div style={{ flex: 1, padding: isMobile ? '56px 24px' : '100px 6vw', position: 'relative', overflow: 'hidden' }}>
           {isMobile && (
             <div style={{ marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontFamily: F_MONO, fontSize: '11px', color: C.gold, fontWeight: '700', letterSpacing: '0.12em' }}>{id}</span>
+              <span style={{ fontFamily: F_MONO, fontSize: '13px', color: C.gold, fontWeight: '700', letterSpacing: '0.12em' }}>{id}</span>
               <div style={{ height: '1px', flex: 1, background: C.border }} />
               <span style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.12em' }}>{title}</span>
             </div>
@@ -227,7 +253,7 @@ function TrustStrip() {
 }
 
 // ─────────────────────────────────────────────────────────
-// CERT ASSEMBLY — metallic border + swoosh
+// CERT ASSEMBLY — FIX: Gold Aura & Z-Index
 // ─────────────────────────────────────────────────────────
 function CertAssembly() {
   const C = useTheme()
@@ -276,6 +302,9 @@ function CertAssembly() {
   const assembledOp = rm(prog, 0.8, 0.88, 0, 1)
   const cardW = isMobile ? 'min(300px, 88vw)' : 'min(440px, 76vw)'
 
+  // GOLD AURA COLOR
+  const auraColor = C.name === 'dark' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(160, 120, 40, 0.15)'
+
   return (
     <div ref={trackRef} style={{
       height: isMobile ? '180vh' : '280vh',
@@ -292,14 +321,18 @@ function CertAssembly() {
       )}
 
       <div style={{ position: 'sticky', top: 0, height: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: C.bg, opacity: 0.95 }} />
+        {/* Overlay background to fix "white space behind island" */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: C.bg, opacity: 0.95 }} />
 
         <div style={{ position: 'relative', zIndex: 4 }}>
           <div style={{ transform: `scale(${certScale})`, opacity: certOpacity }}>
             <div style={{ position: 'relative', width: cardW, height: `calc(${cardW} / 1.414)`, transformStyle: isMobile ? 'flat' : 'preserve-3d' }}>
 
-              {/* Layer 1: METALLIC border frame */}
-              <div style={{ position: 'absolute', inset: 0, transform: l1 }}>
+              {/* Layer 1: METALLIC border frame + GLOW */}
+              <div style={{ 
+                position: 'absolute', inset: 0, transform: l1,
+                boxShadow: `0 30px 60px -12px ${auraColor}` // Gold Aura
+              }}>
                 <svg viewBox="0 0 480 340" width="100%" height="100%" style={{ position: 'absolute', inset: 0, display: 'block' }}>
                   <defs>
                     <linearGradient id="metalGrad" x1="0" y1="0" x2="1" y2="1">
@@ -387,7 +420,7 @@ function CertAssembly() {
 }
 
 // ─────────────────────────────────────────────────────────
-// DATA COMPOSITION
+// DATA COMPOSITION — FIX: Rounded "Blur Median Box"
 // ─────────────────────────────────────────────────────────
 function DataComposition() {
   const C = useTheme()
@@ -412,12 +445,25 @@ function DataComposition() {
         </div>
       </motion.div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', borderTop: `1px solid ${C.border}` }}>
-        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} style={{ padding: isMobile ? '36px 0' : '48px 48px 48px 0', borderBottom: isMobile ? `1px solid ${C.border}` : 'none', borderRight: isMobile ? 'none' : `1px solid ${C.border}` }}>
+        {/* FIX: Changed from rectangle to Rounded Capsule */}
+        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} style={{ 
+          padding: isMobile ? '36px 0' : '48px 48px 48px 0', 
+          borderBottom: isMobile ? `1px solid ${C.border}` : 'none', 
+          borderRight: isMobile ? 'none' : `1px solid ${C.border}`,
+          borderRadius: '24px', // Rounded Capsule
+          background: 'rgba(255,255,255,0.02)', // Subtle blur background
+        }}>
           <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.12em', marginBottom: '14px' }}>// PAYBACK_PERIOD</div>
           <div style={{ fontFamily: F_MONO, fontSize: 'clamp(2.5rem, 6vw, 4rem)', color: C.text, lineHeight: 1, letterSpacing: '-0.03em', fontWeight: '500', marginBottom: '14px' }}><CountUp end={6} suffix=" MO" /></div>
           <div style={{ fontFamily: F_SANS, fontSize: '14px', color: C.text2, lineHeight: '1.65', maxWidth: '36ch' }}>Not "a few months." The exact month your investment turns profitable — calculated for your salary and city.</div>
         </motion.div>
-        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: 0.1 }} style={{ padding: isMobile ? '36px 0' : '48px 0 48px 48px' }}>
+        
+        {/* FIX: Changed from rectangle to Rounded Capsule */}
+        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: 0.1 }} style={{ 
+          padding: isMobile ? '36px 0' : '48px 0 48px 48px', 
+          borderRadius: '24px', // Rounded Capsule
+          background: 'rgba(255,255,255,0.02)', // Subtle blur background
+        }}>
           <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.12em', marginBottom: '14px' }}>// SALARY_DELTA</div>
           <div style={{ fontFamily: F_MONO, fontSize: 'clamp(2.5rem, 6vw, 4rem)', color: C.text, lineHeight: 1, letterSpacing: '-0.03em', fontWeight: '500', marginBottom: '14px' }}><CountUp end={35} suffix="%" /></div>
           <div style={{ fontFamily: F_SANS, fontSize: '14px', color: C.text2, lineHeight: '1.65', maxWidth: '36ch' }}>India-sourced. City-specific. Not US data converted at today's rate and called "India salary insights."</div>
@@ -435,8 +481,8 @@ function HowItWorks({ onEnter }) {
   const isMobile = useIsMobile()
   const steps = [
     { id: '01', label: 'Basecamp', subtitle: 'Where you start', desc: 'Enter your current salary, role, and city. Upload your resume to let AI set your starting elevation.' },
-    { id: '02', label: 'Route', subtitle: 'Choose your path', desc: 'Select a cert or let AI recommend the highest-ROI route. Compare up to three paths side by side.' },
-    { id: '03', label: 'Summit', subtitle: 'Know the outcome', desc: 'Exact payback month, 5-year net gain, monthly delta, and a verdict on whether the climb is worth making.' },
+    { id: '02', label: 'Route', subtitle: 'Choose your path', desc: 'Select a cert or let AI recommend. Compare up to three paths side by side.' },
+    { id: '03', label: 'Summit', subtitle: 'Know to outcome', desc: 'Exact payback month, 5-year net gain, monthly delta, and a verdict on whether to climb is worth making.' },
   ]
   return (
     <StorySection id="03" title="SYS_ARCHITECTURE" bg={C.surface}>
@@ -543,7 +589,7 @@ function ThreeModes() {
       <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
         <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(1.8rem, 4.5vw, 3.2rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, margin: '0 0 52px' }}>Three modes.<br /><span style={{ color: C.gold }}>One tool.</span></h2>
       </motion.div>
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '24px' : '32px', padding: isMobile ? '24px' : '32px', background: C.surface, border: `1px solid ${C.border}` }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '24px' : '32px', padding: isMobile ? '24px' : '32px', background: C.surface, border: `1px solid ${C.border}`, borderRadius: '20px' }}>
         {modes.map((m, i) => (
           <motion.div key={m.label} variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
             <div style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: '17px', color: C.text, letterSpacing: '-0.02em', marginBottom: '6px' }}>{m.label}</div>
@@ -600,11 +646,11 @@ function SocialProof() {
 // FAQ
 // ─────────────────────────────────────────────────────────
 const FAQ_ITEMS = [
-  { q: 'How accurate are the ROI calculations?', a: 'Based on median salary data from Naukri, AmbitionBox, and LinkedIn India — updated quarterly. Directional estimates, not guarantees.' },
+  { q: 'How accurate are to ROI calculations?', a: 'Based on median salary data from Naukri, AmbitionBox, and LinkedIn India — updated quarterly. Directional estimates, not guarantees.' },
   { q: 'Do I need to create an account?', a: 'No. The ROI calculator, comparison tool, and city demand heatmap are all free with no signup.' },
   { q: 'What certifications are covered?', a: '103 certifications across 17 domains — cloud, data, cybersecurity, finance, project management, and more.' },
   { q: 'Is this only useful for India?', a: 'Salary benchmarks and demand data are India-specific. The framework applies anywhere, but numbers are calibrated for India.' },
-  { q: 'How does the Resume AI work?', a: 'Upload a resume or paste your profile. AI reads your domain, role, and experience, then recommends the highest-ROI certifications for your background.' },
+  { q: 'How does to Resume AI work?', a: 'Upload a resume or paste your profile. AI reads your domain, role, and experience, then recommends to highest-ROI certifications for your background.' },
 ]
 
 function FAQItem({ item }) {
@@ -711,7 +757,7 @@ function FinalCTA({ onEnter }) {
           }}
         >
           Stop reading generic advice. Stop asking Reddit.{' '}
-          <span style={{ color: C.text, fontWeight: '600' }}>Know the exact payback period before you pay the exam fee.</span>
+          <span style={{ color: C.text, fontWeight: '600' }}>Know to exact payback period before you pay to fee.</span>
         </motion.p>
 
         <motion.div
@@ -773,13 +819,13 @@ export default function App({ onNavigate, onEnter }) {
         minHeight: '100vh',
         background: C.bg,
         color: C.text,
-        overflow: 'clip',
+        overflow: 'hidden', // Fix for floating island white space
         borderRadius: '14px',
         transition: 'background 0.3s ease, color 0.3s ease',
       }}>
-        {/* ═══════════════════════════════════════════
+        {/* ═════════════════════════════════════════
             HERO — centered mountain, tagline on mountain
-        ═══════════════════════════════════════════ */}
+        ═════════════════════════════════════════ */}
         <div style={{
           position: 'relative',
           height: '100vh',
@@ -805,19 +851,19 @@ export default function App({ onNavigate, onEnter }) {
                   : 'brightness(0.72) contrast(1.06) saturate(0.8)',
               }}
             />
-            {/* Radial fade — centered, slightly left-biased */}
+            {/* FIX: Toned down gradient for light mode AND dark mode readability */}
             <div style={{
               position: 'absolute', inset: 0,
               background: `
                 linear-gradient(to top, ${C.bg} 0%, transparent 28%),
-                radial-gradient(ellipse 80% 68% at 46% 50%, rgba(10,10,10,0.28) 0%, rgba(10,10,10,0.82) 100%)
+                radial-gradient(ellipse 80% 68% at 46% 50%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%)
               `,
             }} />
           </div>
 
           {/* Centered content ON the mountain */}
           <div style={{
-            position: 'relative', zIndex: 2,
+            position: 'relative', zIndex: 10, // Higher than background to fix "hidden" issue
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
             textAlign: 'center',
@@ -842,7 +888,7 @@ export default function App({ onNavigate, onEnter }) {
               <div style={{ width: '28px', height: '1px', background: C.gold }} />
             </motion.div>
 
-            {/* Headline — tightly spaced, on the mountain */}
+            {/* Headline — tightly spaced, on mountain */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -857,7 +903,9 @@ export default function App({ onNavigate, onEnter }) {
                 color: C.text,
                 marginBottom: '28px',
                 maxWidth: '13ch',
-                textShadow: C.name === 'dark' ? '0 2px 40px rgba(0,0,0,0.7), 0 4px 80px rgba(0,0,0,0.4)' : 'none',
+                textShadow: C.name === 'dark' 
+                  ? '0 2px 40px rgba(0,0,0,0.7), 0 4px 80px rgba(0,0,0,0.4)' 
+                  : '0 4px 12px rgba(0,0,0,0.3)', // FIX: Shadow for light mode readability
               }}
             >
               Your next cert<br />
