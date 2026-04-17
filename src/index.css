@@ -360,4 +360,22 @@
   /* ── Pulse dot ───────────────────────────────────────── */
   .pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text); animation: pdot 1.4s ease-in-out infinite; flex-shrink: 0; }
   @keyframes pdot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+
+  /* ── Landing motion accents ─────────────────────────── */
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes scroll-vertical {
+    0% { transform: translateY(0%); }
+    100% { transform: translateY(-50%); }
+  }
+  .animate-scroll-vertical {
+    animation: scroll-vertical 20s linear infinite;
+  }
 }

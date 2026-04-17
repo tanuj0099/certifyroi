@@ -288,7 +288,6 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
             transformStyle: 'preserve-3d', transformPerspective: 800,
             display: 'inline-flex', alignItems: 'center',
             height: isMobile ? '52px' : '48px',
-            marginTop: '10px',
             padding: isMobile ? '0 12px' : '0 14px',
             gap: isMobile ? '0' : '4px',
             background: glassBg,
