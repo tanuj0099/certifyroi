@@ -9,7 +9,7 @@ import {
   Database, Clock, AlertCircle
 } from 'lucide-react'
 import { AuthProvider, useAuth } from './hooks/useAuth.jsx'
-import { ThemeProvider } from './hooks/useTheme.jsx'
+import { ThemeProvider, useTheme } from './hooks/useTheme.jsx'
 import ThemeToggle from './components/ThemeToggle.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import LandingPage from './components/LandingPage.jsx'
@@ -793,73 +793,9 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
         onTabChange={switchTab}
       />
 
-      <motion.header
-        initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={T}
-        style={{ position:'fixed', top:0, left:0, right:0, zIndex:100, background:'var(--bg)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:'1px solid var(--border)', transition:'background 0.3s' }}
-      >
-        <div style={{ maxWidth:'1240px', margin:'0 auto', padding:'0 12px' }}>
-          <div style={{ display:'flex', alignItems:'center', height:NAV_H+'px', gap:'4px' }}>
+      {/* DynamicIslandNav handles all fixed navigation */}
 
-            <button
-              onClick={function() { setDrawerOpen(true) }}
-              aria-label="Open menu"
-              style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'8px', padding:'8px', cursor:'pointer', color:'var(--text-3)', display:'flex', alignItems:'center', justifyContent:'center', minWidth:'40px', minHeight:'40px', flexShrink:0, marginRight:'4px', transition:'all 0.18s' }}
-            >
-              <Menu size={16} />
-            </button>
-
-            <button onClick={function() { go('home') }}
-              style={{ background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:'7px', flexShrink:0, padding:'0 4px 0 0', marginRight:'4px', minHeight:'44px' }}>
-              <div style={{ width:'28px', height:'28px', background:'linear-gradient(135deg,var(--indigo),#4338CA)', borderRadius:'8px', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <TrendingUp size={13} color="white" />
-              </div>
-              <span style={{ fontFamily:FH, fontWeight:'800', fontSize:'16px', letterSpacing:'-0.02em', color:'var(--text)' }}>
-                Certify<span style={{ color:'var(--indigo)' }}>ROI</span>
-              </span>
-            </button>
-
-            {!isMobile ? (
-              <nav style={{ display:'flex', gap:'2px', flex:1, justifyContent:'center', alignItems:'center' }}>
-                {NAV_LINKS.map(function(link) {
-                  var isActive = currentPage === link.id
-                  return (
-                    <button key={link.id} onClick={function() { go(link.id) }}
-                      style={{ display:'flex', alignItems:'center', gap:'5px', padding:'7px 12px', borderRadius:'8px', border:'1px solid '+(isActive?'var(--border-accent)':'transparent'), background:isActive?'var(--indigo-dim)':'transparent', color:isActive?'var(--indigo-light)':'var(--text-4)', fontSize:'13px', fontWeight:isActive?'700':'500', cursor:'pointer', fontFamily:FH, whiteSpace:'nowrap', transition:'all 0.18s', letterSpacing:'-0.01em', minHeight:'36px' }}>
-                      <link.icon size={12} />{link.label}
-                    </button>
-                  )
-                })}
-              </nav>
-            ) : <div style={{ flex:1 }} />}
-
-            <div style={{ display:'flex', alignItems:'center', gap:'6px', flexShrink:0, marginLeft:'auto' }}>
-              {!loading ? (
-                user ? (
-                  <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
-                    {user.photoURL
-                      ? <img src={user.photoURL} alt="" style={{ width:'28px', height:'28px', borderRadius:'50%', border:'2px solid var(--border-accent)' }} />
-                      : <div style={{ width:'28px', height:'28px', borderRadius:'50%', background:'linear-gradient(135deg,var(--indigo),#10B981)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><User size={13} color="white" /></div>
-                    }
-                    <button onClick={signOut}
-                      style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:'7px', color:'#EF4444', fontSize:'12px', padding:'5px 10px', cursor:'pointer', display:'flex', alignItems:'center', gap:'4px', fontFamily:FB, minHeight:'36px' }}>
-                      <LogOut size={12} />
-                      {!isMobile ? <span>Sign out</span> : null}
-                    </button>
-                  </div>
-                ) : (
-                  <button onClick={handleSignIn} disabled={signingIn}
-                    style={{ display:'flex', alignItems:'center', gap:'5px', background:'var(--indigo)', border:'none', borderRadius:'8px', padding:'7px 12px', cursor:'pointer', color:'white', fontSize:'13px', fontFamily:FB, fontWeight:'600', opacity:signingIn?0.7:1, minHeight:'36px', whiteSpace:'nowrap' }}>
-                    <LogIn size={13} />
-                    {!isMobile ? <span>{signingIn?'...':'Sign in'}</span> : null}
-                  </button>
-                )
-              ) : null}
-              <ThemeToggle />
-            </div>
-          </div>
-        </div>
-
-        {currentPage === 'app' ? (
+      {currentPage === 'app' ? (
           <div>
             {/* Row 1: Core Flow — CENTERED */}
             <div style={{ borderTop:'1px solid var(--border)', background:'var(--bg)' }}>
@@ -900,7 +836,6 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
             </div>
           </div>
         ) : null}
-      </motion.header>
     </>
   )
 }
@@ -1110,6 +1045,7 @@ const Footer = function({ onNavigate }) {
 // APP ROOT
 // ─────────────────────────────────────────────────────────
 function AppRoot() {
+  const { isDark, toggle: toggleTheme } = useTheme()
   var [page,          setPage]          = useState('home')
   var [activeTab,     setActiveTab]     = useState('resume')
   var [mode,          setMode]          = useState('professional')
@@ -1141,7 +1077,7 @@ function AppRoot() {
   }
 
   var renderPage = function() {
-    if (page==='home')    return <LandingPage onEnter={function() { goToApp('resume') }} />
+    if (page==='home')    return <LandingPage onEnter={function() { goToApp('resume') }} onNavigate={navigate} />
     if (page==='app')     return (
       <AppPage
         activeTab={activeTab} onTabChange={setActiveTab}
@@ -1163,7 +1099,7 @@ function AppRoot() {
 
   return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
-      <NavBar currentPage={page} activeTab={activeTab} onNavigate={navigate} onTabChange={setActiveTab} />
+      <DynamicIslandNav isDark={isDark} toggleTheme={toggleDarkMode} onEnter={() => goToApp('resume')} onNavigate={navigate} />
       <main style={{ flex:1 }}>
         <AnimatePresence mode="wait">
           <motion.div key={page+activeTab} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={T}>
