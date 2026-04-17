@@ -32,13 +32,14 @@ const F_SANS = "'Inter', 'DM Sans', sans-serif"
 const F_MONO = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 const F_SERIF = "'EB Garamond', Georgia, serif"
 
-// ── Nav items: label → section ID they scroll to ──────────
+// ── Nav items: label → page ID they navigate to ──────────
 const NAV_ITEMS = [
-  { label: 'Tools',   href: '#tools'   },
-  { label: 'About',   href: '#about'   },
-  { label: 'FAQ',     href: '#faq'     },
-  { label: 'Blog',    href: '#blog'    },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home',    pageId: 'home'    },
+  { label: 'Tools',   pageId: 'app'     },
+  { label: 'About',   pageId: 'about'   },
+  { label: 'FAQ',     pageId: 'faq'     },
+  { label: 'Blog',    pageId: 'blog'    },
+  { label: 'Contact', pageId: 'contact' },
 ]
 
 // ── Scroll helper ─────────────────────────────────────────
@@ -62,19 +63,21 @@ function scrollTo(href) {
 // Has a shared animated underline using layoutId="nav-active"
 // Spring-based hover state for the background highlight
 // ─────────────────────────────────────────────────────────
-function NavItem({ label, href, isActive, onActivate, theme = {} }) {
+function NavItem({ label, pageId, isActive, onActivate, onNavigate, theme = {} }) {
   const [hovered, setHovered] = useState(false)
   const t = theme || { name: 'dark', text: '#F5F5F5', text2: '#A3A3A3', gold: '#D4AF37' }
 
   function handleClick(e) {
     e.preventDefault()
-    onActivate(href)
-    scrollTo(href)
+    onActivate(pageId)
+    if (onNavigate) {
+      onNavigate(pageId)
+    }
   }
 
   return (
     <a
-      href={href}
+      href={'#' + pageId}
       onClick={handleClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -195,58 +198,10 @@ function ThemeToggle({ isDark, onToggle, theme = {} }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// CTA BUTTON — compact version for inside the nav
-// ─────────────────────────────────────────────────────────
-function NavCTA({ onClick, theme = {} }) {
-  const t = theme || { name: 'dark', btnFill: '#D4AF37', btnText: '#000000' }
-
-  return (
-    <motion.button
-      onClick={onClick}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.96 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 32 }}
-      style={{
-        display: 'inline-flex', alignItems: 'center', gap: '6px',
-        padding: '0 16px',
-        height: '32px',
-        borderRadius: '100px',
-        border: 'none',
-        background: t.btnFill,
-        color: t.btnText,
-        fontFamily: F_SANS,
-        fontSize: '12px',
-        fontWeight: '600',
-        letterSpacing: '0.02em',
-        cursor: 'pointer',
-        flexShrink: 0,
-        boxShadow: t.name === 'dark'
-          ? '0 2px 8px rgba(212,175,55,0.22)'
-          : '0 2px 8px rgba(0,0,0,0.14)',
-        transition: 'box-shadow 0.18s',
-      }}
-      onMouseEnter={function(e) {
-        e.currentTarget.style.boxShadow = t.name === 'dark'
-          ? '0 4px 16px rgba(212,175,55,0.36)'
-          : '0 4px 14px rgba(0,0,0,0.22)'
-      }}
-      onMouseLeave={function(e) {
-        e.currentTarget.style.boxShadow = t.name === 'dark'
-          ? '0 2px 8px rgba(212,175,55,0.22)'
-          : '0 2px 8px rgba(0,0,0,0.14)'
-      }}
-    >
-      Calculate ROI
-      <ArrowRight size={11} strokeWidth={2.5} />
-    </motion.button>
-  )
-}
-
-// ─────────────────────────────────────────────────────────
 // MOBILE MENU PANEL
 // Expands below the island with a spring animation
 // ─────────────────────────────────────────────────────────
-function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onToggle, onEnter, theme = {} }) {
+function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onToggle, onEnter, onNavigate, theme = {} }) {
   const t = theme || { 
     name: 'dark', 
     borderMid: 'rgba(255,255,255,0.15)', 
@@ -289,20 +244,22 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
         >
           {/* Nav items — staggered in */}
           {NAV_ITEMS.map(function(item, i) {
-            const isActive = activeHref === item.href
+            const isActive = activeHref === item.pageId
             return (
               <motion.div
-                key={item.href}
+                key={item.pageId}
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.04, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               >
                 <a
-                  href={item.href}
+                  href={'#' + item.pageId}
                   onClick={function(e) {
                     e.preventDefault()
-                    onActivate(item.href)
-                    scrollTo(item.href)
+                    onActivate(item.pageId)
+                    if (onNavigate) {
+                      onNavigate(item.pageId)
+                    }
                     onClose()
                   }}
                   style={{
@@ -343,51 +300,26 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
           {/* Divider */}
           <div style={{ height: '1px', background: t.border, margin: '8px 16px' }} />
 
-          {/* Bottom row: theme toggle + CTA */}
+          {/* Bottom row: theme toggle */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: NAV_ITEMS.length * 0.04 + 0.05, duration: 0.3 }}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px 4px' }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px' }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <motion.button
-                onClick={onToggle}
-                whileTap={{ scale: 0.9 }}
-                style={{
-                  width: '38px', height: '38px',
-                  borderRadius: '50%',
-                  border: '1px solid ' + t.border,
-                  background: t.name === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: t.text2,
-                }}
-              >
-                {isDark ? <Sun size={16} strokeWidth={1.8} /> : <Moon size={16} strokeWidth={1.8} />}
-              </motion.button>
-              <span style={{ fontFamily: F_MONO, fontSize: '10px', color: t.text3, letterSpacing: '0.08em' }}>
-                {isDark ? 'LIGHT_MODE' : 'DARK_MODE'}
-              </span>
-            </div>
-
             <motion.button
-              onClick={function() { onEnter(); onClose() }}
-              whileTap={{ scale: 0.96 }}
+              onClick={onToggle}
+              whileTap={{ scale: 0.9 }}
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: '7px',
-                padding: '0 20px', height: '38px',
-                borderRadius: '100px',
-                border: 'none',
-                background: t.btnFill, color: t.btnText,
-                fontFamily: F_SANS, fontSize: '13px', fontWeight: '600',
-                letterSpacing: '0.01em', cursor: 'pointer',
-                boxShadow: t.name === 'dark'
-                  ? '0 2px 10px rgba(212,175,55,0.24)'
-                  : '0 2px 10px rgba(0,0,0,0.16)',
+                width: '40px', height: '40px',
+                borderRadius: '50%',
+                border: '1px solid ' + t.border,
+                background: t.name === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: t.text2,
               }}
             >
-              Calculate ROI
-              <ArrowRight size={13} strokeWidth={2.5} />
+              {isDark ? <Sun size={16} strokeWidth={1.8} /> : <Moon size={16} strokeWidth={1.8} />}
             </motion.button>
           </motion.div>
         </motion.div>
@@ -395,6 +327,8 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
     </AnimatePresence>
   )
 }
+
+
 
 // ─────────────────────────────────────────────────────────
 // DYNAMIC ISLAND NAV — main export
@@ -406,7 +340,7 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
 //   Max tilt: 4° (subtle, premium — not a toy)
 //   translateZ: 0 → 6px on hover for lift effect
 // ─────────────────────────────────────────────────────────
-export default function DynamicIslandNav({ isDark, toggleTheme, onEnter }) {
+export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, onNavigate }) {
 
   // ── Theme management ──────────────────────────────────
   // Always derive theme from isDark to ensure it's always defined
@@ -574,31 +508,6 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter }) {
           transition={{ type: 'spring', stiffness: 360, damping: 34, delay: 0.1 }}
         >
 
-          {/* ───────────── LOGO ───────────── */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '7px',
-            padding: '0 10px',
-            flexShrink: 0,
-          }}>
-            {/* Logo mark — the elevation arc from the page system */}
-            <svg width="18" height="11" viewBox="0 0 18 11" fill="none" style={{ display: 'block', flexShrink: 0 }}>
-              <path d="M 0 11 Q 4.5 1.1 9 1.98 Q 13.5 3.85 18 11"
-                stroke={theme.gold} strokeWidth="1.5" strokeLinecap="round" fill="none" />
-              <circle cx="9" cy="1.98" r="1.8" fill={theme.gold} />
-            </svg>
-
-            <span style={{
-              fontFamily: F_SANS,
-              fontWeight: '700',
-              fontSize: '15px',
-              letterSpacing: '-0.025em',
-              color: theme.text,
-              whiteSpace: 'nowrap',
-            }}>
-              Certify<span style={{ color: theme.gold }}>ROI</span>
-            </span>
-          </div>
-
           {/* ── DESKTOP: center nav items ── */}
           {!isMobile && (
             <>
@@ -610,11 +519,12 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter }) {
                 {NAV_ITEMS.map(function(item) {
                   return (
                     <NavItem
-                      key={item.href}
+                      key={item.pageId}
                       label={item.label}
-                      href={item.href}
-                      isActive={activeHref === item.href}
+                      pageId={item.pageId}
+                      isActive={activeHref === item.pageId}
                       onActivate={setActiveHref}
+                      onNavigate={onNavigate}
                       theme={theme}
                     />
                   )
@@ -627,11 +537,6 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter }) {
               {/* Theme toggle */}
               <div style={{ padding: '0 4px', flexShrink: 0 }}>
                 <ThemeToggle isDark={isDark} onToggle={toggleTheme} theme={theme} />
-              </div>
-
-              {/* Compact CTA */}
-              <div style={{ padding: '0 4px 0 2px', flexShrink: 0 }}>
-                <NavCTA onClick={onEnter} theme={theme} />
               </div>
             </>
           )}
@@ -689,12 +594,11 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter }) {
         isDark={isDark}
         onToggle={toggleTheme}
         onEnter={onEnter}
+        onNavigate={onNavigate}
         theme={theme}
       />
 
-      {/* ── SPACER: prevents page content from going under the nav ── */}
-      {/* 16px top padding + 48px island height + 8px breathing room = 72px */}
-      <div style={{ height: '72px', pointerEvents: 'none' }} aria-hidden="true" />
+
     </>
   )
 }
