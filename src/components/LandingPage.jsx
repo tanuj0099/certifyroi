@@ -1,7 +1,6 @@
 import { motion, useScroll, AnimatePresence } from 'framer-motion'
 import React, { useRef, useState, useEffect, createContext, useContext } from 'react'
 import { ArrowRight, ChevronDown, Sun, Moon, BarChart2, CheckCircle2 } from 'lucide-react'
-import DynamicIslandNav from './DynamicIslandNav'
 
 // ─────────────────────────────────────────────────────────
 // THEME
@@ -762,11 +761,11 @@ function Footer() {
 // ─────────────────────────────────────────────────────────
 // APP
 // ─────────────────────────────────────────────────────────
-export default function App({ onNavigate }) {
+export default function App({ onNavigate, onEnter }) {
   const [isDark, setIsDark] = useState(true)
   const C = isDark ? THEMES.dark : THEMES.light
   const isMobile = useIsMobile()
-  const onEnter = () => { console.log('ROI triggered') }
+  const handleEnter = typeof onEnter === 'function' ? onEnter : function() {}
 
   return (
     <ThemeContext.Provider value={C}>
@@ -775,11 +774,8 @@ export default function App({ onNavigate }) {
         background: C.bg,
         color: C.text,
         overflow: 'clip',
-        borderRadius: '14px',
         transition: 'background 0.3s ease, color 0.3s ease',
       }}>
-
-        <DynamicIslandNav isDark={isDark} toggleTheme={() => setIsDark(!isDark)} onEnter={onEnter} onNavigate={onNavigate} />
 
         {/* ═══════════════════════════════════════════
             HERO — centered mountain, tagline on mountain
@@ -893,7 +889,7 @@ export default function App({ onNavigate }) {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.28 }}
             >
-              <PillBtn onClick={onEnter} large>Calculate ROI <ArrowRight size={15} /></PillBtn>
+              <PillBtn onClick={handleEnter} large>Calculate ROI <ArrowRight size={15} /></PillBtn>
             </motion.div>
           </div>
         </div>
@@ -902,13 +898,13 @@ export default function App({ onNavigate }) {
         <TrustStrip />
         <CertAssembly />
         <DataComposition />
-        <HowItWorks onEnter={onEnter} />
+        <HowItWorks onEnter={handleEnter} />
         <VsSection />
-        <ElevenPM onEnter={onEnter} />
+        <ElevenPM onEnter={handleEnter} />
         <ThreeModes />
         <SocialProof />
         <FAQ />
-        <FinalCTA onEnter={onEnter} />
+        <FinalCTA onEnter={handleEnter} />
         <Footer />
       </div>
     </ThemeContext.Provider>

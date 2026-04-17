@@ -4,7 +4,7 @@
 
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Sun, Moon, BarChart2, Menu, X, ArrowRight } from 'lucide-react'
+import { Sun, Moon, Menu, X } from 'lucide-react'
 
 const F_SANS  = "'Inter', 'DM Sans', sans-serif"
 const F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
@@ -118,10 +118,8 @@ function ThemeToggle({ isDark, onToggle, theme }) {
   )
 }
 
-function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onToggle, onEnter, onNavigate, theme }) {
+function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onToggle, onNavigate, theme }) {
   const t = theme
-  // Defensive: ensure onEnter is always callable
-  const handleEnter = typeof onEnter === 'function' ? onEnter : () => {}
 
   return (
     <AnimatePresence>
@@ -185,28 +183,12 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
 
           <div style={{ height: '1px', background: t.border, margin: '8px 16px' }} />
 
-          {/* Calculate ROI CTA in mobile menu */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: NAV_ITEMS.length * 0.04 + 0.05, duration: 0.3 }}
-            style={{ padding: '8px 8px 4px', display: 'flex', gap: '10px', alignItems: 'center' }}
+            style={{ padding: '8px 8px 4px', display: 'flex', justifyContent: 'flex-end' }}
           >
-            <motion.button
-              onClick={() => { handleEnter(); onClose() }}
-              whileTap={{ scale: 0.97 }}
-              style={{
-                flex: 1, height: '44px', borderRadius: '9999px',
-                border: '0.5px solid ' + t.borderMid,
-                background: t.name === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                cursor: 'pointer', color: t.text2,
-                fontFamily: F_SANS, fontSize: '11px', fontWeight: '600',
-                letterSpacing: '0.09em', textTransform: 'uppercase',
-              }}
-            >
-              Calculate ROI <ArrowRight size={12} />
-            </motion.button>
             <ThemeToggle isDark={isDark} onToggle={onToggle} theme={t} />
           </motion.div>
         </motion.div>
@@ -218,10 +200,7 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
 // ─────────────────────────────────────────────────────────
 // MAIN EXPORT
 // ─────────────────────────────────────────────────────────
-export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, onNavigate }) {
-  // Defensive: ensure onEnter always callable regardless of caller
-  const handleEnter = typeof onEnter === 'function' ? onEnter : () => {}
-
+export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, currentPage }) {
   const DARK_THEME = {
     name: 'dark',
     text: '#EFEFEF', text2: '#999999', text3: '#5A5A5A', text4: '#2E2E2E',
@@ -255,6 +234,10 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, onNavig
     check(); window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
   }, [])
+
+  useEffect(() => {
+    if (currentPage) setActiveHref(currentPage)
+  }, [currentPage])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -294,7 +277,7 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, onNavig
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
         display: 'flex', justifyContent: 'center',
-        paddingTop: '16px', pointerEvents: 'none',
+        paddingTop: '0', pointerEvents: 'none',
       }}>
         <motion.div
           ref={islandRef}
@@ -305,7 +288,8 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, onNavig
             transformStyle: 'preserve-3d', transformPerspective: 800,
             display: 'inline-flex', alignItems: 'center',
             height: isMobile ? '52px' : '48px',
-            padding: isMobile ? '0 12px' : '0 8px',
+            marginTop: '10px',
+            padding: isMobile ? '0 12px' : '0 14px',
             gap: isMobile ? '0' : '4px',
             background: glassBg,
             backdropFilter: 'blur(20px) saturate(180%)',
@@ -321,17 +305,8 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, onNavig
           animate={{ y: 0, opacity: 1, scale: 1 }}
           transition={{ type: 'spring', stiffness: 360, damping: 34, delay: 0.1 }}
         >
-          {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '0 8px', flexShrink: 0 }}>
-            <BarChart2 size={14} color={theme.gold} />
-            <span style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: '13px', color: theme.text, letterSpacing: '-0.01em' }}>
-              Certify<span style={{ color: theme.gold }}>ROI</span>
-            </span>
-          </div>
-
           {!isMobile && (
             <>
-              <div style={{ width: '1px', height: '20px', background: borderColor, flexShrink: 0, margin: '0 4px' }} />
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {NAV_ITEMS.map((item) => (
                   <NavItem
@@ -346,28 +321,6 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, onNavig
                 ))}
               </div>
               <div style={{ width: '1px', height: '20px', background: borderColor, flexShrink: 0, margin: '0 4px' }} />
-
-              {/* Desktop CTA */}
-              <motion.button
-                onClick={handleEnter}
-                whileTap={{ scale: 0.97 }}
-                style={{
-                  height: '34px', padding: '0 16px',
-                  borderRadius: '9999px',
-                  border: '0.5px solid ' + (isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.10)'),
-                  background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
-                  display: 'flex', alignItems: 'center', gap: '7px',
-                  cursor: 'pointer', color: theme.silverL,
-                  fontFamily: F_SANS, fontSize: '10px', fontWeight: '600',
-                  letterSpacing: '0.09em', textTransform: 'uppercase',
-                  transition: 'background 0.2s',
-                  flexShrink: 0,
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)' }}
-              >
-                Calculate ROI <ArrowRight size={11} />
-              </motion.button>
 
               <div style={{ padding: '0 4px', flexShrink: 0 }}>
                 <ThemeToggle isDark={isDark} onToggle={toggleTheme} theme={theme} />
@@ -413,7 +366,6 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onEnter, onNavig
         onActivate={setActiveHref}
         isDark={isDark}
         onToggle={toggleTheme}
-        onEnter={handleEnter}
         onNavigate={onNavigate}
         theme={theme}
       />

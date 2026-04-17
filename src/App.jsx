@@ -1044,6 +1044,53 @@ const Footer = function({ onNavigate }) {
 // ─────────────────────────────────────────────────────────
 // APP ROOT
 // ─────────────────────────────────────────────────────────
+const LandingAuthBar = function() {
+  const { user, signInGoogle, signOut, loading } = useAuth()
+  const [busy, setBusy] = useState(false)
+
+  var handleClick = async function() {
+    if (loading || busy) return
+    setBusy(true)
+    try {
+      if (user) await signOut()
+      else await signInGoogle()
+    } catch (e) {
+      console.error('Landing auth failed:', e)
+    }
+    setBusy(false)
+  }
+
+  return (
+    <div style={{ position:'fixed', top:0, left:0, right:0, zIndex:9998, pointerEvents:'none' }}>
+      <div style={{ maxWidth:'1400px', margin:'0 auto', padding:'12px 20px 0', display:'flex', justifyContent:'flex-end' }}>
+        <button
+          onClick={handleClick}
+          disabled={loading || busy}
+          style={{
+            pointerEvents:'auto',
+            height:'38px',
+            padding:'0 16px',
+            borderRadius:'9999px',
+            border:'1px solid rgba(255,255,255,0.14)',
+            background:'transparent',
+            color:'#F5F5F4',
+            fontFamily:FH,
+            fontSize:'12px',
+            fontWeight:'700',
+            letterSpacing:'0.04em',
+            cursor:loading || busy ? 'not-allowed' : 'pointer',
+            opacity:loading || busy ? 0.65 : 1,
+            backdropFilter:'blur(10px)',
+            WebkitBackdropFilter:'blur(10px)',
+          }}
+        >
+          {user ? 'Sign Out' : busy ? 'Signing In...' : 'Sign In'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function AppRoot() {
   const { isDark, toggle: toggleTheme } = useTheme()
   var [page,          setPage]          = useState('home')
@@ -1094,17 +1141,18 @@ function AppRoot() {
     if (page==='contact') return <ContactPage />
     if (page==='terms')   return <TermsPage />
     if (page==='privacy') return <PrivacyPage />
-    return <LandingPage onEnter={function() { goToApp('resume') }} />
+    return <LandingPage onEnter={function() { goToApp('resume') }} onNavigate={navigate} />
   }
 
   return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
+      {page === 'home' ? <LandingAuthBar /> : null}
       <DynamicIslandNav
-  isDark={isDark}
-  toggleTheme={toggleTheme}
-  onEnter={function() { goToApp('resume') }}
-  onNavigate={navigate}
-/>
+        isDark={isDark}
+        toggleTheme={toggleTheme}
+        onNavigate={navigate}
+        currentPage={page}
+      />
       <main style={{ flex:1 }}>
         <AnimatePresence mode="wait">
           <motion.div key={page+activeTab} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={T}>
