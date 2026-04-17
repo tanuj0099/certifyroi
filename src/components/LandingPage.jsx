@@ -762,7 +762,7 @@ function Footer() {
 // ─────────────────────────────────────────────────────────
 // APP
 // ─────────────────────────────────────────────────────────
-export default function App() {
+export default function App({ onNavigate }) {
   const [isDark, setIsDark] = useState(true)
   const C = isDark ? THEMES.dark : THEMES.light
   const isMobile = useIsMobile()
@@ -779,7 +779,7 @@ export default function App() {
         transition: 'background 0.3s ease, color 0.3s ease',
       }}>
 
-        <DynamicIslandNav isDark={isDark} toggleTheme={() => setIsDark(!isDark)} onEnter={onEnter} />
+        <DynamicIslandNav isDark={isDark} toggleTheme={() => setIsDark(!isDark)} onEnter={onEnter} onNavigate={onNavigate} />
 
         {/* ═══════════════════════════════════════════
             HERO — centered mountain, tagline on mountain
