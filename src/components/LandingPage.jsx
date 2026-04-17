@@ -226,39 +226,6 @@ function TrustStrip() {
   )
 }
 
-function VerticalStoryText() {
-  const C = useTheme()
-  const lines = ['ANALYSIS COMPLETE', 'ROUTE OPTIMIZED', 'ROI CONFIRMED', 'FUTURE SECURED', 'GOLDMINE DETECTED']
-  const scrollContent = [...lines, ...lines, ...lines]
-
-  return (
-    <div style={{ position: 'fixed', right: '22px', top: 0, height: '100vh', display: 'flex', alignItems: 'center', zIndex: 4, pointerEvents: 'none', userSelect: 'none' }}>
-      <div
-        className="animate-scroll-vertical"
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '44px', writingMode: 'vertical-rl', textOrientation: 'mixed' }}
-      >
-        {scrollContent.map(function(line, index) {
-          return (
-            <span
-              key={index}
-              style={{
-                fontFamily: F_MONO,
-                fontSize: '18px',
-                fontWeight: '600',
-                letterSpacing: '0.3em',
-                color: C.name === 'dark' ? 'rgba(255,255,255,0.22)' : 'rgba(18,18,18,0.18)',
-                opacity: 0.82,
-              }}
-            >
-              {line}
-            </span>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 // ─────────────────────────────────────────────────────────
 // CERT ASSEMBLY — metallic border + swoosh
 // ─────────────────────────────────────────────────────────
@@ -425,15 +392,6 @@ function CertAssembly() {
 function DataComposition() {
   const C = useTheme()
   const isMobile = useIsMobile()
-  const statCard = {
-    padding: '30px 30px 32px',
-    borderRadius: '32px',
-    background: C.name === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.42)',
-    border: C.name === 'dark' ? '1px solid rgba(255,255,255,0.10)' : '1px solid rgba(255,255,255,0.55)',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
-    boxShadow: C.name === 'dark' ? '0 18px 40px rgba(0,0,0,0.32)' : '0 18px 40px rgba(15,23,42,0.08)',
-  }
   return (
     <StorySection id="02" title="METRICS_LOG" noBorderTop>
       <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
@@ -453,13 +411,13 @@ function DataComposition() {
           <div style={{ padding: '4px 10px', background: C.surface, border: `1px solid ${C.border}`, fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.08em' }}>BLR MEDIAN '26</div>
         </div>
       </motion.div>
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
-        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} style={statCard}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', borderTop: `1px solid ${C.border}` }}>
+        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} style={{ padding: isMobile ? '36px 0' : '48px 48px 48px 0', borderBottom: isMobile ? `1px solid ${C.border}` : 'none', borderRight: isMobile ? 'none' : `1px solid ${C.border}` }}>
           <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.12em', marginBottom: '14px' }}>// PAYBACK_PERIOD</div>
           <div style={{ fontFamily: F_MONO, fontSize: 'clamp(2.5rem, 6vw, 4rem)', color: C.text, lineHeight: 1, letterSpacing: '-0.03em', fontWeight: '500', marginBottom: '14px' }}><CountUp end={6} suffix=" MO" /></div>
           <div style={{ fontFamily: F_SANS, fontSize: '14px', color: C.text2, lineHeight: '1.65', maxWidth: '36ch' }}>Not "a few months." The exact month your investment turns profitable — calculated for your salary and city.</div>
         </motion.div>
-        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: 0.1 }} style={statCard}>
+        <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: 0.1 }} style={{ padding: isMobile ? '36px 0' : '48px 0 48px 48px' }}>
           <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.12em', marginBottom: '14px' }}>// SALARY_DELTA</div>
           <div style={{ fontFamily: F_MONO, fontSize: 'clamp(2.5rem, 6vw, 4rem)', color: C.text, lineHeight: 1, letterSpacing: '-0.03em', fontWeight: '500', marginBottom: '14px' }}><CountUp end={35} suffix="%" /></div>
           <div style={{ fontFamily: F_SANS, fontSize: '14px', color: C.text2, lineHeight: '1.65', maxWidth: '36ch' }}>India-sourced. City-specific. Not US data converted at today's rate and called "India salary insights."</div>
@@ -819,8 +777,6 @@ export default function App({ onNavigate, onEnter }) {
         borderRadius: '14px',
         transition: 'background 0.3s ease, color 0.3s ease',
       }}>
-        {!isMobile ? <VerticalStoryText /> : null}
-
         {/* ═══════════════════════════════════════════
             HERO — centered mountain, tagline on mountain
         ═══════════════════════════════════════════ */}
@@ -852,9 +808,10 @@ export default function App({ onNavigate, onEnter }) {
             {/* Radial fade — centered, slightly left-biased */}
             <div style={{
               position: 'absolute', inset: 0,
-              background: C.name === 'dark'
-                ? 'linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.38) 58%, rgba(0,0,0,0.78) 100%), radial-gradient(ellipse 78% 66% at 48% 42%, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.54) 100%)'
-                : 'linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.54) 58%, rgba(255,255,255,0.92) 100%), radial-gradient(ellipse 80% 68% at 48% 42%, rgba(255,255,255,0.00) 0%, rgba(255,255,255,0.36) 100%)',
+              background: `
+                linear-gradient(to top, ${C.bg} 0%, transparent 28%),
+                radial-gradient(ellipse 80% 68% at 46% 50%, rgba(10,10,10,0.28) 0%, rgba(10,10,10,0.82) 100%)
+              `,
             }} />
           </div>
 
@@ -898,11 +855,9 @@ export default function App({ onNavigate, onEnter }) {
                 lineHeight: 0.88,
                 letterSpacing: '-0.03em',
                 color: C.text,
-                marginBottom: '18px',
+                marginBottom: '28px',
                 maxWidth: '13ch',
-                textShadow: C.name === 'dark'
-                  ? '0 2px 40px rgba(0,0,0,0.72), 0 4px 80px rgba(0,0,0,0.42)'
-                  : '0 2px 22px rgba(255,255,255,0.85), 0 0 2px rgba(255,255,255,0.95)',
+                textShadow: C.name === 'dark' ? '0 2px 40px rgba(0,0,0,0.7), 0 4px 80px rgba(0,0,0,0.4)' : 'none',
               }}
             >
               Your next cert<br />
@@ -921,74 +876,14 @@ export default function App({ onNavigate, onEnter }) {
               style={{
                 fontFamily: F_SANS, fontSize: isMobile ? '14px' : '16px',
                 color: C.text2, maxWidth: '380px', lineHeight: '1.6',
-                margin: '0 0 26px',
-                textShadow: C.name === 'dark'
-                  ? '0 1px 20px rgba(0,0,0,0.6)'
-                  : '0 1px 14px rgba(255,255,255,0.72)',
+                margin: '0 0 36px',
+                textShadow: C.name === 'dark' ? '0 1px 20px rgba(0,0,0,0.6)' : 'none',
               }}
             >
               Know the exact payback period before you pay the fee. Calculated for your city and current salary.
             </motion.p>
 
             {/* CTA — button only, no pill box */}
-            <motion.div
-              initial={{ opacity: 0, y: 16, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.85, delay: 0.22 }}
-              style={{ position: 'relative', marginBottom: '34px' }}
-            >
-              <div style={{
-                position: 'absolute',
-                inset: '-12px',
-                borderRadius: '30px',
-                background: 'linear-gradient(135deg, rgba(212,175,55,0.18), rgba(176,112,34,0.34))',
-                filter: 'blur(24px)',
-                opacity: 0.9,
-              }} />
-              <div
-                className="animate-float"
-                style={{
-                  position: 'relative',
-                  width: isMobile ? '220px' : '280px',
-                  padding: isMobile ? '18px' : '20px',
-                  borderRadius: '26px',
-                  background: C.name === 'dark'
-                    ? 'linear-gradient(180deg, rgba(23,23,23,0.94), rgba(10,10,10,0.92))'
-                    : 'linear-gradient(180deg, rgba(255,255,255,0.92), rgba(247,244,238,0.88))',
-                  border: C.name === 'dark'
-                    ? '1px solid rgba(255,255,255,0.12)'
-                    : '1px solid rgba(255,255,255,0.72)',
-                  boxShadow: '0 0 30px rgba(251,191,36,0.34), 0 18px 36px rgba(0,0,0,0.12)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                  textAlign: 'left',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <div style={{ fontFamily: F_MONO, fontSize: '10px', color: C.text3, letterSpacing: '0.16em' }}>CERT BRIEF</div>
-                  <div style={{ padding: '4px 10px', borderRadius: '999px', background: 'rgba(212,175,55,0.14)', border: '1px solid rgba(212,175,55,0.28)', fontFamily: F_MONO, fontSize: '10px', color: C.gold }}>ROI +35%</div>
-                </div>
-                <div style={{ fontFamily: F_SERIF, fontSize: isMobile ? '28px' : '34px', lineHeight: 0.95, color: C.text, letterSpacing: '-0.03em', marginBottom: '12px' }}>
-                  AWS
-                  <br />
-                  Solutions Architect
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  {[
-                    { l: 'PAYBACK', v: '6 MO', c: C.text },
-                    { l: 'DELTA', v: '+35%', c: C.gold },
-                  ].map(function(item) {
-                    return (
-                      <div key={item.l} style={{ padding: '12px 12px 10px', borderRadius: '18px', background: C.name === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.55)', border: C.name === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.72)' }}>
-                        <div style={{ fontFamily: F_MONO, fontSize: '9px', color: C.text3, letterSpacing: '0.12em', marginBottom: '6px' }}>{item.l}</div>
-                        <div style={{ fontFamily: F_MONO, fontSize: '24px', color: item.c, lineHeight: 1, letterSpacing: '-0.04em' }}>{item.v}</div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </motion.div>
-
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
