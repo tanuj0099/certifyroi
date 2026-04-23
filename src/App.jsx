@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import DynamicIslandNav from './components/DynamicIslandNav'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   TrendingUp, FileText, Map, LogIn, LogOut, User,
   Menu, X, Home, Info, Phone, BookOpen,
   Shield, ChevronRight, Sparkles, FileCheck,
-  GraduationCap, Award, Route, Building2, ArrowRight,
+  GraduationCap, Award, Building2, ArrowRight, Route as RouteIcon,
   Database, Clock, AlertCircle
 } from 'lucide-react'
 import { AuthProvider, useAuth } from './hooks/useAuth.jsx'
@@ -23,6 +24,12 @@ import CertCompare from './components/CertCompare.jsx'
 import CareerSimulator from './components/CareerSimulator.jsx'
 import JobCertMap from './components/JobCertMap.jsx'
 import HikeVerifier from './components/HikeVerifier.jsx'
+const FAQPage = lazy(() => import('./pages/FAQ.jsx'))
+const AboutPage = lazy(() => import('./pages/About.jsx'))
+const FeaturesPage = lazy(() => import('./pages/Features.jsx'))
+const HowItWorksPage = lazy(() => import('./pages/HowItWorks.jsx'))
+const PricingPage = lazy(() => import('./pages/Pricing.jsx'))
+const ContactPage = lazy(() => import('./pages/Contact.jsx'))
 
 const T   = { duration: 0.32, ease: [0.4, 0, 0.2, 1] }
 const FM  = "'JetBrains Mono','Commit Mono',monospace"
@@ -80,202 +87,6 @@ const DataFreshnessBadge = function() {
         Data: Q1 2026 · LinkedIn India · NASSCOM · Naukri · AmbitionBox
       </span>
     </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────
-// ABOUT PAGE — Phase B + C: real founder story + methodology
-// ─────────────────────────────────────────────────────────
-const AboutPage = function() {
-  return (
-    <PageWrapper maxWidth="820px">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={T}>
-        <h1 style={{ ...hs, fontSize: 'clamp(2rem,5.5vw,3.8rem)', marginBottom: '12px' }}>
-          WHY I BUILT<br />
-          <span style={{ background: 'linear-gradient(135deg,#6366F1,#10B981)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            CERTIFYROI
-          </span>
-        </h1>
-        <p style={{ fontSize: '13px', color: 'var(--text-4)', fontFamily: FM, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '40px' }}>
-          Bangalore · Built out of genuine frustration
-        </p>
-
-        {/* ── Origin story ── */}
-        <div className="glass" style={{ padding: 'clamp(20px,4vw,36px)', marginBottom: '20px', borderLeft: '3px solid #6366F1' }}>
-          <div style={{ fontSize: '11px', color: '#818CF8', fontFamily: FM, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>The honest version</div>
-          <p style={{ fontSize: 'clamp(14px,2vw,16px)', color: 'var(--text)', lineHeight: '1.85', marginBottom: '18px', fontFamily: FB, fontWeight: '500' }}>
-            I was sitting in my room in Bangalore at 11pm, looking at my ex-classmate's LinkedIn post. Same college. Same graduation year. He'd done an AWS certification and was now making ₹28L. I was at ₹9L. I felt stupid for not having done this earlier.
-          </p>
-          <p style={{ fontSize: 'clamp(13px,1.8vw,15px)', color: 'var(--text-2)', lineHeight: '1.85', marginBottom: '18px', fontFamily: FB }}>
-            So I did what any frustrated 22-year-old does at 11pm — I Googled "is AWS certification worth it in India." Forty-seven blog posts. All saying the same vague thing: "it depends on your career goals." Not one of them would tell me if ₹25,000 + 3 months of preparation would actually pay off at my salary level, in Bangalore, in backend development. Every salary figure was in dollars. Every "success story" was from an American LinkedIn influencer.
-          </p>
-          <p style={{ fontSize: 'clamp(13px,1.8vw,15px)', color: 'var(--text-2)', lineHeight: '1.85', fontFamily: FB }}>
-            I made a spreadsheet. Pulled salary data from Naukri, AmbitionBox, LinkedIn India. Mapped break-even timelines. Ran the numbers for 8 different certifications. Two months later I had my answer — and I'd spent more time building the spreadsheet than studying for the cert itself. That spreadsheet became CertifyROI.
-          </p>
-        </div>
-
-        {/* ── How it works — Phase C ── */}
-        <div className="glass" style={{ padding: 'clamp(18px,3.5vw,28px)', marginBottom: '20px' }}>
-          <div style={{ fontSize: '11px', color: '#51B1E7', fontFamily: FM, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '20px' }}>How it works — 3 steps</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-            {[
-              {
-                num: '01',
-                title: 'You give us your context',
-                body: 'Upload your resume or paste your experience. Tell us your city, current salary, and target certification. The more specific, the more accurate.',
-                color: '#6366F1',
-              },
-              {
-                num: '02',
-                title: 'We run the numbers against real India data',
-                body: 'We cross-reference your salary bracket against city-specific hike data from Naukri, AmbitionBox, and LinkedIn India. We calculate break-even using your actual cert cost, not a generic estimate. We factor in market demand using live job posting counts.',
-                color: '#51B1E7',
-              },
-              {
-                num: '03',
-                title: 'You get a specific, bounded answer',
-                body: 'Break-even to the month. 5-year net gain in rupees. Monthly salary delta from day one. An AI verdict on whether the cert makes sense for your profile. Not "it depends." An actual number.',
-                color: '#10B981',
-              },
-            ].map(function(step, i) {
-              var isLast = i === 2
-              return (
-                <div key={i} style={{
-                  display: 'flex', gap: '20px', alignItems: 'flex-start',
-                  paddingBottom: isLast ? '0' : '20px',
-                  marginBottom: isLast ? '0' : '20px',
-                  borderBottom: isLast ? 'none' : '1px solid var(--border)',
-                }}>
-                  <div style={{
-                    fontFamily: FM, fontSize: 'clamp(1.4rem,3vw,2rem)', color: step.color,
-                    fontWeight: '800', letterSpacing: '-0.04em', opacity: 0.4,
-                    flexShrink: 0, lineHeight: 1, paddingTop: '2px',
-                  }}>
-                    {step.num}
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: FH, fontWeight: '700', fontSize: '15px', color: 'var(--text)', marginBottom: '6px', letterSpacing: '-0.02em' }}>
-                      {step.title}
-                    </div>
-                    <div style={{ fontFamily: FB, fontSize: '13px', color: 'var(--text-3)', lineHeight: '1.7' }}>
-                      {step.body}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* ── Methodology — Phase C ── */}
-        <div className="glass" style={{ padding: 'clamp(18px,3.5vw,28px)', marginBottom: '20px' }}>
-          <div style={{ fontSize: '11px', color: '#F59E0B', fontFamily: FM, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Database size={11} />
-            Methodology + Data Sources
-          </div>
-
-          <p style={{ fontSize: '13px', color: 'var(--text-2)', lineHeight: '1.8', marginBottom: '16px', fontFamily: FB }}>
-            Every salary figure on CertifyROI is a <strong>median</strong> — not an average, not a maximum. Half of professionals at that cert level earn more, half earn less. We use medians because averages are skewed by outliers at large MNCs.
-          </p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '12px', marginBottom: '16px' }}>
-            {[
-              { source: 'LinkedIn Economic Graph India', what: 'Salary bands by skill and city', updated: 'Q1 2026' },
-              { source: 'NASSCOM Talent Pulse',          what: 'Certification demand by domain',  updated: 'Annual 2026' },
-              { source: 'Naukri Salary Insights',        what: 'Active job postings + hike data',  updated: 'Monthly' },
-              { source: 'AmbitionBox (self-reported)',   what: 'Post-certification salary jumps',  updated: 'Continuous' },
-            ].map(function(s, i) {
-              return (
-                <div key={i} style={{ padding: '12px', borderRadius: '9px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
-                  <div style={{ fontFamily: FH, fontSize: '12px', fontWeight: '700', color: 'var(--text)', marginBottom: '4px' }}>{s.source}</div>
-                  <div style={{ fontFamily: FB, fontSize: '11px', color: 'var(--text-4)', marginBottom: '4px' }}>{s.what}</div>
-                  <div style={{ fontFamily: FM, fontSize: '10px', color: '#10B981', opacity: 0.8 }}>Updated: {s.updated}</div>
-                </div>
-              )
-            })}
-          </div>
-
-          <div style={{ padding: '12px 14px', borderRadius: '9px', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.18)', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-            <AlertCircle size={13} color="#F59E0B" style={{ flexShrink: 0, marginTop: '1px' }} />
-            <div style={{ fontFamily: FB, fontSize: '12px', color: 'var(--text-3)', lineHeight: '1.65' }}>
-              <strong style={{ color: 'var(--text-2)' }}>What we assume:</strong> That you stay in the same city, that market demand doesn't collapse, and that you negotiate your hike. Real outcomes vary based on company tier, negotiation skill, and economic conditions. We show medians, not guarantees. Always use this as one data point in your decision — not the only one.
-            </div>
-          </div>
-        </div>
-
-        {/* ── Who it's actually for — Phase B rewrite ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '14px', marginBottom: '20px' }}>
-          {[
-            {
-              label: 'The mid-level plateau',
-              desc: '3 years in. Stagnant base. Watching peers jump 2x on LinkedIn. You need numbers, not motivation. That\'s what this is for.',
-              color: '#818CF8',
-            },
-            {
-              label: 'The career switcher',
-              desc: 'Moving from ops to data, from finance to product. The MBA-or-cert question is expensive. We help you answer it with a spreadsheet, not a feeling.',
-              color: '#51B1E7',
-            },
-            {
-              label: 'The fresh graduate',
-              desc: 'No salary history, no benchmark. Student Mode reframes the calculation around time-to-first-offer, not salary hike percentage. Built for where you actually are.',
-              color: '#10B981',
-            },
-            {
-              label: 'The professional pitching their boss',
-              desc: '"My company won\'t fund it without an ROI case." Pitch Your Boss exists because this exact conversation happens every Tuesday in every Bangalore office.',
-              color: '#F59E0B',
-            },
-          ].map(function(c, i) {
-            return (
-              <div key={i} className="glass" style={{ padding: '20px' }}>
-                <h3 style={{ fontSize: '13px', color: c.color, marginBottom: '8px', fontFamily: FH, fontWeight: '700', lineHeight: '1.3', marginTop: '0' }}>{c.label}</h3>
-                <p style={{ fontSize: '12px', color: 'var(--text-3)', lineHeight: '1.65', fontFamily: FB, margin: '0' }}>{c.desc}</p>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* ── What we are not ── */}
-        <div className="glass" style={{ padding: 'clamp(18px,3.5vw,24px)', marginBottom: '20px', background: 'rgba(239,68,68,0.04)', borderColor: 'rgba(239,68,68,0.15)' }}>
-          <div style={{ fontSize: '11px', color: '#EF4444', fontFamily: FM, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>What we are not</div>
-          <p style={{ fontSize: 'clamp(13px,1.8vw,14px)', color: 'var(--text-2)', lineHeight: '1.75', fontFamily: FB, margin: '0' }}>
-            CertifyROI is not a certification prep platform. We don't sell courses. We have no affiliate deals with Coursera, Udemy, or any certification body — we earn nothing if you buy a cert. Our only incentive is to give you honest numbers, including the number that says a particular cert is <em>not worth it</em> for your specific profile. That independence is the only thing that makes this tool actually useful.
-          </p>
-        </div>
-
-        {/* ── Tech stack — Phase B: no "powered by AI" ── */}
-        <div className="glass" style={{ padding: 'clamp(18px,3.5vw,28px)', marginBottom: '20px' }}>
-          <div style={{ fontSize: '11px', color: '#F59E0B', fontFamily: FM, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>Under the hood</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: '14px' }}>
-            {[
-              { label: 'Inference',    value: 'Groq LPU · llama-3.3-70b',      desc: 'Sub-2-second resume analysis. Not a wrapper — actual LLM inference via Groq\'s Language Processing Unit.' },
-              { label: 'Salary data', value: '40,000+ India data points',       desc: 'Cross-referenced across LinkedIn, NASSCOM, Naukri, and AmbitionBox. City-specific, not national averages.' },
-              { label: 'Coverage',    value: '103 certs · 17 domains',          desc: 'Cloud, finance, medical, law, government, architecture, marketing, HR. Updated when demand thresholds change.' },
-              { label: 'City model',  value: 'Haversine nearest-match',         desc: 'If your city isn\'t one of the 8 metros, we calculate geographic distance and show data for the nearest match.' },
-            ].map(function(item, i) {
-              return (
-                <div key={i} style={{ padding: '14px', borderRadius: '10px', background: 'var(--bg)', border: '1px solid var(--border)' }}>
-                  <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '5px' }}>{item.label}</div>
-                  <div style={{ fontFamily: FH, fontSize: '13px', fontWeight: '700', color: 'var(--text)', marginBottom: '5px' }}>{item.value}</div>
-                  <div style={{ fontFamily: FB, fontSize: '12px', color: 'var(--text-4)', lineHeight: '1.5' }}>{item.desc}</div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <a href="mailto:hello@certifyroi.in"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '12px 20px', borderRadius: '10px', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', color: '#818CF8', fontSize: '13px', fontFamily: FH, fontWeight: '700', textDecoration: 'none' }}>
-            ✉ hello@certifyroi.in
-          </a>
-          <div style={{ padding: '12px 20px', borderRadius: '10px', background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-4)', fontSize: '13px', fontFamily: FM }}>
-            Built in Bangalore · 2025–2026
-          </div>
-        </div>
-      </motion.div>
-    </PageWrapper>
   )
 }
 
@@ -458,7 +269,7 @@ const BlogPage = function() {
 // ─────────────────────────────────────────────────────────
 // FAQ — 20 questions, Phase B: specific not generic
 // ─────────────────────────────────────────────────────────
-const FAQPage = function() {
+const _OldFAQPage = function() {
   var [open, setOpen] = useState(null)
   var faqs = [
     { category: 'Product', q: 'Is CertifyROI free?', a: 'Yes. The ROI calculator, city demand heatmap, cert comparison, career simulator, and job-cert map are all free with no account required. You get 3 free AI analyses as a guest. Sign in with Google for unlimited free AI analyses.' },
@@ -539,7 +350,7 @@ const FAQPage = function() {
 // ─────────────────────────────────────────────────────────
 // CONTACT
 // ─────────────────────────────────────────────────────────
-const ContactPage = function() {
+const _OldContactPage = function() {
   var [sent, setSent]         = useState(false)
   var [formData, setFormData] = useState({ name:'', email:'', subject:'General feedback', message:'' })
   var inputStyle = { width:'100%', padding:'11px 14px', background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'10px', color:'var(--text)', fontSize:'14px', fontFamily:FB, outline:'none', boxSizing:'border-box', transition:'border-color 0.18s' }
@@ -619,7 +430,7 @@ const STEP_TABS = [
 
 const TOOL_TABS = [
   { id:'compare',       label:'Compare Certs',   icon:Award,         desc:'Two certs side by side'       },
-  { id:'simulate',      label:'Career Path',     icon:Route,         desc:'Multi-cert salary trajectory' },
+  { id:'simulate',      label:'Career Path',     icon:RouteIcon,     desc:'Multi-cert salary trajectory' },
   { id:'jobmap',        label:'Cert to Job Map', icon:Building2,     desc:'Which cert gets which role'   },
   { id:'college',       label:'Degree vs Certs', icon:GraduationCap, desc:'MBA vs certifications'        },
   { id:'hikeverifier',  label:'Verify Hike',     icon:TrendingUp,    desc:'Did the cert pay off?'        },
@@ -959,6 +770,8 @@ const AppPage = function({ activeTab, onTabChange, mode, modeLocked, onModeSelec
 // FOOTER — Phase B: no "Powered by AI", specific credits
 // ─────────────────────────────────────────────────────────
 const Footer = function({ onNavigate }) {
+  const navigate = useNavigate()
+  const nav = onNavigate || ((pageId) => navigate(pageId === 'home' ? '/' : '/' + pageId))
   return (
     <footer style={{ borderTop:'1px solid var(--border)', padding:'40px 16px 24px', marginTop:'auto', background:'var(--bg)' }}>
       <div style={{ maxWidth:'1240px', margin:'0 auto' }}>
@@ -986,7 +799,7 @@ const Footer = function({ onNavigate }) {
             <div style={{ fontSize:'10px', color:'var(--text-4)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'14px', fontFamily:FM }}>Tools</div>
             {['Resume AI','ROI Calculator','City Demand','Compare Certs','Career Simulator','Cert to Job Map','Verify Hike'].map(function(l) {
               return (
-                <button key={l} onClick={function() { onNavigate('app') }}
+                <button key={l} onClick={function() { nav('app') }}
                   style={{ display:'block', background:'none', border:'none', color:'var(--text-4)', fontSize:'13px', cursor:'pointer', marginBottom:'8px', fontFamily:FB, padding:0, textAlign:'left', transition:'color 0.15s', minHeight:'28px' }}
                   onMouseEnter={function(e) { e.currentTarget.style.color='var(--text)' }}
                   onMouseLeave={function(e) { e.currentTarget.style.color='var(--text-4)' }}>
@@ -1000,7 +813,7 @@ const Footer = function({ onNavigate }) {
             <div style={{ fontSize:'10px', color:'var(--text-4)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'14px', fontFamily:FM }}>Company</div>
             {['about','blog','faq','contact'].map(function(id) {
               return (
-                <button key={id} onClick={function() { onNavigate(id) }}
+                <button key={id} onClick={function() { nav(id) }}
                   style={{ display:'block', background:'none', border:'none', color:'var(--text-4)', fontSize:'13px', cursor:'pointer', marginBottom:'8px', fontFamily:FB, padding:0, textAlign:'left', transition:'color 0.15s', minHeight:'28px' }}
                   onMouseEnter={function(e) { e.currentTarget.style.color='var(--text)' }}
                   onMouseLeave={function(e) { e.currentTarget.style.color='var(--text-4)' }}>
@@ -1014,7 +827,7 @@ const Footer = function({ onNavigate }) {
             <div style={{ fontSize:'10px', color:'var(--text-4)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'14px', fontFamily:FM }}>Legal</div>
             {['terms','privacy'].map(function(id) {
               return (
-                <button key={id} onClick={function() { onNavigate(id) }}
+                <button key={id} onClick={function() { nav(id) }}
                   style={{ display:'block', background:'none', border:'none', color:'var(--text-4)', fontSize:'13px', cursor:'pointer', marginBottom:'8px', fontFamily:FB, padding:0, textAlign:'left', transition:'color 0.15s', minHeight:'28px' }}
                   onMouseEnter={function(e) { e.currentTarget.style.color='var(--text)' }}
                   onMouseLeave={function(e) { e.currentTarget.style.color='var(--text-4)' }}>
@@ -1093,7 +906,8 @@ const LandingAuthBar = function() {
 
 function AppRoot() {
   const { isDark, toggle: toggleTheme } = useTheme()
-  var [page,          setPage]          = useState('home')
+  const navigate = useNavigate()
+  const location = useLocation()
   var [activeTab,     setActiveTab]     = useState('resume')
   var [mode,          setMode]          = useState('professional')
   var [modeLocked,    setModeLocked]    = useState(false)
@@ -1102,14 +916,9 @@ function AppRoot() {
   var [resumeDomain,  setResumeDomain]  = useState('')
   var [resumeName,    setResumeName]    = useState('')
 
-  var navigate = function(pageId) {
-    setPage(pageId)
-    window.scrollTo({ top:0, behavior:'smooth' })
-  }
-
   var goToApp = function(tab) {
     setActiveTab(tab || 'resume')
-    navigate('app')
+    navigate('/app')
   }
 
   var handleModeSelect = function(id) { setMode(id); setModeLocked(true) }
@@ -1123,44 +932,63 @@ function AppRoot() {
     setActiveTab('calculator')
   }
 
-  var renderPage = function() {
-    if (page==='home')    return <LandingPage onEnter={function() { goToApp('resume') }} onNavigate={navigate} />
-    if (page==='app')     return (
-      <AppPage
-        activeTab={activeTab} onTabChange={setActiveTab}
-        mode={mode} modeLocked={modeLocked}
-        onModeSelect={handleModeSelect} onModeReset={handleModeReset}
-        onCertSelected={handleCertSelected}
-        prefilledCert={prefilledCert} resumeCity={resumeCity}
-        resumeDomain={resumeDomain} resumeName={resumeName}
-      />
-    )
-    if (page==='blog')    return <BlogPage />
-    if (page==='faq')     return <FAQPage />
-    if (page==='about')   return <AboutPage />
-    if (page==='contact') return <ContactPage />
-    if (page==='terms')   return <TermsPage />
-    if (page==='privacy') return <PrivacyPage />
-    return <LandingPage onEnter={function() { goToApp('resume') }} onNavigate={navigate} />
+  // Determine current page for nav highlighting
+  const getPageFromPath = () => {
+    const path = (location.pathname || '').toLowerCase()
+    if (path === '/' || path === '') return 'home'
+    if (path === '/app') return 'app'
+    if (path.startsWith('/')) return path.slice(1)
+    return 'home'
   }
+  const currentPage = getPageFromPath()
 
   return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
-      {page === 'home' ? <LandingAuthBar /> : null}
+      {currentPage === 'home' ? <LandingAuthBar /> : null}
       <DynamicIslandNav
         isDark={isDark}
         toggleTheme={toggleTheme}
-        onNavigate={navigate}
-        currentPage={page}
+        onNavigate={(pageId) => navigate(pageId === 'home' ? '/' : '/' + pageId)}
+        currentPage={currentPage}
       />
       <main style={{ flex:1 }}>
         <AnimatePresence mode="wait">
-          <motion.div key={page+activeTab} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={T}>
-            {renderPage()}
+          <motion.div key={location.pathname+activeTab} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={T}>
+            <Suspense fallback={<div style={{ minHeight: '40vh' }} />}>
+              <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<LandingPage onEnter={() => goToApp('resume')} onNavigate={(p) => navigate(p === 'home' ? '/' : '/' + p)} />} />
+                <Route path="/app" element={
+                  <AppPage
+                    activeTab={activeTab} onTabChange={setActiveTab}
+                    mode={mode} modeLocked={modeLocked}
+                    onModeSelect={handleModeSelect} onModeReset={handleModeReset}
+                    onCertSelected={handleCertSelected}
+                    prefilledCert={prefilledCert} resumeCity={resumeCity}
+                    resumeDomain={resumeDomain} resumeName={resumeName}
+                  />
+                } />
+                <Route path="/faq" element={<FAQPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/features" element={<FeaturesPage />} />
+                <Route path="/how-it-works" element={<HowItWorksPage />} />
+                <Route path="/pricing" element={<PricingPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/FAQ" element={<Navigate to="/faq" replace />} />
+                <Route path="/About" element={<Navigate to="/about" replace />} />
+                <Route path="/Features" element={<Navigate to="/features" replace />} />
+                <Route path="/How-It-Works" element={<Navigate to="/how-it-works" replace />} />
+                <Route path="/Pricing" element={<Navigate to="/pricing" replace />} />
+                <Route path="/Contact" element={<Navigate to="/contact" replace />} />
+                <Route path="/Terms" element={<Navigate to="/terms" replace />} />
+                <Route path="/Privacy" element={<Navigate to="/privacy" replace />} />
+                <Route path="*" element={<LandingPage onEnter={() => goToApp('resume')} onNavigate={(p) => navigate(p === 'home' ? '/' : '/' + p)} />} />
+              </Routes>
+            </Suspense>
           </motion.div>
         </AnimatePresence>
       </main>
-      <Footer onNavigate={navigate} />
     </div>
   )
 }
@@ -1170,7 +998,9 @@ export default function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <AuthProvider>
-          <AppRoot />
+          <BrowserRouter>
+            <AppRoot />
+          </BrowserRouter>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

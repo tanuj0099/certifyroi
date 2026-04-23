@@ -1,0 +1,223 @@
+// ─────────────────────────────────────────────────────────
+// Features.jsx — Platform Features
+// ─────────────────────────────────────────────────────────
+
+import { motion } from 'framer-motion'
+import {
+  TrendingUp, FileText, MapPin, Shield, Zap,
+  BarChart3, Users, Clock, CheckCircle2, Target
+} from 'lucide-react'
+import Layout from '../components/Layout.jsx'
+
+const F_HEAD = "'Inter', sans-serif"
+const F_BODY = "'Inter', sans-serif"
+const F_MONO = "'JetBrains Mono', monospace"
+
+const FEATURES = [
+  {
+    icon: TrendingUp,
+    title: 'Live ROI Calculator',
+    desc: 'Real-time salary hike projections based on your current salary, certification cost, and expected hike percentage. See break-even timelines to the month.',
+    color: '#10B981',
+  },
+  {
+    icon: FileText,
+    title: 'AI Resume Analysis',
+    desc: 'Upload your resume and get personalized certification recommendations. Our Groq-powered AI analyzes your experience and suggests the highest-ROI certs for your profile.',
+    color: '#6366F1',
+  },
+  {
+    icon: MapPin,
+    title: 'City-Specific Data',
+    desc: 'Salary data tailored to Bangalore, Hyderabad, Pune, Mumbai, Delhi NCR, Chennai, Kolkata, and Ahmedabad. Not national averages — your actual market.',
+    color: '#F59E0B',
+  },
+  {
+    icon: Shield,
+    title: 'Loss Aversion Chart',
+    desc: 'Visualize "With Certification" vs "Inaction" scenarios over 5 years. See exactly how much you lose by not acting — not just what you gain.',
+    color: '#EF4444',
+  },
+  {
+    icon: Zap,
+    title: 'Student Mode',
+    desc: 'No current salary? Student Mode calculates time-to-first-offer and expected starting salary after certification. Built for freshers and career switchers.',
+    color: '#8B5CF6',
+  },
+  {
+    icon: BarChart3,
+    title: 'Market Demand Scores',
+    desc: 'Live job posting counts from Naukri and LinkedIn. See which certifications employers are actively hiring for right now.',
+    color: '#3B82F6',
+  },
+  {
+    icon: Users,
+    title: 'Pitch Your Boss',
+    desc: 'Generate a one-page ROI brief to convince your manager to fund your certification. Includes break-even, salary delta, and market demand data.',
+    color: '#EC4899',
+  },
+  {
+    icon: Clock,
+    title: 'Hike Verifier',
+    desc: 'Compare your expected hike against actual market data. Know if your employer\'s offer is fair before you sign.',
+    color: '#14B8A6',
+  },
+  {
+    icon: CheckCircle2,
+    title: '100+ Certifications',
+    desc: 'Across 17 domains: Cloud, Data Science, Cybersecurity, Finance, Project Management, Marketing, HR, Medical, Law, and more.',
+    color: '#22C55E',
+  },
+  {
+    icon: Target,
+    title: 'Goal-Based Filtering',
+    desc: 'Filter certifications by your goal: salary hike, job switch, career pivot, first job, promotion, or going abroad.',
+    color: '#F97316',
+  },
+]
+
+function FeatureCard({ feature, index }) {
+  const Icon = feature.icon
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      className="glass"
+      style={{
+        padding: '24px',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-xl)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}
+    >
+      <div style={{
+        width: '44px', height: '44px', borderRadius: '10px',
+        background: feature.color + '15',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <Icon size={22} color={feature.color} strokeWidth={2} />
+      </div>
+      <div>
+        <h3 style={{
+          fontFamily: F_HEAD, fontSize: '15px', fontWeight: '700',
+          color: 'var(--text)', marginBottom: '8px', lineHeight: 1.3,
+        }}>
+          {feature.title}
+        </h3>
+        <p style={{
+          fontFamily: F_BODY, fontSize: '13px', color: 'var(--text-2)',
+          lineHeight: '1.65', margin: 0,
+        }}>
+          {feature.desc}
+        </p>
+      </div>
+    </motion.div>
+  )
+}
+
+export default function FeaturesPage() {
+  return (
+    <Layout currentPage="/features">
+      <div style={{
+        maxWidth: '1200px', margin: '0 auto',
+        padding: '60px 24px 80px',
+      }}>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          style={{ marginBottom: '48px', textAlign: 'center' }}
+        >
+          <h1 style={{
+            fontFamily: F_HEAD, fontSize: 'clamp(2rem, 5vw, 3rem)',
+            fontWeight: '800', color: 'var(--text)',
+            letterSpacing: '-0.02em', lineHeight: 1.1,
+            marginBottom: '16px',
+          }}>
+            Everything you need to<br />
+            <span className="gradient-text">make the right call</span>
+          </h1>
+          <p style={{
+            fontFamily: F_BODY, fontSize: '15px', color: 'var(--text-2)',
+            lineHeight: 1.6, maxWidth: '540px', margin: '0 auto',
+          }}>
+            CertifyROI combines real India salary data with AI analysis to give you bounded, specific answers — not "it depends."
+          </p>
+        </motion.div>
+
+        {/* Features Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '16px',
+        }}>
+          {FEATURES.map((feature, i) => (
+            <FeatureCard key={i} feature={feature} index={i} />
+          ))}
+        </div>
+
+        {/* Data Freshness Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          style={{
+            marginTop: '48px',
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '8px 14px', borderRadius: '8px',
+            background: 'rgba(16, 185, 129, 0.08)',
+            border: '1px solid rgba(16, 185, 129, 0.2)',
+          }}
+        >
+          <div style={{
+            width: '6px', height: '6px', borderRadius: '50%',
+            background: '#10B981',
+            boxShadow: '0 0 6px #10B981',
+          }} />
+          <span style={{
+            fontFamily: F_MONO, fontSize: '11px',
+            color: '#059669', letterSpacing: '0.06em',
+          }}>
+            Data: Q1 2026 · LinkedIn India · NASSCOM · Naukri · AmbitionBox
+          </span>
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.35 }}
+          style={{
+            marginTop: '40px',
+            display: 'flex', gap: '12px', flexWrap: 'wrap',
+          }}
+        >
+          <a
+            href="/"
+            className="btn-primary"
+            style={{ textDecoration: 'none' }}
+          >
+            Start Your Analysis
+          </a>
+          <a
+            href="/how-it-works"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              padding: '12px 20px', borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-strong)',
+              color: 'var(--text-2)', fontFamily: F_HEAD,
+              fontSize: '13px', fontWeight: '600',
+              textDecoration: 'none',
+            }}
+          >
+            How It Works
+          </a>
+        </motion.div>
+      </div>
+    </Layout>
+  )
+}

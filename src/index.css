@@ -292,6 +292,7 @@
   /* ── Desktop nav hide on mobile ──────────────────────── */
   @media (max-width: 860px) {
     .desktop-nav { display: none !important; }
+    .mobile-menu-button { display: inline-flex !important; }
   }
 
   /* ── Mobile ──────────────────────────────────────────── */

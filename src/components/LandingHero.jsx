@@ -6,7 +6,7 @@ const LandingHero = () => {
       
       {/* BACKGROUND & GRADIENTS */}
       {/* Toned down gradients: Light mode blends to white, Dark to black */}
-      <div className="absolute inset-0 z-0 bg-[url('/path-to-your-mountain-image.jpg')] bg-cover bg-center" />
+      <div className="absolute inset-0 z-0 bg-[url('/mountain.png')] bg-cover bg-center" />
       
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-white/60 to-white dark:via-black/40 dark:to-black" />
 
