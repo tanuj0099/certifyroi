@@ -678,6 +678,36 @@ const AppPage = function({ activeTab, onTabChange, mode, modeLocked, onModeSelec
             <ModePill mode={mode} onReset={onModeReset} />
             {/* Phase C: data freshness badge in tools */}
             <DataFreshnessBadge />
+
+            <div style={{ borderTop:'1px solid var(--border)', marginTop:'6px' }}>
+              <div style={{ display:'flex', alignItems:'center', overflowX:'auto', gap:'6px', padding:'8px 0 4px' }} className="tab-row-scroll">
+                {STEP_TABS.map(function(tab) {
+                  var active = activeTab === tab.id
+                  return (
+                    <button key={tab.id} onClick={function() { onTabChange(tab.id) }}
+                      style={{ display:'flex', alignItems:'center', gap:'6px', padding:'6px 11px', borderRadius:'8px', border:'1px solid '+(active?'var(--border-accent)':'var(--border)'), background:active?'var(--indigo-dim)':'var(--surface)', color:active?'var(--indigo-light)':'var(--text-3)', cursor:'pointer', fontFamily:FH, whiteSpace:'nowrap', minHeight:'34px' }}>
+                      <tab.icon size={12} />
+                      <span style={{ fontSize:'12px', fontWeight:active?'700':'500', letterSpacing:'-0.01em' }}>{tab.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div style={{ borderTop:'1px solid rgba(99,102,241,0.08)', marginTop:'3px' }}>
+              <div style={{ display:'flex', alignItems:'center', overflowX:'auto', gap:'6px', padding:'7px 0 10px' }} className="tab-row-scroll">
+                {TOOL_TABS.map(function(tab) {
+                  var active = activeTab === tab.id
+                  return (
+                    <button key={tab.id} onClick={function() { onTabChange(tab.id) }}
+                      style={{ display:'flex', alignItems:'center', gap:'5px', padding:'5px 10px', borderRadius:'7px', border:'1px solid '+(active?'var(--border-accent)':'var(--border)'), background:active?'rgba(99,102,241,0.08)':'var(--surface)', color:active?'var(--indigo-light)':'var(--text-4)', fontSize:'12px', fontWeight:active?'700':'500', cursor:'pointer', fontFamily:FH, whiteSpace:'nowrap', minHeight:'32px' }}>
+                      <tab.icon size={11} />
+                      {tab.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           </div>
           <AnimatePresence mode="wait">
             <motion.div key={activeTab} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-6 }} transition={T}>
@@ -1008,6 +1038,9 @@ function AppRoot() {
           </motion.div>
         </AnimatePresence>
       </main>
+      {currentPage === 'app' ? (
+        <Footer onNavigate={(pageId) => navigate(pageId === 'home' ? '/' : '/' + pageId)} />
+      ) : null}
     </div>
   )
 }

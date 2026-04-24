@@ -54,7 +54,7 @@ const FAQS = [
   },
 ]
 
-function FAQItem({ question, answer, index }) {
+function FAQItem({ q, a, index }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -91,7 +91,7 @@ function FAQItem({ question, answer, index }) {
             fontFamily: F_HEAD, fontSize: '15px', fontWeight: '600',
             color: 'var(--text)', lineHeight: '1.4', marginBottom: open ? '12px' : '8px',
           }}>
-            {question}
+            {q}
           </div>
           {open && (
             <motion.p
@@ -102,7 +102,7 @@ function FAQItem({ question, answer, index }) {
                 lineHeight: '1.75', margin: 0,
               }}
             >
-              {answer}
+                {a}
             </motion.p>
           )}
         </div>

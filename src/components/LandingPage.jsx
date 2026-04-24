@@ -773,7 +773,6 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
         background: C.bg,
         color: C.text,
         overflow: 'clip',
-        borderRadius: '14px',
         transition: 'background 0.3s ease, color 0.3s ease',
       }}>
         {/* ═══════════════════════════════════════════
