@@ -1,37 +1,37 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GraduationCap, Repeat, Briefcase, RotateCcw } from 'lucide-react'
 
 const MODES = [
-  { id: 'student',      label: 'STUDENT',      sub: 'First offer · Fresher path',  color: '#818CF8', icon: GraduationCap, desc: 'Path to your first ₹4–6L offer' },
-  { id: 'switcher',     label: 'SWITCHER',      sub: 'Changing fields',             color: '#F59E0B', icon: Repeat,        desc: 'Moving to a new domain' },
-  { id: 'professional', label: 'PROFESSIONAL',  sub: 'Level up · Max ROI',          color: '#10B981', icon: Briefcase,     desc: 'Maximise your next hike' },
+  { id: 'student', label: 'STUDENT', sub: 'First offer - Fresher path', color: '#818CF8', icon: GraduationCap, desc: 'Path to your first 4-6L offer' },
+  { id: 'switcher', label: 'SWITCHER', sub: 'Changing fields', color: '#F59E0B', icon: Repeat, desc: 'Moving to a new domain' },
+  { id: 'professional', label: 'PROFESSIONAL', sub: 'Level up - Max ROI', color: '#10B981', icon: Briefcase, desc: 'Maximise your next hike' },
 ]
 
 const SWITCH_DOMAINS = [
-  { id: 'tech',          label: 'Cloud / Tech',       emoji: '☁️' },
-  { id: 'data',          label: 'Data & AI',           emoji: '📊' },
-  { id: 'cybersecurity', label: 'Cybersecurity',       emoji: '🔒' },
-  { id: 'finance',       label: 'Finance',             emoji: '₹'  },
-  { id: 'management',    label: 'Management / PMP',    emoji: '📋' },
-  { id: 'marketing',     label: 'Marketing / Digital', emoji: '📱' },
-  { id: 'hr',            label: 'HR & People',         emoji: '👥' },
-  { id: 'government',    label: 'Govt / PSU',          emoji: '🏛' },
-  { id: 'medical',       label: 'Medical / Pharma',    emoji: '🏥' },
-  { id: 'product',       label: 'Product Management',  emoji: '🚀' },
+  { id: 'tech', label: 'Cloud / Tech', short: 'CLD' },
+  { id: 'data', label: 'Data & AI', short: 'DATA' },
+  { id: 'cybersecurity', label: 'Cybersecurity', short: 'SEC' },
+  { id: 'finance', label: 'Finance', short: 'FIN' },
+  { id: 'management', label: 'Management / PMP', short: 'PM' },
+  { id: 'marketing', label: 'Marketing / Digital', short: 'MKT' },
+  { id: 'hr', label: 'HR & People', short: 'HR' },
+  { id: 'government', label: 'Govt / PSU', short: 'GOV' },
+  { id: 'medical', label: 'Medical / Pharma', short: 'MED' },
+  { id: 'product', label: 'Product Management', short: 'PROD' },
 ]
 
 const FM = "'JetBrains Mono','Commit Mono',monospace"
 const FH = "'Plus Jakarta Sans','Bricolage Grotesque',sans-serif"
 const FB = "'Inter',sans-serif"
 
-var OFFSET = 'calc(var(--nav-h, 64px) + 88px)'
+const OFFSET = 'calc(var(--nav-h, 64px) + 88px)'
 
-// ── ModePill ──────────────────────────────────────────────
 export function ModePill({ mode, onReset }) {
-  var m = MODES.find(function(x) { return x.id === mode })
-  if (!m) return null
-  var Icon = m.icon
+  const current = MODES.find((item) => item.id === mode)
+  if (!current) return null
+  const Icon = current.icon
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.88, x: -10 }}
@@ -40,21 +40,21 @@ export function ModePill({ mode, onReset }) {
       style={{
         display: 'inline-flex', alignItems: 'center', gap: '6px',
         padding: '5px 12px 5px 8px', borderRadius: '20px',
-        background: m.color + '12', border: '1px solid ' + m.color + '35',
+        background: current.color + '12', border: '1px solid ' + current.color + '35',
         marginBottom: '20px', cursor: 'default', userSelect: 'none',
       }}
     >
-      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: m.color + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <Icon size={11} color={m.color} />
+      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: current.color + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <Icon size={11} color={current.color} />
       </div>
-      <span style={{ fontSize: '11px', fontWeight: '700', color: m.color, fontFamily: FM, letterSpacing: '0.07em', textTransform: 'uppercase' }}>
-        {m.label}
+      <span style={{ fontSize: '11px', fontWeight: '700', color: current.color, fontFamily: FM, letterSpacing: '0.07em', textTransform: 'uppercase' }}>
+        {current.label}
       </span>
       <button
         onClick={onReset}
-        style={{ background: 'none', border: 'none', padding: '0 0 0 4px', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.45, transition: 'opacity 0.15s', color: m.color }}
-        onMouseEnter={function(e) { e.currentTarget.style.opacity = '1' }}
-        onMouseLeave={function(e) { e.currentTarget.style.opacity = '0.45' }}
+        style={{ background: 'none', border: 'none', padding: '0 0 0 4px', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.45, transition: 'opacity 0.15s', color: current.color }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '1' }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.45' }}
       >
         <RotateCcw size={11} />
       </button>
@@ -62,99 +62,86 @@ export function ModePill({ mode, onReset }) {
   )
 }
 
-// ── Word row ──────────────────────────────────────────────
-function WordRow({ hovered, setHovered, onPick, disabled }) {
+function WordRow({ hovered, setHovered, onPick }) {
   return (
     <div style={{
       display: 'flex',
-      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      // Responsive gap — tighter on mobile
       gap: 'clamp(4px, 4vw, 64px)',
       width: '100%',
       padding: '0 clamp(12px, 4vw, 48px)',
       flexWrap: 'nowrap',
     }}>
-      {MODES.map(function(m, i) {
-        var isHovered  = hovered === m.id
-        var isOtherHov = hovered && hovered !== m.id
-        var Icon       = m.icon
+      {MODES.map((mode, index) => {
+        const Icon = mode.icon
+        const isHovered = hovered === mode.id
+        const isOtherHovered = hovered && hovered !== mode.id
 
         return (
           <motion.div
-            key={m.id}
+            key={mode.id}
             initial={{ opacity: 0, y: 40, scale: 0.82 }}
             animate={{
-              opacity: isOtherHov ? 0.07 : 1,
+              opacity: isOtherHovered ? 0.07 : 1,
               y: 0,
               scale: isHovered ? 1.04 : 1,
-              filter: isOtherHov ? 'blur(2px)' : 'blur(0px)',
+              filter: isOtherHovered ? 'blur(2px)' : 'blur(0px)',
             }}
             transition={{
-              delay: i * 0.1,
+              delay: index * 0.1,
               duration: 0.6,
               ease: [0.34, 1.1, 0.64, 1],
-              opacity: { duration: isOtherHov ? 0.15 : 0.5, delay: i * 0.1 },
-              filter: { duration: 0.15 },
-              scale: { duration: 0.45, delay: i * 0.1 },
             }}
-            onMouseEnter={function() { if (!disabled) setHovered(m.id) }}
-            onMouseLeave={function() { if (!disabled) setHovered(null) }}
-            onClick={function() { if (!disabled) onPick(m.id) }}
+            onMouseEnter={() => setHovered(mode.id)}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => onPick(mode.id)}
             style={{
-              cursor: disabled ? 'default' : 'pointer',
+              cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              // Each word takes equal width, never wraps
               flex: '1 1 0',
               minWidth: 0,
               maxWidth: 'clamp(80px, 28vw, 300px)',
               gap: 'clamp(6px, 1.5vh, 14px)',
               userSelect: 'none',
-              WebkitUserSelect: 'none',
               WebkitTapHighlightColor: 'transparent',
               padding: 'clamp(6px, 1.5vw, 16px) clamp(4px, 1vw, 12px)',
             }}
           >
-            {/* Icon ring */}
             <motion.div
               animate={{
-                background: isHovered ? m.color + '1C' : 'rgba(255,255,255,0.03)',
-                borderColor: isHovered ? m.color + '55' : 'rgba(255,255,255,0.07)',
-                boxShadow: isHovered ? '0 0 22px ' + m.color + '18' : 'none',
+                background: isHovered ? mode.color + '1C' : 'var(--indigo-dim)',
+                borderColor: isHovered ? mode.color + '55' : 'var(--border)',
+                boxShadow: isHovered ? '0 0 22px ' + mode.color + '18' : 'none',
               }}
               transition={{ duration: 0.22 }}
               style={{
                 width: 'clamp(32px, 5.5vw, 60px)',
                 height: 'clamp(32px, 5.5vw, 60px)',
                 borderRadius: '50%',
-                border: '1px solid rgba(255,255,255,0.07)',
+                border: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
               <Icon
                 size={typeof window !== 'undefined' ? Math.max(12, Math.min(22, window.innerWidth * 0.016)) : 16}
-                color={isHovered ? m.color : 'rgba(255,255,255,0.18)'}
+                color={isHovered ? mode.color : 'var(--text-4)'}
                 style={{ transition: 'color 0.2s' }}
               />
             </motion.div>
 
-            {/* The word — scales DOWN to fit, never overflows */}
             <motion.div
-              animate={{ color: isHovered ? m.color : 'rgba(255,255,255,0.88)' }}
+              animate={{ color: isHovered ? mode.color : 'var(--text)' }}
               transition={{ duration: 0.15 }}
               style={{
                 fontFamily: FH,
                 fontWeight: '900',
-                // Key fix: use vw-based scaling so all 3 fit in one row
                 fontSize: 'clamp(18px, 5.2vw, 80px)',
                 letterSpacing: '-0.04em',
                 lineHeight: 1,
-                willChange: 'color',
-                // Prevent overflow
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -162,28 +149,26 @@ function WordRow({ hovered, setHovered, onPick, disabled }) {
                 textAlign: 'center',
               }}
             >
-              {m.label}
+              {mode.label}
             </motion.div>
 
-            {/* Sub on hover */}
             <motion.div
               animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 6 }}
               transition={{ duration: 0.18 }}
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', pointerEvents: 'none', minHeight: '28px' }}
             >
-              <div style={{ fontFamily: FM, fontSize: 'clamp(8px, 0.85vw, 10px)', color: m.color, letterSpacing: '0.07em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                {m.sub}
+              <div style={{ fontFamily: FM, fontSize: 'clamp(8px, 0.85vw, 10px)', color: mode.color, letterSpacing: '0.07em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                {mode.sub}
               </div>
               <div style={{ fontFamily: FB, fontSize: 'clamp(10px, 1vw, 12px)', color: 'var(--text-4)', textAlign: 'center', maxWidth: '160px', lineHeight: 1.4 }}>
-                {m.desc}
+                {mode.desc}
               </div>
             </motion.div>
 
-            {/* Underline */}
             <motion.div
               animate={{ scaleX: isHovered ? 1 : 0, opacity: isHovered ? 1 : 0 }}
               transition={{ duration: 0.24 }}
-              style={{ height: '2px', width: '100%', background: 'linear-gradient(90deg,transparent,' + m.color + ',transparent)', transformOrigin: 'center', borderRadius: '1px', marginTop: '-8px' }}
+              style={{ height: '2px', width: '100%', background: 'linear-gradient(90deg,transparent,' + mode.color + ',transparent)', transformOrigin: 'center', borderRadius: '1px', marginTop: '-8px' }}
             />
           </motion.div>
         )
@@ -192,9 +177,8 @@ function WordRow({ hovered, setHovered, onPick, disabled }) {
   )
 }
 
-// ── Switcher domain picker ────────────────────────────────
 function DomainPicker({ onConfirm, color }) {
-  var [selected, setSelected] = useState(null)
+  const [selected, setSelected] = useState(null)
 
   return (
     <motion.div
@@ -204,7 +188,6 @@ function DomainPicker({ onConfirm, color }) {
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       style={{ width: '100%', maxWidth: '700px', padding: '0 clamp(14px, 4vw, 40px)' }}
     >
-      {/* Question */}
       <div style={{
         fontFamily: FM, fontSize: 'clamp(10px, 1.2vw, 13px)',
         color: color, letterSpacing: '0.22em', textTransform: 'uppercase',
@@ -214,30 +197,29 @@ function DomainPicker({ onConfirm, color }) {
         WHERE ARE YOU SWITCHING TO?
       </div>
 
-      {/* Domain grid */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(min(150px, 100%), 1fr))',
         gap: '8px',
         marginBottom: 'clamp(18px, 3.5vh, 32px)',
       }}>
-        {SWITCH_DOMAINS.map(function(d, i) {
-          var isSelected = selected === d.id
+        {SWITCH_DOMAINS.map((domain, index) => {
+          const isSelected = selected === domain.id
           return (
             <motion.button
-              key={d.id}
+              key={domain.id}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 + i * 0.035, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-              onClick={function() { setSelected(d.id) }}
+              transition={{ delay: 0.05 + index * 0.035, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+              onClick={() => setSelected(domain.id)}
               whileHover={{ scale: 1.03, y: -1 }}
               whileTap={{ scale: 0.97 }}
               style={{
                 padding: '13px 11px',
                 borderRadius: '11px',
-                border: '1px solid ' + (isSelected ? color + '65' : 'rgba(255,255,255,0.08)'),
-                background: isSelected ? color + '18' : 'rgba(255,255,255,0.025)',
-                color: isSelected ? color : 'rgba(255,255,255,0.52)',
+                border: '1px solid ' + (isSelected ? color + '65' : 'var(--border)'),
+                background: isSelected ? color + '18' : 'var(--indigo-dim)',
+                color: isSelected ? color : 'var(--text-2)',
                 fontSize: 'clamp(11px, 1.2vw, 13px)',
                 fontFamily: FH,
                 fontWeight: isSelected ? '700' : '500',
@@ -248,26 +230,23 @@ function DomainPicker({ onConfirm, color }) {
                 boxShadow: isSelected ? '0 0 18px ' + color + '18' : 'none',
               }}
             >
-              <span style={{ fontSize: '15px', flexShrink: 0 }}>{d.emoji}</span>
-              <span style={{ lineHeight: 1.3 }}>{d.label}</span>
+              <span style={{ fontSize: '10px', flexShrink: 0, fontFamily: FM, letterSpacing: '0.08em', opacity: 0.75 }}>{domain.short}</span>
+              <span style={{ lineHeight: 1.3 }}>{domain.label}</span>
             </motion.button>
           )
         })}
       </div>
 
-      {/* Confirm */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
         <motion.button
-          onClick={function() { if (selected) onConfirm(selected) }}
+          onClick={() => { if (selected) onConfirm(selected) }}
           animate={{ opacity: selected ? 1 : 0.28 }}
           whileHover={selected ? { scale: 1.04, y: -2 } : {}}
           whileTap={selected ? { scale: 0.97 } : {}}
           style={{
             padding: '14px 44px', borderRadius: '40px', border: 'none',
-            background: selected
-              ? 'linear-gradient(135deg,' + color + ',#B86800)'
-              : 'rgba(255,255,255,0.06)',
-            color: selected ? 'white' : 'rgba(255,255,255,0.25)',
+            background: selected ? 'linear-gradient(135deg,' + color + ',#B86800)' : 'var(--surface)',
+            color: selected ? 'white' : 'var(--text-4)',
             fontSize: '15px', fontFamily: FH, fontWeight: '800',
             cursor: selected ? 'pointer' : 'not-allowed',
             letterSpacing: '-0.02em',
@@ -275,16 +254,17 @@ function DomainPicker({ onConfirm, color }) {
             transition: 'box-shadow 0.2s, background 0.2s',
           }}
         >
-          {selected ? 'Start switching →' : 'Pick a domain first'}
+          {selected ? 'Start switching ->' : 'Pick a domain first'}
         </motion.button>
 
         <button
-          onClick={function() { onConfirm('auto') }}
+          onClick={() => onConfirm('auto')}
           style={{
             background: 'none', border: 'none',
-            color: 'rgba(255,255,255,0.22)', fontSize: '12px',
+            color: 'var(--text-4)', fontSize: '12px',
             fontFamily: FB, cursor: 'pointer',
             textDecoration: 'underline', textUnderlineOffset: '3px',
+            opacity: 0.8,
           }}
         >
           let AI decide from my resume
@@ -294,42 +274,35 @@ function DomainPicker({ onConfirm, color }) {
   )
 }
 
-// ── Main ──────────────────────────────────────────────────
 function ModeSelector({ onSelect }) {
-  // step: 'pick' | 'domain' | 'exiting'
-  var [step,    setStep]    = useState('pick')
-  var [hovered, setHovered] = useState(null)
-  var [ready,   setReady]   = useState(false)
+  const [step, setStep] = useState('pick')
+  const [hovered, setHovered] = useState(null)
+  const [ready, setReady] = useState(false)
 
-  // Stagger words in
-  useEffect(function() {
-    var t = setTimeout(function() { setReady(true) }, 160)
-    return function() { clearTimeout(t) }
+  useEffect(() => {
+    const timer = setTimeout(() => setReady(true), 160)
+    return () => clearTimeout(timer)
   }, [])
 
   function handleWordPick(id) {
     if (step !== 'pick') return
     if (id === 'switcher') {
       setStep('domain')
-    } else {
-      setStep('exiting')
-      setTimeout(function() { onSelect(id) }, 600)
+      return
     }
+    setStep('exiting')
+    setTimeout(() => onSelect(id), 600)
   }
 
   function handleDomainConfirm(domainId) {
-    // Save domain choice
     if (domainId && domainId !== 'auto') {
-      try { localStorage.setItem('certifyroi_switch_domain', domainId) } catch(e) {}
+      try { localStorage.setItem('certifyroi_switch_domain', domainId) } catch (e) {}
     } else {
-      try { localStorage.removeItem('certifyroi_switch_domain') } catch(e) {}
+      try { localStorage.removeItem('certifyroi_switch_domain') } catch (e) {}
     }
     setStep('exiting')
-    // Call onSelect immediately — no extra timer
-    setTimeout(function() { onSelect('switcher') }, 500)
+    setTimeout(() => onSelect('switcher'), 500)
   }
-
-  var switcherColor = '#F59E0B'
 
   return (
     <motion.div
@@ -348,7 +321,6 @@ function ModeSelector({ onSelect }) {
         overflow: 'hidden',
       }}
     >
-      {/* Dot grid */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: 'radial-gradient(rgba(99,102,241,0.08) 1px, transparent 1px)',
@@ -356,7 +328,6 @@ function ModeSelector({ onSelect }) {
         pointerEvents: 'none',
       }} />
 
-      {/* Hover glow */}
       <AnimatePresence>
         {hovered && step === 'pick' ? (
           <motion.div
@@ -370,7 +341,7 @@ function ModeSelector({ onSelect }) {
               width: '75vw', height: '75vw', maxWidth: '680px', maxHeight: '680px',
               borderRadius: '50%',
               background: 'radial-gradient(circle,' +
-                (MODES.find(function(m) { return m.id === hovered })?.color || '#6366F1') +
+                (MODES.find((m) => m.id === hovered)?.color || '#6366F1') +
                 '0D 0%, transparent 65%)',
             }}
           />
@@ -378,8 +349,6 @@ function ModeSelector({ onSelect }) {
       </AnimatePresence>
 
       <div style={{ position: 'relative', zIndex: 2, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-        {/* ── STEP: pick ── */}
         <AnimatePresence mode="wait">
           {step === 'pick' && ready ? (
             <motion.div
@@ -390,7 +359,6 @@ function ModeSelector({ onSelect }) {
               transition={{ duration: 0.3 }}
               style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(18px, 4vh, 44px)' }}
             >
-              {/* WHO ARE YOU */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.42 }}
@@ -404,15 +372,8 @@ function ModeSelector({ onSelect }) {
                 WHO ARE YOU?
               </motion.div>
 
-              {/* Three words */}
-              <WordRow
-                hovered={hovered}
-                setHovered={setHovered}
-                onPick={handleWordPick}
-                disabled={false}
-              />
+              <WordRow hovered={hovered} setHovered={setHovered} onPick={handleWordPick} />
 
-              {/* Hint */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: hovered ? 0 : 1 }}
@@ -422,24 +383,22 @@ function ModeSelector({ onSelect }) {
                   color: 'var(--text-4)', textAlign: 'center',
                 }}
               >
-                pick one — it shapes every recommendation
+                pick one - it shapes every recommendation
               </motion.div>
             </motion.div>
           ) : null}
         </AnimatePresence>
 
-        {/* ── STEP: domain (switcher follow-up) ── */}
         <AnimatePresence mode="wait">
           {step === 'domain' ? (
             <motion.div
               key="domain"
               style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             >
-              <DomainPicker onConfirm={handleDomainConfirm} color={switcherColor} />
+              <DomainPicker onConfirm={handleDomainConfirm} color="#F59E0B" />
             </motion.div>
           ) : null}
         </AnimatePresence>
-
       </div>
     </motion.div>
   )

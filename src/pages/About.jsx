@@ -105,16 +105,16 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <GlassCard style={{ padding: 'clamp(20px, 4vw, 32px)', background: 'rgba(26,25,22,0.96)', borderColor: 'rgba(45,106,79,0.18)' }}>
+        <GlassCard style={{ padding: 'clamp(20px, 4vw, 32px)', background: 'var(--text)', borderColor: 'var(--border-accent)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '18px', alignItems: 'center' }}>
             <div>
-              <div style={{ fontFamily: FM, fontSize: '10px', color: 'rgba(255,255,255,0.6)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '14px' }}>
+              <div style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-3)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '14px' }}>
                 The outcome
               </div>
-              <p style={{ fontFamily: FH, fontSize: 'clamp(1.9rem, 4vw, 3rem)', lineHeight: 0.98, letterSpacing: '-0.03em', color: 'white', margin: '0 0 14px' }}>
+              <p style={{ fontFamily: FH, fontSize: 'clamp(1.9rem, 4vw, 3rem)', lineHeight: 0.98, letterSpacing: '-0.03em', color: 'var(--bg)', margin: '0 0 14px' }}>
                 You should know the answer before you pay the exam fee.
               </p>
-              <p style={{ fontFamily: FB, fontSize: '14px', lineHeight: '1.8', color: 'rgba(255,255,255,0.72)', margin: 0 }}>
+              <p style={{ fontFamily: FB, fontSize: '14px', lineHeight: '1.8', color: 'var(--text-2)', margin: 0 }}>
                 CertifyROI is built to make that answer visible, explainable, and fast to evaluate.
               </p>
             </div>
@@ -123,7 +123,7 @@ export default function AboutPage() {
               <PillButton href="/app" wide>
                 Calculate ROI <ArrowRight size={15} />
               </PillButton>
-              <a href="mailto:hello@certifyroi.in" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontFamily: FB, fontSize: '13px', color: 'rgba(255,255,255,0.72)', textDecoration: 'none' }}>
+              <a href="mailto:hello@certifyroi.in" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontFamily: FB, fontSize: '13px', color: 'var(--text-2)', textDecoration: 'none' }}>
                 <Mail size={14} /> hello@certifyroi.in
               </a>
             </div>
@@ -131,15 +131,15 @@ export default function AboutPage() {
         </GlassCard>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '9999px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.6)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '9999px', border: '1px solid var(--border)', background: 'var(--surface)' }}>
             <ShieldCheck size={14} color="var(--indigo)" />
             <span style={{ fontFamily: FB, fontSize: '12px', color: 'var(--text-3)' }}>No affiliate links. No sponsored picks.</span>
           </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '9999px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.6)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '9999px', border: '1px solid var(--border)', background: 'var(--surface)' }}>
             <Sparkles size={14} color="var(--gold)" />
             <span style={{ fontFamily: FB, fontSize: '12px', color: 'var(--text-3)' }}>Built for clarity, not noise.</span>
           </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '9999px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.6)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '9999px', border: '1px solid var(--border)', background: 'var(--surface)' }}>
             <Database size={14} color="var(--indigo)" />
             <span style={{ fontFamily: FB, fontSize: '12px', color: 'var(--text-3)' }}>Median-based India data.</span>
           </div>

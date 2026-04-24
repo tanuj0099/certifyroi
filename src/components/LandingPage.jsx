@@ -1,6 +1,6 @@
 import { motion, useScroll, AnimatePresence } from 'framer-motion'
 import React, { useRef, useState, useEffect, createContext, useContext } from 'react'
-import { ArrowRight, ChevronDown, Sun, Moon, BarChart2, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, ChevronDown, BarChart2, CheckCircle2 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────
 // THEME
@@ -761,8 +761,7 @@ function Footer() {
 // ─────────────────────────────────────────────────────────
 // APP
 // ─────────────────────────────────────────────────────────
-export default function App({ onNavigate, onEnter }) {
-  const [isDark, setIsDark] = useState(true)
+export default function App({ onNavigate, onEnter, isDark = true }) {
   const C = isDark ? THEMES.dark : THEMES.light
   const isMobile = useIsMobile()
   const handleEnter = typeof onEnter === 'function' ? onEnter : function() {}

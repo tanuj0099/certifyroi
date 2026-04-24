@@ -1,13 +1,9 @@
-// ─────────────────────────────────────────────────────────
-// HowItWorks.jsx — Step-by-step guide
-// ─────────────────────────────────────────────────────────
-
 import { motion } from 'framer-motion'
 import { Database, Upload, FileCheck, ArrowRight, TrendingUp } from 'lucide-react'
-import Layout from '../components/Layout.jsx'
+import MarketingPageShell from '../components/MarketingPageShell.jsx'
 
-const F_HEAD = "'Inter', sans-serif"
-const F_BODY = "'Inter', sans-serif"
+const F_HEAD = "'EB Garamond','Cormorant Garamond',Georgia,serif"
+const F_BODY = "'Inter','DM Sans',sans-serif"
 const F_MONO = "'JetBrains Mono', monospace"
 
 const STEPS = [
@@ -16,7 +12,7 @@ const STEPS = [
     icon: Upload,
     title: 'Upload your resume or set your profile',
     body: 'Tell us your current salary, city, and target certification. The more specific you are, the more accurate our analysis becomes. You can skip the resume and enter details manually if you prefer.',
-    color: '#6366F1',
+    color: 'var(--indigo)',
   },
   {
     num: '02',
@@ -30,14 +26,14 @@ const STEPS = [
     icon: FileCheck,
     title: 'Get a specific, bounded answer',
     body: 'Break-even to the month. 5-year net gain in rupees. Monthly salary delta from day one. An AI verdict on whether the cert makes sense for your profile. Not "it depends." An actual number.',
-    color: '#10B981',
+    color: 'var(--accent)',
   },
   {
     num: '04',
     icon: TrendingUp,
-    title: 'Verify your hike or pitch your boss',
+    title: "Verify your hike or pitch your boss",
     body: 'Use our Hike Verifier to check if your employer\'s offer is fair. Or generate a one-page brief to convince your manager to fund your certification. Both tools are included.',
-    color: '#F59E0B',
+    color: 'var(--gold)',
   },
 ]
 
@@ -58,7 +54,6 @@ function StepCard({ step, index, isLast }) {
         position: 'relative',
       }}
     >
-      {/* Step Number */}
       <div style={{
         fontFamily: F_MONO,
         fontSize: 'clamp(1.4rem, 3vw, 2rem)',
@@ -73,7 +68,6 @@ function StepCard({ step, index, isLast }) {
         {step.num}
       </div>
 
-      {/* Icon */}
       <div style={{
         width: '48px', height: '48px', borderRadius: '12px',
         background: step.color + '15',
@@ -83,16 +77,15 @@ function StepCard({ step, index, isLast }) {
         <Icon size={22} color={step.color} strokeWidth={2} />
       </div>
 
-      {/* Content */}
       <div style={{ flex: 1 }}>
         <h3 style={{
           fontFamily: F_HEAD,
           fontWeight: '700',
-          fontSize: '16px',
+          fontSize: '24px',
           color: 'var(--text)',
           marginBottom: '8px',
           letterSpacing: '-0.02em',
-          lineHeight: 1.3,
+          lineHeight: 1.2,
         }}>
           {step.title}
         </h3>
@@ -107,7 +100,6 @@ function StepCard({ step, index, isLast }) {
         </p>
       </div>
 
-      {/* Arrow connector (not on last) */}
       {!isLast && (
         <ArrowRight
           size={18}
@@ -126,49 +118,23 @@ function StepCard({ step, index, isLast }) {
 
 export default function HowItWorksPage() {
   return (
-    <Layout currentPage="/how-it-works">
+    <MarketingPageShell
+      eyebrow="HOW IT WORKS"
+      title="From Uncertainty"
+      accent="to Clarity"
+      subtitle="Four steps from uncertainty to a data-backed certification decision."
+    >
       <div style={{
-        maxWidth: '800px',
+        maxWidth: '900px',
         margin: '0 auto',
-        padding: '60px 24px 80px',
+        padding: '0 0 12px',
       }}>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          style={{ marginBottom: '48px' }}
-        >
-          <h1 style={{
-            fontFamily: F_HEAD,
-            fontSize: 'clamp(2rem, 5vw, 3rem)',
-            fontWeight: '800',
-            color: 'var(--text)',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
-            marginBottom: '16px',
-          }}>
-            How It Works
-          </h1>
-          <p style={{
-            fontFamily: F_BODY,
-            fontSize: '15px',
-            color: 'var(--text-2)',
-            lineHeight: 1.6,
-            maxWidth: '540px',
-          }}>
-            Four steps from uncertainty to a data-backed career decision.
-          </p>
-        </motion.div>
-
-        {/* Steps */}
         <div>
           {STEPS.map((step, i) => (
             <StepCard key={i} step={step} index={i} isLast={i === STEPS.length - 1} />
           ))}
         </div>
 
-        {/* Under the hood */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -184,7 +150,7 @@ export default function HowItWorksPage() {
           <p style={{
             fontFamily: F_MONO,
             fontSize: '11px',
-            color: '#F59E0B',
+            color: 'var(--gold)',
             textTransform: 'uppercase',
             letterSpacing: '0.1em',
             marginBottom: '16px',
@@ -223,7 +189,7 @@ export default function HowItWorksPage() {
                 </div>
                 <div style={{
                   fontFamily: F_HEAD,
-                  fontSize: '13px',
+                  fontSize: '20px',
                   fontWeight: '700',
                   color: 'var(--text)',
                   marginBottom: '5px',
@@ -243,7 +209,6 @@ export default function HowItWorksPage() {
           </div>
         </motion.div>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -268,7 +233,7 @@ export default function HowItWorksPage() {
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border-strong)',
               color: 'var(--text-2)',
-              fontFamily: F_HEAD,
+              fontFamily: F_BODY,
               fontSize: '13px',
               fontWeight: '600',
               textDecoration: 'none',
@@ -278,6 +243,6 @@ export default function HowItWorksPage() {
           </a>
         </motion.div>
       </div>
-    </Layout>
+    </MarketingPageShell>
   )
 }

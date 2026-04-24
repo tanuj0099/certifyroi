@@ -5,7 +5,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { ChevronDown, HelpCircle, Mail } from 'lucide-react'
-import Layout from '../components/Layout.jsx'
+import MarketingPageShell from '../components/MarketingPageShell.jsx'
 
 const F_HEAD = "'Inter', sans-serif"
 const F_BODY = "'Inter', sans-serif"
@@ -122,34 +122,16 @@ function FAQItem({ question, answer, index }) {
 
 export default function FAQPage() {
   return (
-    <Layout currentPage="/faq">
+    <MarketingPageShell
+      eyebrow="FAQ"
+      title="Frequently Asked"
+      accent="Questions"
+      subtitle="Everything you need to know about CertifyROI, salary data, and certification decisions."
+    >
       <div style={{
         maxWidth: '800px', margin: '0 auto',
-        padding: '60px 24px 80px',
+        padding: '0 0 12px',
       }}>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          style={{ marginBottom: '48px' }}
-        >
-          <h1 style={{
-            fontFamily: F_HEAD, fontSize: 'clamp(2rem, 5vw, 3rem)',
-            fontWeight: '800', color: 'var(--text)',
-            letterSpacing: '-0.02em', lineHeight: 1.1,
-            marginBottom: '16px',
-          }}>
-            Frequently Asked<br />Questions
-          </h1>
-          <p style={{
-            fontFamily: F_BODY, fontSize: '15px', color: 'var(--text-2)',
-            lineHeight: 1.6, maxWidth: '540px',
-          }}>
-            Everything you need to know about CertifyROI, salary data, and certification decisions.
-          </p>
-        </motion.div>
-
         {/* FAQ List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {FAQS.map((faq, i) => (
@@ -190,6 +172,6 @@ export default function FAQPage() {
           </a>
         </motion.div>
       </div>
-    </Layout>
+    </MarketingPageShell>
   )
 }

@@ -30,6 +30,7 @@ const FeaturesPage = lazy(() => import('./pages/Features.jsx'))
 const HowItWorksPage = lazy(() => import('./pages/HowItWorks.jsx'))
 const PricingPage = lazy(() => import('./pages/Pricing.jsx'))
 const ContactPage = lazy(() => import('./pages/Contact.jsx'))
+const BlogPage = lazy(() => import('./pages/Blog.jsx'))
 const ResumeTool = lazy(() => import('./pages/ResumeTool.jsx'))
 const ROITool = lazy(() => import('./pages/ROITool.jsx'))
 const HeatmapTool = lazy(() => import('./pages/HeatmapTool.jsx'))
@@ -189,7 +190,7 @@ const BLOG_POSTS = [
   { id: 30, tag: 'HR & People',     tagColor: '#A855F7', title: 'People Analytics Certification: ROI for HR Professionals in 2026',    date: 'Mar 2026', readTime: '5 min', forWho: 'Professional', excerpt: 'People Analytics is the fastest-growing sub-discipline in HR. Indian companies — especially in tech, BFSI, and large manufacturing — are building people analytics functions from scratch.\n\nThe University of Pennsylvania People Analytics Certificate (Coursera, ₹15,000, 3 months) is the most respected short-form credential in this space. It covers workforce planning, HR metrics, regression analysis for people data, and dashboard design.\n\nSalary premium in India: HR professionals with demonstrated people analytics skills command ₹4–8L more than peers at the same experience level at MNCs and product companies.\n\nThe cert alone isn\'t sufficient — you need a real portfolio project. Ideally a workforce analysis you ran at your current company, presented as a case study. That\'s what converts the credential into a salary move.' },
 ]
 
-const BlogPage = function() {
+const _OldBlogPage = function() {
   var [filter,       setFilter]       = useState('All')
   var [expandedPost, setExpandedPost] = useState(null)
   var [domainFilter, setDomainFilter] = useState('All')
@@ -945,6 +946,7 @@ function AppRoot() {
     const path = (location.pathname || '').toLowerCase()
     if (path === '/' || path === '') return 'home'
     if (path === '/app') return 'app'
+    if (path === '/tools' || path.startsWith('/tools/')) return 'app'
     if (path.startsWith('/')) return path.slice(1)
     return 'home'
   }
@@ -964,7 +966,7 @@ function AppRoot() {
           <motion.div key={location.pathname+activeTab} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={T}>
             <Suspense fallback={<div style={{ minHeight: '40vh' }} />}>
               <Routes location={location} key={location.pathname}>
-                <Route path="/" element={<LandingPage onEnter={() => goToApp('resume')} onNavigate={(p) => navigate(p === 'home' ? '/' : '/' + p)} />} />
+                <Route path="/" element={<LandingPage isDark={isDark} onEnter={() => goToApp('resume')} onNavigate={(p) => navigate(p === 'home' ? '/' : '/' + p)} />} />
                 <Route path="/app" element={
                   <AppPage
                     activeTab={activeTab} onTabChange={setActiveTab}
@@ -980,6 +982,7 @@ function AppRoot() {
                 <Route path="/features" element={<FeaturesPage />} />
                 <Route path="/how-it-works" element={<HowItWorksPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
+                <Route path="/blog" element={<BlogPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/tools/resume" element={<ResumeTool />} />
                 <Route path="/tools/roi" element={<ROITool />} />
@@ -999,7 +1002,7 @@ function AppRoot() {
                 <Route path="/Contact" element={<Navigate to="/contact" replace />} />
                 <Route path="/Terms" element={<Navigate to="/terms" replace />} />
                 <Route path="/Privacy" element={<Navigate to="/privacy" replace />} />
-                <Route path="*" element={<LandingPage onEnter={() => goToApp('resume')} onNavigate={(p) => navigate(p === 'home' ? '/' : '/' + p)} />} />
+                <Route path="*" element={<LandingPage isDark={isDark} onEnter={() => goToApp('resume')} onNavigate={(p) => navigate(p === 'home' ? '/' : '/' + p)} />} />
               </Routes>
             </Suspense>
           </motion.div>

@@ -10,12 +10,15 @@ const F_SANS  = "'Inter', 'DM Sans', sans-serif"
 const F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
 const NAV_ITEMS = [
-  { label: 'Home',    pageId: 'home'    },
-  { label: 'Tools',   pageId: 'app'     },
-  { label: 'About',   pageId: 'about'   },
-  { label: 'FAQ',     pageId: 'faq'     },
-  { label: 'Blog',    pageId: 'blog'    },
-  { label: 'Contact', pageId: 'contact' },
+  { label: 'Home',           pageId: 'home'          },
+  { label: 'Tools',          pageId: 'app'           },
+  { label: 'How It Works',   pageId: 'how-it-works'  },
+  { label: 'Features',       pageId: 'features'      },
+  { label: 'Pricing',        pageId: 'pricing'       },
+  { label: 'About',          pageId: 'about'         },
+  { label: 'FAQ',            pageId: 'faq'           },
+  { label: 'Blog',           pageId: 'blog'          },
+  { label: 'Contact',        pageId: 'contact'       },
 ]
 
 function scrollTo(id) {

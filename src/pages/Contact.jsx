@@ -45,11 +45,11 @@ export default function ContactPage() {
                 style={{
                   padding: '20px',
                   borderRadius: 'var(--radius-lg)',
-                  background: 'rgba(16,185,129,0.08)',
-                  border: '1px solid rgba(16,185,129,0.18)',
+                  background: 'var(--indigo-dim)',
+                  border: '1px solid var(--border-accent)',
                 }}
               >
-                <div style={{ fontFamily: FH, fontSize: '18px', fontWeight: '800', color: '#059669', marginBottom: '8px' }}>
+                <div style={{ fontFamily: FH, fontSize: '18px', fontWeight: '800', color: 'var(--indigo)', marginBottom: '8px' }}>
                   Message received
                 </div>
                 <p style={{ fontFamily: FB, fontSize: '14px', color: 'var(--text-3)', lineHeight: '1.8', margin: 0 }}>
@@ -74,7 +74,7 @@ export default function ContactPage() {
                       padding: '13px 16px',
                       borderRadius: '12px',
                       border: '1px solid var(--border)',
-                      background: 'rgba(255,255,255,0.72)',
+                      background: 'var(--surface)',
                       color: 'var(--text)',
                       fontFamily: FB,
                       fontSize: '14px',
@@ -82,8 +82,8 @@ export default function ContactPage() {
                       transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(45,106,79,0.35)'
-                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(45,106,79,0.08)'
+                      e.currentTarget.style.borderColor = 'var(--indigo)'
+                      e.currentTarget.style.boxShadow = '0 0 0 4px var(--indigo-dim)'
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border)'
@@ -108,7 +108,7 @@ export default function ContactPage() {
                       padding: '13px 16px',
                       borderRadius: '12px',
                       border: '1px solid var(--border)',
-                      background: 'rgba(255,255,255,0.72)',
+                      background: 'var(--surface)',
                       color: 'var(--text)',
                       fontFamily: FB,
                       fontSize: '14px',
@@ -116,8 +116,8 @@ export default function ContactPage() {
                       transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(45,106,79,0.35)'
-                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(45,106,79,0.08)'
+                      e.currentTarget.style.borderColor = 'var(--indigo)'
+                      e.currentTarget.style.boxShadow = '0 0 0 4px var(--indigo-dim)'
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border)'
@@ -139,7 +139,7 @@ export default function ContactPage() {
                       padding: '13px 16px',
                       borderRadius: '12px',
                       border: '1px solid var(--border)',
-                      background: 'rgba(255,255,255,0.72)',
+                      background: 'var(--surface)',
                       color: 'var(--text)',
                       fontFamily: FB,
                       fontSize: '14px',
@@ -170,7 +170,7 @@ export default function ContactPage() {
                       padding: '13px 16px',
                       borderRadius: '12px',
                       border: '1px solid var(--border)',
-                      background: 'rgba(255,255,255,0.72)',
+                      background: 'var(--surface)',
                       color: 'var(--text)',
                       fontFamily: FB,
                       fontSize: '14px',
@@ -180,8 +180,8 @@ export default function ContactPage() {
                       transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(45,106,79,0.35)'
-                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(45,106,79,0.08)'
+                      e.currentTarget.style.borderColor = 'var(--indigo)'
+                      e.currentTarget.style.boxShadow = '0 0 0 4px var(--indigo-dim)'
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border)'
@@ -239,12 +239,12 @@ export default function ContactPage() {
               </p>
             </GlassCard>
 
-            <GlassCard style={{ padding: '22px', background: 'rgba(26,25,22,0.96)', borderColor: 'rgba(45,106,79,0.18)' }}>
+            <GlassCard style={{ padding: '22px', background: 'var(--text)', borderColor: 'var(--border-accent)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                <Sparkles size={18} color="white" />
-                <h3 style={{ fontFamily: FH, fontSize: '15px', fontWeight: '800', color: 'white', margin: 0 }}>Need a faster answer?</h3>
+                <Sparkles size={18} color="var(--bg)" />
+                <h3 style={{ fontFamily: FH, fontSize: '15px', fontWeight: '800', color: 'var(--bg)', margin: 0 }}>Need a faster answer?</h3>
               </div>
-              <p style={{ fontFamily: FB, fontSize: '13px', color: 'rgba(255,255,255,0.72)', lineHeight: '1.8', margin: '0 0 16px' }}>
+              <p style={{ fontFamily: FB, fontSize: '13px', color: 'var(--text-2)', lineHeight: '1.8', margin: '0 0 16px' }}>
                 If you are asking which cert to take next, the ROI calculator is usually the fastest route.
               </p>
               <PillButton href="/app">

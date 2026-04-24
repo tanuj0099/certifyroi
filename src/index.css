@@ -70,6 +70,53 @@
     --shadow:         rgba(26,25,22,0.08);
   }
 
+  /* ── DARK MODE ────────────────────────────────────────── */
+  [data-theme="dark"], html[data-theme="dark"] {
+    --bg:             #0A0A0A;
+    --bg-secondary:   #101010;
+    --surface:        #131313;
+    --surface-high:   #1A1A1A;
+    --text:           #F0F0F0;
+    --text-2:         #A8A8A8;
+    --text-3:         #6E6E6E;
+    --text-4:         #3A3A3A;
+
+    --accent:         #4A8C6A;
+    --accent-light:   #5FA083;
+    --gold:           #D4AF37;
+    --gold-light:     #F0D060;
+    --err:            #D94848;
+
+    --border:         rgba(255,255,255,0.07);
+    --border-subtle:  rgba(255,255,255,0.04);
+    --border-strong:  rgba(255,255,255,0.13);
+
+    --shadow-1: 0 1px 2px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2);
+    --shadow-2: 0 2px 6px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.25);
+    --shadow-3: 0 4px 12px rgba(0,0,0,0.4), 0 20px 48px rgba(0,0,0,0.3);
+
+    --scrollbar: rgba(255,255,255,0.15);
+
+    /* Dark mode legacy */
+    --glass-bg:       rgba(20,20,20,0.8);
+    --glass-border:   rgba(255,255,255,0.08);
+    --card-highlight: rgba(255,255,255,0.05);
+    --card-border:    rgba(255,255,255,0.08);
+    --number-color:   #4A8C6A;
+    --indigo:         #4A8C6A;
+    --indigo-light:   #5FA083;
+    --indigo-dim:     rgba(74,140,106,0.12);
+    --border-accent:  rgba(74,140,106,0.3);
+    --emerald:        #4A8C6A;
+    --emerald-light:  #5FA083;
+    --amber:          #D4AF37;
+    --red:            #D94848;
+    --picton:         #4A8C6A;
+    --picton-dim:     rgba(74,140,106,0.12);
+    --dot-color:      rgba(255,255,255,0.03);
+    --shadow:         rgba(0,0,0,0.3);
+  }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
 

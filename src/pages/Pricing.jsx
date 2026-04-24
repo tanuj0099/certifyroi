@@ -1,13 +1,9 @@
-// ─────────────────────────────────────────────────────────
-// Pricing.jsx — Free forever, no hidden costs
-// ─────────────────────────────────────────────────────────
-
 import { motion } from 'framer-motion'
 import { Check, Zap, Shield, Headphones } from 'lucide-react'
-import Layout from '../components/Layout.jsx'
+import MarketingPageShell from '../components/MarketingPageShell.jsx'
 
-const F_HEAD = "'Inter', sans-serif"
-const F_BODY = "'Inter', sans-serif"
+const F_HEAD = "'EB Garamond','Cormorant Garamond',Georgia,serif"
+const F_BODY = "'Inter','DM Sans',sans-serif"
 const F_MONO = "'JetBrains Mono', monospace"
 
 const FREE_FEATURES = [
@@ -28,7 +24,7 @@ const WHY_FREE = [
   {
     icon: Shield,
     title: 'No affiliate deals',
-    desc: 'We don\'t earn commissions from certification sales. Our only incentive is honest numbers.',
+    desc: "We don't earn commissions from certification sales. Our only incentive is honest numbers.",
   },
   {
     icon: Zap,
@@ -44,44 +40,17 @@ const WHY_FREE = [
 
 export default function PricingPage() {
   return (
-    <Layout currentPage="/pricing">
+    <MarketingPageShell
+      eyebrow="PRICING"
+      title="Free Forever"
+      accent="No Catch"
+      subtitle="CertifyROI is completely free. Sign in with Google or phone OTP after 3 guest analyses to continue using all features at no cost."
+    >
       <div style={{
-        maxWidth: '800px',
+        maxWidth: '900px',
         margin: '0 auto',
-        padding: '60px 24px 80px',
+        padding: '0 0 12px',
       }}>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          style={{ marginBottom: '48px', textAlign: 'center' }}
-        >
-          <h1 style={{
-            fontFamily: F_HEAD,
-            fontSize: 'clamp(2rem, 5vw, 3rem)',
-            fontWeight: '800',
-            color: 'var(--text)',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
-            marginBottom: '16px',
-          }}>
-            Free forever.<br />
-            <span style={{ color: 'var(--text-3)', fontWeight: '500' }}>No hidden costs. No catches.</span>
-          </h1>
-          <p style={{
-            fontFamily: F_BODY,
-            fontSize: '15px',
-            color: 'var(--text-2)',
-            lineHeight: 1.6,
-            maxWidth: '540px',
-            margin: '0 auto',
-          }}>
-            CertifyROI is completely free. Sign in with Google or phone OTP after 3 guest analyses to continue using all features at no cost.
-          </p>
-        </motion.div>
-
-        {/* Pricing Card */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -114,10 +83,11 @@ export default function PricingPage() {
             <div>
               <h2 style={{
                 fontFamily: F_HEAD,
-                fontSize: '18px',
+                fontSize: '28px',
                 fontWeight: '700',
                 color: 'var(--text)',
                 margin: 0,
+                lineHeight: 1.1,
               }}>
                 Everything is free
               </h2>
@@ -129,7 +99,7 @@ export default function PricingPage() {
                 letterSpacing: '0.08em',
                 margin: 0,
               }}>
-                All features · Unlimited use after sign-in
+                All features - Unlimited use after sign-in
               </p>
             </div>
           </div>
@@ -186,7 +156,7 @@ export default function PricingPage() {
                 borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--border-strong)',
                 color: 'var(--text-2)',
-                fontFamily: F_HEAD,
+                fontFamily: F_BODY,
                 fontSize: '13px',
                 fontWeight: '600',
                 textDecoration: 'none',
@@ -197,7 +167,6 @@ export default function PricingPage() {
           </div>
         </motion.div>
 
-        {/* Why Free */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -246,11 +215,11 @@ export default function PricingPage() {
                   </div>
                   <h3 style={{
                     fontFamily: F_HEAD,
-                    fontSize: '14px',
+                    fontSize: '22px',
                     fontWeight: '700',
                     color: 'var(--text)',
                     marginBottom: '8px',
-                    lineHeight: 1.3,
+                    lineHeight: 1.2,
                   }}>
                     {item.title}
                   </h3>
@@ -269,7 +238,6 @@ export default function PricingPage() {
           </div>
         </motion.div>
 
-        {/* Data badge */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -280,27 +248,27 @@ export default function PricingPage() {
             gap: '8px',
             padding: '8px 14px',
             borderRadius: '8px',
-            background: 'rgba(16, 185, 129, 0.08)',
-            border: '1px solid rgba(16, 185, 129, 0.2)',
+            background: 'var(--indigo-dim)',
+            border: '1px solid var(--border-accent)',
           }}
         >
           <div style={{
             width: '6px',
             height: '6px',
             borderRadius: '50%',
-            background: '#10B981',
-            boxShadow: '0 0 6px #10B981',
+            background: 'var(--accent)',
+            boxShadow: '0 0 6px var(--accent)',
           }} />
           <span style={{
             fontFamily: F_MONO,
             fontSize: '11px',
-            color: '#059669',
+            color: 'var(--indigo)',
             letterSpacing: '0.06em',
           }}>
-            Data: Q1 2026 · LinkedIn India · NASSCOM · Naukri · AmbitionBox
+            Data: Q1 2026 - LinkedIn India - NASSCOM - Naukri - AmbitionBox
           </span>
         </motion.div>
       </div>
-    </Layout>
+    </MarketingPageShell>
   )
 }

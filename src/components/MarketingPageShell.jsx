@@ -26,8 +26,8 @@ export function PillButton({ children, href, onClick, type = 'button', wide = fa
         minHeight: '54px',
         padding: wide ? '0 28px' : '0 24px',
         borderRadius: '9999px',
-        border: '1px solid rgba(45,106,79,0.22)',
-        background: 'linear-gradient(135deg, rgba(26,25,22,0.96), rgba(26,25,22,0.84))',
+        border: '1px solid var(--border-accent)',
+        background: 'linear-gradient(135deg, var(--text), var(--text))',
         color: 'var(--bg)',
         textDecoration: 'none',
         fontFamily: FB,
@@ -35,7 +35,7 @@ export function PillButton({ children, href, onClick, type = 'button', wide = fa
         fontWeight: '700',
         letterSpacing: '0.08em',
         textTransform: 'uppercase',
-        boxShadow: '0 12px 28px rgba(26,25,22,0.15)',
+        boxShadow: '0 12px 28px var(--shadow)',
         cursor: 'pointer',
       }}
     >
@@ -49,7 +49,7 @@ export function GlassCard({ children, style }) {
     <div
       className="glass"
       style={{
-        background: 'rgba(255,255,255,0.74)',
+        background: 'var(--surface)',
         backdropFilter: 'blur(14px)',
         WebkitBackdropFilter: 'blur(14px)',
         border: '1px solid var(--border)',
