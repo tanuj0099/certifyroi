@@ -12,7 +12,7 @@
     --text:           #1A1916;
     --text-2:         #5C5A56;
     --text-3:         #8C8A86;
-    --text-4:         #B4B2AE;
+    --text-4:         #8B8681;
 
     /* No blue, no purple, no indigo */
     --accent:         #2D6A4F;   /* muted forest green */
@@ -290,7 +290,7 @@
   .step-arrow-animated { animation: flowDash 1.2s linear infinite; }
 
   /* ── Desktop nav hide on mobile ──────────────────────── */
-  @media (max-width: 860px) {
+  @media (max-width: 768px) {
     .desktop-nav { display: none !important; }
     .mobile-menu-button { display: inline-flex !important; }
   }

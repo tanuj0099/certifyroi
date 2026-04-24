@@ -4,7 +4,7 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { ChevronDown, HelpCircle } from 'lucide-react'
+import { ChevronDown, HelpCircle, Mail } from 'lucide-react'
 import Layout from '../components/Layout.jsx'
 
 const F_HEAD = "'Inter', sans-serif"

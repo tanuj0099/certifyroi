@@ -30,6 +30,14 @@ const FeaturesPage = lazy(() => import('./pages/Features.jsx'))
 const HowItWorksPage = lazy(() => import('./pages/HowItWorks.jsx'))
 const PricingPage = lazy(() => import('./pages/Pricing.jsx'))
 const ContactPage = lazy(() => import('./pages/Contact.jsx'))
+const ResumeTool = lazy(() => import('./pages/ResumeTool.jsx'))
+const ROITool = lazy(() => import('./pages/ROITool.jsx'))
+const HeatmapTool = lazy(() => import('./pages/HeatmapTool.jsx'))
+const CompareTool = lazy(() => import('./pages/CompareTool.jsx'))
+const SimulatorTool = lazy(() => import('./pages/SimulatorTool.jsx'))
+const JobMapTool = lazy(() => import('./pages/JobMapTool.jsx'))
+const CollegeTool = lazy(() => import('./pages/CollegeTool.jsx'))
+const HikeVerifierTool = lazy(() => import('./pages/HikeVerifierTool.jsx'))
 
 const T   = { duration: 0.32, ease: [0.4, 0, 0.2, 1] }
 const FM  = "'JetBrains Mono','Commit Mono',monospace"
@@ -973,6 +981,14 @@ function AppRoot() {
                 <Route path="/how-it-works" element={<HowItWorksPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/tools/resume" element={<ResumeTool />} />
+                <Route path="/tools/roi" element={<ROITool />} />
+                <Route path="/tools/heatmap" element={<HeatmapTool />} />
+                <Route path="/tools/compare" element={<CompareTool />} />
+                <Route path="/tools/simulator" element={<SimulatorTool />} />
+                <Route path="/tools/jobmap" element={<JobMapTool />} />
+                <Route path="/tools/college" element={<CollegeTool />} />
+                <Route path="/tools/hike" element={<HikeVerifierTool />} />
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/FAQ" element={<Navigate to="/faq" replace />} />

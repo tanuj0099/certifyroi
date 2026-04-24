@@ -59,10 +59,11 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
+                  <label htmlFor="name-input" style={{ display: 'block', fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
                     Name
                   </label>
                   <input
+                    id="name-input"
                     type="text"
                     value={formState.name}
                     onChange={(e) => setFormState((prev) => ({ ...prev, name: e.target.value }))}
@@ -92,10 +93,11 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
+                  <label htmlFor="email-input" style={{ display: 'block', fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
                     Email
                   </label>
                   <input
+                    id="email-input"
                     type="email"
                     value={formState.email}
                     onChange={(e) => setFormState((prev) => ({ ...prev, email: e.target.value }))}
@@ -125,10 +127,11 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
+                  <label htmlFor="subject-select" style={{ display: 'block', fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
                     Subject
                   </label>
                   <select
+                    id="subject-select"
                     value={formState.subject}
                     onChange={(e) => setFormState((prev) => ({ ...prev, subject: e.target.value }))}
                     style={{
@@ -152,10 +155,11 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
+                  <label htmlFor="message-textarea" style={{ display: 'block', fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
                     Message
                   </label>
                   <textarea
+                    id="message-textarea"
                     rows={5}
                     value={formState.message}
                     onChange={(e) => setFormState((prev) => ({ ...prev, message: e.target.value }))}
