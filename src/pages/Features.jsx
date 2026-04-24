@@ -20,7 +20,7 @@ const FEATURES = [
     icon: FileText,
     title: 'AI Resume Analysis',
     desc: 'Upload your resume and get personalized certification recommendations. Our Groq-powered AI analyzes your experience and suggests the highest-ROI certs for your profile.',
-    color: 'var(--indigo)',
+    color: 'var(--accent-light)',
   },
   {
     icon: MapPin,
@@ -32,43 +32,43 @@ const FEATURES = [
     icon: Shield,
     title: 'Loss Aversion Chart',
     desc: 'Visualize "With Certification" vs "Inaction" scenarios over 5 years. See exactly how much you lose by not acting, not just what you gain.',
-    color: '#EF4444',
+    color: 'var(--err)',
   },
   {
     icon: Zap,
     title: 'Student Mode',
     desc: 'No current salary? Student Mode calculates time-to-first-offer and expected starting salary after certification. Built for freshers and career switchers.',
-    color: '#8B5CF6',
+    color: 'var(--gold)',
   },
   {
     icon: BarChart3,
     title: 'Market Demand Scores',
     desc: 'Live job posting counts from Naukri and LinkedIn. See which certifications employers are actively hiring for right now.',
-    color: '#3B82F6',
+    color: 'var(--accent)',
   },
   {
     icon: Users,
     title: 'Pitch Your Boss',
     desc: 'Generate a one-page ROI brief to convince your manager to fund your certification. Includes break-even, salary delta, and market demand data.',
-    color: '#EC4899',
+    color: 'var(--gold-light)',
   },
   {
     icon: Clock,
     title: 'Hike Verifier',
     desc: "Compare your expected hike against actual market data. Know if your employer's offer is fair before you sign.",
-    color: '#14B8A6',
+    color: 'var(--accent-light)',
   },
   {
     icon: CheckCircle2,
     title: '100+ Certifications',
     desc: 'Across 17 domains: Cloud, Data Science, Cybersecurity, Finance, Project Management, Marketing, HR, Medical, Law, and more.',
-    color: '#22C55E',
+    color: 'var(--accent)',
   },
   {
     icon: Target,
     title: 'Goal-Based Filtering',
     desc: 'Filter certifications by your goal: salary hike, job switch, career pivot, first job, promotion, or going abroad.',
-    color: '#F97316',
+    color: 'var(--gold)',
   },
 ]
 
@@ -144,7 +144,7 @@ export default function FeaturesPage() {
             marginTop: '48px',
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             padding: '8px 14px', borderRadius: '8px',
-            background: 'var(--indigo-dim)',
+            background: 'var(--picton-dim)',
             border: '1px solid var(--border-accent)',
           }}
         >
@@ -155,7 +155,7 @@ export default function FeaturesPage() {
           }} />
           <span style={{
             fontFamily: F_MONO, fontSize: '11px',
-            color: 'var(--indigo)', letterSpacing: '0.06em',
+            color: 'var(--accent)', letterSpacing: '0.06em',
           }}>
             Data: Q1 2026 - LinkedIn India - NASSCOM - Naukri - AmbitionBox
           </span>

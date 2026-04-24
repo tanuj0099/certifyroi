@@ -800,7 +800,7 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
                 objectPosition: 'center 32%',
                 filter: C.name === 'dark'
                   ? 'brightness(0.38) contrast(1.12) saturate(0.6)'
-                  : 'brightness(0.72) contrast(1.06) saturate(0.8)',
+                  : 'brightness(0.62) contrast(1.12) saturate(0.82)',
               }}
             />
             {/* Radial fade — centered, slightly left-biased */}
@@ -808,7 +808,7 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
               position: 'absolute', inset: 0,
               background: `
                 linear-gradient(to top, ${C.bg} 0%, transparent 28%),
-                radial-gradient(ellipse 80% 68% at 46% 50%, rgba(10,10,10,0.28) 0%, rgba(10,10,10,0.82) 100%)
+                radial-gradient(ellipse 82% 70% at 46% 50%, rgba(10,10,10,0.36) 0%, rgba(10,10,10,0.88) 100%)
               `,
             }} />
           </div>
@@ -855,7 +855,9 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
                 color: C.text,
                 marginBottom: '28px',
                 maxWidth: '13ch',
-                textShadow: C.name === 'dark' ? '0 2px 40px rgba(0,0,0,0.7), 0 4px 80px rgba(0,0,0,0.4)' : 'none',
+                textShadow: C.name === 'dark'
+                  ? '0 2px 40px rgba(0,0,0,0.7), 0 4px 80px rgba(0,0,0,0.4)'
+                  : '0 2px 28px rgba(0,0,0,0.34), 0 4px 56px rgba(0,0,0,0.2)',
               }}
             >
               Your next cert<br />
@@ -875,7 +877,9 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
                 fontFamily: F_SANS, fontSize: isMobile ? '14px' : '16px',
                 color: C.text2, maxWidth: '380px', lineHeight: '1.6',
                 margin: '0 0 36px',
-                textShadow: C.name === 'dark' ? '0 1px 20px rgba(0,0,0,0.6)' : 'none',
+                textShadow: C.name === 'dark'
+                  ? '0 1px 20px rgba(0,0,0,0.6)'
+                  : '0 1px 16px rgba(0,0,0,0.25)',
               }}
             >
               Know the exact payback period before you pay the fee. Calculated for your city and current salary.

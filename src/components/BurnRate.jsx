@@ -120,7 +120,7 @@ const BurnRate = ({ certName = 'Your Certification', breakEvenMonths = 6 }) => {
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '16px' }}>
         {[
-          { icon: Flame,       color: AMBER,   label: 'Streak',    value: data.streak + (stats.streakAlive ? '' : ' 🔥'), sub: 'days' },
+          { icon: Flame,       color: AMBER,   label: 'Streak',    value: data.streak + (stats.streakAlive ? '' : ' (paused)'), sub: 'days' },
           { icon: CheckCircle, color: EMERALD, label: 'Done',      value: stats.completedCount + '/' + totalModules, sub: 'modules' },
           { icon: Target,      color: PICTON,  label: 'Progress',  value: stats.pct + '%', sub: 'complete' },
           { icon: Clock,       color: '#818CF8', label: 'ETA',     value: stats.daysToFinish > 365 ? '1yr+' : stats.daysToFinish + 'd', sub: 'remaining' },
@@ -142,7 +142,7 @@ const BurnRate = ({ certName = 'Your Certification', breakEvenMonths = 6 }) => {
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
           <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '10px', color: 'var(--text-4)' }}>Started {data.startDate}</span>
           <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '10px', color: stats.pct === 100 ? EMERALD : 'var(--text-4)' }}>
-            {stats.pct === 100 ? '🎉 Complete!' : 'Est. ' + stats.estFinishDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+            {stats.pct === 100 ? 'Complete' : 'Est. ' + stats.estFinishDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
           </span>
         </div>
       </div>
@@ -177,7 +177,7 @@ const BurnRate = ({ certName = 'Your Certification', breakEvenMonths = 6 }) => {
 
       {/* Break-even reminder */}
       <div style={{ marginTop: '16px', padding: '12px 14px', borderRadius: '10px', background: 'var(--indigo-dim)', border: '1px solid var(--border-accent)', display: 'flex', gap: '9px', alignItems: 'flex-start' }}>
-        <span style={{ fontSize: '14px', flexShrink: 0 }}>⚡</span>
+        <Target size={14} color="var(--indigo-light)" style={{ flexShrink: 0, marginTop: '2px' }} />
         <div style={{ fontSize: '13px', color: 'var(--text-2)', fontFamily: 'Inter, sans-serif', lineHeight: '1.6' }}>
           Complete this cert and break even in <strong style={{ color: 'var(--indigo-light)', fontFamily: 'JetBrains Mono, monospace' }}>{breakEvenMonths} months</strong> — that's the average rent for a 1BHK in Bangalore recovered.
         </div>
@@ -187,7 +187,7 @@ const BurnRate = ({ certName = 'Your Certification', breakEvenMonths = 6 }) => {
         {justChecked && (
           <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.95 }} transition={SPRING}
             style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 200, padding: '12px 18px', borderRadius: '12px', background: EMERALD, color: 'white', fontSize: '13px', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: `0 4px 20px ${EMERALD}44` }}>
-            <CheckCircle size={15} /> Module done! Keep going 🔥
+            <CheckCircle size={15} /> Module done. Keep going.
           </motion.div>
         )}
       </AnimatePresence>

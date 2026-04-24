@@ -374,13 +374,13 @@ function PickMessage({ certName, prefilledCert, firstName }) {
         transition={{ type: 'spring', stiffness: 420, damping: 28 }}
         style={{ marginBottom: '16px', padding: '13px 16px', borderRadius: '12px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.28)', display: 'flex', alignItems: 'flex-start', gap: '10px' }}
       >
-        <motion.span
-          animate={{ rotate: [0, -12, 12, -8, 8, 0] }}
+        <motion.div
+          animate={{ rotate: [0, -10, 10, -6, 6, 0] }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          style={{ fontSize: '18px', flexShrink: 0 }}
+          style={{ flexShrink: 0, marginTop: '1px' }}
         >
-          🎯
-        </motion.span>
+          <CheckCircle size={16} color={EMERALD} />
+        </motion.div>
         <div>
           <div style={{ fontFamily: FH, fontWeight: '800', fontSize: '14px', color: EMERALD, letterSpacing: '-0.01em', marginBottom: '3px' }}>
             {firstName ? 'Great choice, ' + firstName + '.' : 'Strong move.'}
@@ -402,7 +402,7 @@ function PickMessage({ certName, prefilledCert, firstName }) {
       transition={{ type: 'spring', stiffness: 420, damping: 28 }}
       style={{ marginBottom: '16px', padding: '13px 16px', borderRadius: '12px', background: 'rgba(81,177,231,0.07)', border: '1px solid rgba(81,177,231,0.25)', display: 'flex', alignItems: 'flex-start', gap: '10px' }}
     >
-      <span style={{ fontSize: '18px', flexShrink: 0 }}>🔍</span>
+      <Info size={16} color={PICTON} style={{ flexShrink: 0, marginTop: '2px' }} />
       <div>
         <div style={{ fontFamily: FH, fontWeight: '800', fontSize: '14px', color: PICTON, letterSpacing: '-0.01em', marginBottom: '3px' }}>
           Interesting choice.
@@ -658,7 +658,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
           ) : null}
           {prefilledCert ? (
             <span style={{ marginLeft: 'auto', fontSize: '10px', color: VIOLET, fontFamily: FM, padding: '2px 7px', borderRadius: '4px', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)' }}>
-              ↑ from Resume AI
+              From Resume AI
             </span>
           ) : null}
         </motion.div>
@@ -700,7 +700,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
             <span style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: FB }}>{selectedCert.forWho}</span>
             <a href={selectedCert.link} target="_blank" rel="noopener noreferrer"
               style={{ marginLeft: 'auto', fontSize: '11px', color: VIOLET, fontFamily: FM, textDecoration: 'none', letterSpacing: '0.05em' }}>
-              OFFICIAL ↗
+              Official Site
             </a>
           </motion.div>
         ) : null}

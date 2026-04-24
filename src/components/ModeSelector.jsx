@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { GraduationCap, Repeat, Briefcase, RotateCcw } from 'lucide-react'
 
 const MODES = [
-  { id: 'student', label: 'STUDENT', sub: 'First offer - Fresher path', color: '#818CF8', icon: GraduationCap, desc: 'Path to your first 4-6L offer' },
+  { id: 'student', label: 'STUDENT', sub: 'First offer - Fresher path', color: '#4A8C6A', icon: GraduationCap, desc: 'Path to your first 4-6L offer' },
   { id: 'switcher', label: 'SWITCHER', sub: 'Changing fields', color: '#F59E0B', icon: Repeat, desc: 'Moving to a new domain' },
   { id: 'professional', label: 'PROFESSIONAL', sub: 'Level up - Max ROI', color: '#10B981', icon: Briefcase, desc: 'Maximise your next hike' },
 ]
@@ -112,7 +112,7 @@ function WordRow({ hovered, setHovered, onPick }) {
           >
             <motion.div
               animate={{
-                background: isHovered ? mode.color + '1C' : 'var(--indigo-dim)',
+                background: isHovered ? mode.color + '1C' : 'var(--picton-dim)',
                 borderColor: isHovered ? mode.color + '55' : 'var(--border)',
                 boxShadow: isHovered ? '0 0 22px ' + mode.color + '18' : 'none',
               }}
@@ -218,7 +218,7 @@ function DomainPicker({ onConfirm, color }) {
                 padding: '13px 11px',
                 borderRadius: '11px',
                 border: '1px solid ' + (isSelected ? color + '65' : 'var(--border)'),
-                background: isSelected ? color + '18' : 'var(--indigo-dim)',
+                background: isSelected ? color + '18' : 'var(--surface)',
                 color: isSelected ? color : 'var(--text-2)',
                 fontSize: 'clamp(11px, 1.2vw, 13px)',
                 fontFamily: FH,
@@ -323,7 +323,7 @@ function ModeSelector({ onSelect }) {
     >
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: 'radial-gradient(rgba(99,102,241,0.08) 1px, transparent 1px)',
+        backgroundImage: 'radial-gradient(rgba(45,106,79,0.08) 1px, transparent 1px)',
         backgroundSize: '32px 32px',
         pointerEvents: 'none',
       }} />
@@ -341,7 +341,7 @@ function ModeSelector({ onSelect }) {
               width: '75vw', height: '75vw', maxWidth: '680px', maxHeight: '680px',
               borderRadius: '50%',
               background: 'radial-gradient(circle,' +
-                (MODES.find((m) => m.id === hovered)?.color || '#6366F1') +
+                (MODES.find((m) => m.id === hovered)?.color || '#2D6A4F') +
                 '0D 0%, transparent 65%)',
             }}
           />

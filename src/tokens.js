@@ -1205,16 +1205,16 @@ export const CERT_DOMAINS = [
 
 // ── GOAL OPTIONS ──────────────────────────────────────────────
 export const GOAL_OPTIONS = [
-  { id: 'salary-hike',   label: '💰 Get a salary hike at current job'        },
-  { id: 'job-switch',    label: '🔄 Switch to a better company'              },
-  { id: 'career-switch', label: '🚀 Switch to a completely different field'  },
-  { id: 'first-job',     label: '🎓 Get my first job / fresher offer'        },
-  { id: 'promotion',     label: '📈 Get promoted to senior/lead role'        },
-  { id: 'freelance',     label: '💼 Start freelancing or consulting'         },
-  { id: 'abroad',        label: '✈️  Get a job abroad (US/UK/Singapore/UAE)'  },
-  { id: 'startup',       label: '⚡ Join or start a startup'                 },
-  { id: 'psu-govt',      label: '🏛️  Get a PSU or government position'       },
-  { id: 'higher-study',  label: '📚 Higher studies (MTech/MBA/MS abroad)'    },
+  { id: 'salary-hike',   label: 'Get a salary hike at current job' },
+  { id: 'job-switch',    label: 'Switch to a better company' },
+  { id: 'career-switch', label: 'Switch to a completely different field' },
+  { id: 'first-job',     label: 'Get my first job / fresher offer' },
+  { id: 'promotion',     label: 'Get promoted to senior/lead role' },
+  { id: 'freelance',     label: 'Start freelancing or consulting' },
+  { id: 'abroad',        label: 'Get a job abroad (US/UK/Singapore/UAE)' },
+  { id: 'startup',       label: 'Join or start a startup' },
+  { id: 'psu-govt',      label: 'Get a PSU or government position' },
+  { id: 'higher-study',  label: 'Higher studies (MTech/MBA/MS abroad)' },
 ]
 
 // ── INDIA CONTEXT ─────────────────────────────────────────────

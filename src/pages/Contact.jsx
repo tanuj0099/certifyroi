@@ -32,7 +32,7 @@ export default function ContactPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '18px', alignItems: 'start' }}>
           <GlassCard style={{ padding: 'clamp(22px, 4vw, 34px)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <MessageSquare size={18} color="var(--indigo)" />
+              <MessageSquare size={18} color="var(--accent)" />
               <h2 style={{ fontFamily: FH, fontSize: 'clamp(1.3rem, 2vw, 1.7rem)', fontWeight: '800', letterSpacing: '-0.02em', margin: 0 }}>
                 Send a message
               </h2>
@@ -45,11 +45,11 @@ export default function ContactPage() {
                 style={{
                   padding: '20px',
                   borderRadius: 'var(--radius-lg)',
-                  background: 'var(--indigo-dim)',
+                  background: 'var(--picton-dim)',
                   border: '1px solid var(--border-accent)',
                 }}
               >
-                <div style={{ fontFamily: FH, fontSize: '18px', fontWeight: '800', color: 'var(--indigo)', marginBottom: '8px' }}>
+                <div style={{ fontFamily: FH, fontSize: '18px', fontWeight: '800', color: 'var(--accent)', marginBottom: '8px' }}>
                   Message received
                 </div>
                 <p style={{ fontFamily: FB, fontSize: '14px', color: 'var(--text-3)', lineHeight: '1.8', margin: 0 }}>
@@ -82,8 +82,8 @@ export default function ContactPage() {
                       transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--indigo)'
-                      e.currentTarget.style.boxShadow = '0 0 0 4px var(--indigo-dim)'
+                      e.currentTarget.style.borderColor = 'var(--accent)'
+                      e.currentTarget.style.boxShadow = '0 0 0 4px var(--picton-dim)'
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border)'
@@ -116,8 +116,8 @@ export default function ContactPage() {
                       transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--indigo)'
-                      e.currentTarget.style.boxShadow = '0 0 0 4px var(--indigo-dim)'
+                      e.currentTarget.style.borderColor = 'var(--accent)'
+                      e.currentTarget.style.boxShadow = '0 0 0 4px var(--picton-dim)'
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border)'
@@ -180,8 +180,8 @@ export default function ContactPage() {
                       transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--indigo)'
-                      e.currentTarget.style.boxShadow = '0 0 0 4px var(--indigo-dim)'
+                      e.currentTarget.style.borderColor = 'var(--accent)'
+                      e.currentTarget.style.boxShadow = '0 0 0 4px var(--picton-dim)'
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border)'
@@ -202,10 +202,10 @@ export default function ContactPage() {
           <div style={{ display: 'grid', gap: '14px' }}>
             <GlassCard style={{ padding: '22px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                <Mail size={18} color="var(--indigo)" />
+                <Mail size={18} color="var(--accent)" />
                 <h3 style={{ fontFamily: FH, fontSize: '15px', fontWeight: '800', margin: 0 }}>Email</h3>
               </div>
-              <a href="mailto:hello@certifyroi.in" style={{ fontFamily: FB, fontSize: '15px', color: 'var(--indigo)', textDecoration: 'none', fontWeight: '700' }}>
+              <a href="mailto:hello@certifyroi.in" style={{ fontFamily: FB, fontSize: '15px', color: 'var(--accent)', textDecoration: 'none', fontWeight: '700' }}>
                 hello@certifyroi.in
               </a>
               <p style={{ fontFamily: FB, fontSize: '13px', lineHeight: '1.75', color: 'var(--text-3)', margin: '8px 0 0' }}>
@@ -228,7 +228,7 @@ export default function ContactPage() {
 
             <GlassCard style={{ padding: '22px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                <Clock3 size={18} color="var(--indigo)" />
+                <Clock3 size={18} color="var(--accent)" />
                 <h3 style={{ fontFamily: FH, fontSize: '15px', fontWeight: '800', margin: 0 }}>Response times</h3>
               </div>
               <p style={{ fontFamily: FB, fontSize: '14px', color: 'var(--text-2)', lineHeight: '1.8', margin: 0 }}>

@@ -41,7 +41,7 @@ export default function ToolPageWrapper({
               marginBottom: '16px',
             }}>
               {title}
-              {subtitle ? <><br /><span style={{ color: 'var(--indigo)', fontStyle: 'italic' }}>{subtitle}</span></> : null}
+              {subtitle ? <><br /><span style={{ color: 'var(--accent)', fontStyle: 'italic' }}>{subtitle}</span></> : null}
             </h1>
             {description ? (
               <p style={{

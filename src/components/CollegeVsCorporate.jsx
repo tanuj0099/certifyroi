@@ -157,7 +157,9 @@ const CollegeVsCorporate = () => {
             transition={SPRING}
             style={{ padding: '18px', borderRadius: '14px', background: calc.winner === 'certs' ? `${EMERALD}0c` : `${INDIGO}0c`, border: `2px solid ${calc.winner === 'certs' ? EMERALD : INDIGO}33`, textAlign: 'center' }}
           >
-            <div style={{ fontSize: '2rem', marginBottom: '8px' }}>{calc.winner === 'certs' ? '📜' : '🎓'}</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+              {calc.winner === 'certs' ? <Award size={30} color={EMERALD} /> : <GraduationCap size={30} color={INDIGO} />}
+            </div>
             <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fontSize: '1.1rem', color: calc.winner === 'certs' ? EMERALD : INDIGO, marginBottom: '5px' }}>
               {calc.winner === 'certs' ? 'Certs Win This Scenario' : 'MBA Wins This Scenario'}
             </div>
@@ -262,8 +264,8 @@ const CollegeVsCorporate = () => {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.25 }} style={{ overflow: 'hidden' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
               {[
-                { title: '🎓 Choose MBA when...', items: pros.mba, color: INDIGO },
-                { title: '📜 Choose Certs when...', items: pros.certs, color: PICTON },
+                { title: 'Choose MBA when...', items: pros.mba, color: INDIGO },
+                { title: 'Choose Certs when...', items: pros.certs, color: PICTON },
               ].map((col, ci) => (
                 <div key={ci} style={{ background: 'var(--surface)', border: `1px solid ${col.color}22`, borderRadius: '12px', padding: '18px' }}>
                   <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fontSize: '13px', color: col.color, marginBottom: '12px' }}>{col.title}</div>
@@ -278,7 +280,7 @@ const CollegeVsCorporate = () => {
             </div>
 
             <div style={{ padding: '14px 18px', borderRadius: '10px', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.18)', marginTop: '12px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '16px', flexShrink: 0 }}>💡</span>
+              <TrendingUp size={16} color={AMBER} style={{ flexShrink: 0, marginTop: '2px' }} />
               <div style={{ fontSize: '13px', color: 'var(--text-2)', fontFamily: 'Inter, sans-serif', lineHeight: '1.65' }}>
                 <strong style={{ color: AMBER }}>India reality check:</strong> An IIM-A/B/C MBA still commands a network premium that certs cannot replicate. But for everyone else — Tier 2/3 colleges, private universities, or online MBAs — the cert stack almost always wins on pure ROI within 5 years.
               </div>

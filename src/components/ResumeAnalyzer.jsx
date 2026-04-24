@@ -188,31 +188,35 @@ var parseResponse = function(text) {
 // ── Not-a-resume error ────────────────────────────────────
 var NotAResumeError = function({ rejectedBy, onDismiss }) {
   var messages = {
-    'fee receipt':    { emoji: '🧾', title: "That's a fee receipt",       desc: "Please upload your CV or resume instead." },
-    'hall ticket':    { emoji: '🎫', title: "That's an exam hall ticket",  desc: "Please upload your resume or LinkedIn profile." },
-    'question paper': { emoji: '📝', title: "That's a question paper",     desc: "Please upload your actual resume." },
-    'study notes':    { emoji: '📚', title: "These are study notes",       desc: "Please upload your resume or CV." },
-    'assignment':     { emoji: '📄', title: "That's a college assignment", desc: "Please upload your personal resume." },
-    'technical doc':  { emoji: '💾', title: "That's a technical document", desc: "Please upload your resume instead." },
-    'research report':{ emoji: '📊', title: "That's a research report",    desc: "Please upload your personal resume." },
-    'academic paper': { emoji: '🎓', title: "That's an academic paper",    desc: "Please upload your resume." },
-    'too short':      { emoji: '🤔', title: "Too short to be a resume",    desc: "Please paste more of your profile — work experience, education, skills." },
-    default:          { emoji: '🤔', title: "That doesn't look like a resume", desc: "We need your work experience, education, skills, and contact details." },
+    'fee receipt':    { title: "That's a fee receipt",       desc: "Please upload your CV or resume instead." },
+    'hall ticket':    { title: "That's an exam hall ticket",  desc: "Please upload your resume or LinkedIn profile." },
+    'question paper': { title: "That's a question paper",     desc: "Please upload your actual resume." },
+    'study notes':    { title: "These are study notes",       desc: "Please upload your resume or CV." },
+    'assignment':     { title: "That's a college assignment", desc: "Please upload your personal resume." },
+    'technical doc':  { title: "That's a technical document", desc: "Please upload your resume instead." },
+    'research report':{ title: "That's a research report",    desc: "Please upload your personal resume." },
+    'academic paper': { title: "That's an academic paper",    desc: "Please upload your resume." },
+    'too short':      { title: "Too short to be a resume",    desc: "Please paste more of your profile - work experience, education, skills." },
+    default:          { title: "That doesn't look like a resume", desc: "We need your work experience, education, skills, and contact details." },
   }
   var msg = messages[rejectedBy] || messages.default
+  var isTooShort = rejectedBy === 'too short'
+  var tone = isTooShort ? '#F59E0B' : '#FCA5A5'
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-      style={{ padding: '22px', borderRadius: '13px', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.22)', textAlign: 'center' }}
+      style={{ padding: '22px', borderRadius: '13px', background: isTooShort ? 'rgba(245,158,11,0.08)' : 'rgba(239,68,68,0.07)', border: isTooShort ? '1px solid rgba(245,158,11,0.28)' : '1px solid rgba(239,68,68,0.22)', textAlign: 'center' }}
     >
-      <div style={{ fontSize: '2.2rem', marginBottom: '10px' }}>{msg.emoji}</div>
-      <h3 style={{ fontFamily: FH, fontWeight: '800', fontSize: '15px', color: '#FCA5A5', marginBottom: '7px' }}>{msg.title}</h3>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+        <AlertTriangle size={24} color={tone} />
+      </div>
+      <h3 style={{ fontFamily: FH, fontWeight: '800', fontSize: '15px', color: tone, marginBottom: '7px' }}>{msg.title}</h3>
       <p style={{ fontSize: '13px', color: 'var(--text-3)', fontFamily: FB, lineHeight: '1.6', marginBottom: '14px' }}>{msg.desc}</p>
       {/* FIX: onDismiss only clears rejection + fileName, NOT the textarea text.
           Previously called clearAll() which wiped pasted text the user would need to retype. */}
       <button
         onClick={onDismiss}
-        style={{ padding: '8px 18px', borderRadius: '8px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', color: '#FCA5A5', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: FH }}
+        style={{ padding: '8px 18px', borderRadius: '8px', background: isTooShort ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)', border: isTooShort ? '1px solid rgba(245,158,11,0.28)' : '1px solid rgba(239,68,68,0.25)', color: tone, fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: FH }}
       >
         Try a different file
       </button>

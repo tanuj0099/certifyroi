@@ -46,11 +46,11 @@ const GovtCard = ({ org }) => {
       <button onClick={() => setOpen(v => !v)}
         style={{ width: '100%', padding: '16px 18px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'left' }}>
         <div style={{ width: 40, height: 40, borderRadius: '10px', background: `${org.color}15`, border: `1px solid ${org.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
-          {org.emoji}
+          <Building2 size={18} color={org.color} />
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: '15px', color: 'var(--text)', marginBottom: '2px' }}>{org.org}</div>
-          <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: F_BODY }}>{org.sector} · {org.roles.length} roles</div>
+          <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: F_BODY }}>{org.sector} - {org.roles.length} roles</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <DataBadge verified={true} source={org.roles[0]?.source} />
@@ -142,11 +142,11 @@ const PrivateCard = ({ company }) => {
       <button onClick={() => setOpen(v => !v)}
         style={{ width: '100%', padding: '16px 18px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'left' }}>
         <div style={{ width: 40, height: 40, borderRadius: '10px', background: `${company.color}15`, border: `1px solid ${company.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
-          {company.emoji}
+          <Building2 size={18} color={company.color} />
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: '15px', color: 'var(--text)', marginBottom: '2px' }}>{company.company}</div>
-          <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: F_BODY }}>{company.sector} · {company.size}</div>
+          <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: F_BODY }}>{company.sector} - {company.size}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <DataBadge verified={false} source={company.source} />
@@ -172,7 +172,7 @@ const PrivateCard = ({ company }) => {
                 {/* Transition arrow */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '12px', fontFamily: F_HEAD, fontWeight: '700', color: 'var(--text)', padding: '4px 10px', borderRadius: '6px', background: 'var(--bg)', border: '1px solid var(--border)' }}>{track.from}</span>
-                  <span style={{ fontSize: '14px', color: company.color }}>→</span>
+                  <span style={{ fontSize: '14px', color: company.color }}>-&gt;</span>
                   <span style={{ fontSize: '12px', fontFamily: F_HEAD, fontWeight: '700', color: company.color, padding: '4px 10px', borderRadius: '6px', background: `${company.color}10`, border: `1px solid ${company.color}25` }}>{track.to}</span>
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     {track.typicalTime && (
@@ -270,7 +270,7 @@ const JobCertMap = () => {
       {/* Page header */}
       <div style={{ marginBottom: '24px' }}>
         <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--indigo-light)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>
-          CERT REQUIREMENTS · INDIA 2026
+          CERT REQUIREMENTS - INDIA 2026
         </div>
         <h2 style={{ fontFamily: F_HEAD, fontWeight: '800', fontSize: 'clamp(1.5rem,3vw,2rem)', color: 'var(--text)', letterSpacing: '-0.04em', marginBottom: '8px' }}>
           Which Cert Gets You That Role?
@@ -283,9 +283,9 @@ const JobCertMap = () => {
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', padding: '4px', background: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border)', width: 'fit-content' }}>
         {[
-          { id: 'govt',    label: '🏛️ Government & PSU',     count: GOVT_DATA.length    },
-          { id: 'private', label: '🏢 Private Companies',    count: PRIVATE_DATA.length },
-          { id: 'mandatory', label: '⚠️ SEBI / IRDAI Mandated', count: MANDATORY_FINANCIAL_CERTS.length },
+          { id: 'govt', label: 'Government & PSU', count: GOVT_DATA.length },
+          { id: 'private', label: 'Private Companies', count: PRIVATE_DATA.length },
+          { id: 'mandatory', label: 'SEBI / IRDAI Mandated', count: MANDATORY_FINANCIAL_CERTS.length },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ padding: '8px 16px', borderRadius: '9px', border: 'none', cursor: 'pointer', fontFamily: F_HEAD, fontWeight: tab === t.id ? '700' : '500', fontSize: '13px', background: tab === t.id ? 'var(--indigo)' : 'transparent', color: tab === t.id ? 'white' : 'var(--text-4)', transition: 'all 0.18s', whiteSpace: 'nowrap' }}>
@@ -303,7 +303,7 @@ const JobCertMap = () => {
         <Info size={13} color="var(--indigo-light)" style={{ flexShrink: 0, marginTop: '2px' }} />
         <div style={{ fontSize: '12px', color: 'var(--text-3)', fontFamily: F_BODY, lineHeight: '1.6' }}>
           {tab === 'govt' && <><strong style={{ color: 'var(--indigo-light)' }}>Government data</strong> is from official UPSC/SSC/IBPS/RRB notifications and government circulars. Verified accurate as of March 2026.</>}
-          {tab === 'private' && <><strong style={{ color: '#F59E0B)' }}>Private company data</strong> is reported by employees on AmbitionBox, Glassdoor India, and LinkedIn. Not official company policy. Actual requirements vary by business unit and year.</>}
+          {tab === 'private' && <><strong style={{ color: '#F59E0B' }}>Private company data</strong> is reported by employees on AmbitionBox, Glassdoor India, and LinkedIn. Not official company policy. Actual requirements vary by business unit and year.</>}
           {tab === 'mandatory' && <><strong style={{ color: '#EF4444' }}>These certifications are legally mandated</strong> by SEBI or IRDAI. You cannot legally sell financial/insurance products in India without them.</>}
         </div>
       </div>
@@ -337,7 +337,7 @@ const JobCertMap = () => {
         {tab === 'mandatory' && (
           <motion.div key="mandatory" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
             <div style={{ marginBottom: '16px', padding: '14px 16px', borderRadius: '12px', background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)' }}>
-              <div style={{ fontFamily: F_HEAD, fontWeight: '700', fontSize: '14px', color: '#EF4444', marginBottom: '5px' }}>⚠️ Legal Requirement — Not Optional</div>
+              <div style={{ fontFamily: F_HEAD, fontWeight: '700', fontSize: '14px', color: '#EF4444', marginBottom: '5px' }}>Legal Requirement - Not Optional</div>
               <div style={{ fontSize: '13px', color: 'var(--text-2)', fontFamily: F_BODY, lineHeight: '1.6' }}>
                 If you work in financial services in India, selling mutual funds, insurance, or derivatives without these certifications is illegal. SEBI and IRDAI actively penalise violations.
               </div>

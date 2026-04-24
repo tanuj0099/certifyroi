@@ -6,6 +6,7 @@
   :root {
     /* ── Light palette — single source ─────────────────── */
     --bg:             #FAFAF8;
+    --app-bg:         #FAFAF8;
     --bg-secondary:   #F4F2EE;
     --surface:        #F7F5F1;
     --surface-high:   #EFECE7;
@@ -73,6 +74,7 @@
   /* ── DARK MODE ────────────────────────────────────────── */
   [data-theme="dark"], html[data-theme="dark"] {
     --bg:             #0A0A0A;
+    --app-bg:         #0A0A0A;
     --bg-secondary:   #101010;
     --surface:        #131313;
     --surface-high:   #1A1A1A;
@@ -176,7 +178,7 @@
 
   /* ── Card ────────────────────────────────────────────── */
   .glass {
-    background: #FFFFFF;
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-1);
@@ -193,20 +195,22 @@
 
   /* ── Buttons ─────────────────────────────────────────── */
   .btn-primary {
-    background: var(--text);
+    background: linear-gradient(135deg, var(--text), var(--text));
     color: var(--bg);
-    font-weight: 500;
-    padding: 0 24px;
-    height: 44px;
-    border-radius: var(--radius-md);
-    border: none;
+    font-weight: 700;
+    padding: 0 26px;
+    height: 46px;
+    border-radius: 9999px;
+    border: 1px solid var(--border-strong);
     cursor: pointer;
     font-family: var(--font-body);
-    font-size: 14px;
-    letter-spacing: -0.01em;
+    font-size: 12px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 10px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), var(--shadow-1);
     transition:
       opacity 160ms var(--ease-snap),
@@ -219,17 +223,21 @@
 
   .btn-ghost {
     background: transparent;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border);
     color: var(--text-2);
-    padding: 0 18px;
-    height: 40px;
-    border-radius: var(--radius-md);
+    padding: 0 20px;
+    height: 42px;
+    border-radius: 9999px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     font-family: var(--font-body);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 8px;
     transition:
       border-color 160ms var(--ease-snap),
       color 140ms linear,

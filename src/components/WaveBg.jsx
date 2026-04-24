@@ -8,28 +8,28 @@ const W3 = "M0,695 C200,668 400,722 600,692 C800,662 1000,708 1200,675 C1320,658
 // Dark theme wave configs
 const DARK = {
   landing: [
-    { path: W1, c1: '#6366F1', c2: '#818CF8', c3: '#10B981', o: 0.055, dur: 20, dy: 22, delay: 0   },
-    { path: W2, c1: '#10B981', c2: '#51B1E7', c3: '#6366F1', o: 0.040, dur: 25, dy: 16, delay: 1.5 },
-    { path: W3, c1: '#51B1E7', c2: '#818CF8', c3: '#10B981', o: 0.030, dur: 16, dy: 12, delay: 0.8 },
+    { path: W1, c1: '#2D6A4F', c2: '#9A7235', c3: '#4A8C6A', o: 0.050, dur: 20, dy: 22, delay: 0   },
+    { path: W2, c1: '#9A7235', c2: '#2D6A4F', c3: '#B89050', o: 0.038, dur: 25, dy: 16, delay: 1.5 },
+    { path: W3, c1: '#4A8C6A', c2: '#2D6A4F', c3: '#9A7235', o: 0.028, dur: 16, dy: 12, delay: 0.8 },
   ],
   app: [
-    { path: W1, c1: '#F59E0B', c2: '#EF4444', c3: '#6366F1', o: 0.10, dur: 18, dy: 22, delay: 0   },
-    { path: W2, c1: '#6366F1', c2: '#A78BFA', c3: '#51B1E7', o: 0.08, dur: 22, dy: 16, delay: 1.5 },
-    { path: W3, c1: '#10B981', c2: '#51B1E7', c3: '#F59E0B', o: 0.07, dur: 14, dy: 12, delay: 0.8 },
+    { path: W1, c1: '#2D6A4F', c2: '#9A7235', c3: '#4A8C6A', o: 0.090, dur: 18, dy: 22, delay: 0   },
+    { path: W2, c1: '#9A7235', c2: '#B89050', c3: '#2D6A4F', o: 0.070, dur: 22, dy: 16, delay: 1.5 },
+    { path: W3, c1: '#4A8C6A', c2: '#2D6A4F', c3: '#9A7235', o: 0.060, dur: 14, dy: 12, delay: 0.8 },
   ],
 }
 
-// Light theme wave configs — more vivid, warm tones
+// Light theme wave configs
 const LIGHT = {
   landing: [
-    { path: W1, c1: '#6366F1', c2: '#818CF8', c3: '#10B981', o: 0.12, dur: 20, dy: 22, delay: 0   },
-    { path: W2, c1: '#10B981', c2: '#51B1E7', c3: '#6366F1', o: 0.09, dur: 25, dy: 16, delay: 1.5 },
-    { path: W3, c1: '#51B1E7', c2: '#818CF8', c3: '#10B981', o: 0.07, dur: 16, dy: 12, delay: 0.8 },
+    { path: W1, c1: '#2D6A4F', c2: '#9A7235', c3: '#4A8C6A', o: 0.105, dur: 20, dy: 22, delay: 0   },
+    { path: W2, c1: '#9A7235', c2: '#2D6A4F', c3: '#B89050', o: 0.082, dur: 25, dy: 16, delay: 1.5 },
+    { path: W3, c1: '#4A8C6A', c2: '#2D6A4F', c3: '#9A7235', o: 0.062, dur: 16, dy: 12, delay: 0.8 },
   ],
   app: [
-    { path: W1, c1: '#F59E0B', c2: '#EF4444', c3: '#6366F1', o: 0.18, dur: 18, dy: 22, delay: 0   },
-    { path: W2, c1: '#6366F1', c2: '#A78BFA', c3: '#51B1E7', o: 0.14, dur: 22, dy: 16, delay: 1.5 },
-    { path: W3, c1: '#10B981', c2: '#51B1E7', c3: '#F59E0B', o: 0.12, dur: 14, dy: 12, delay: 0.8 },
+    { path: W1, c1: '#2D6A4F', c2: '#9A7235', c3: '#4A8C6A', o: 0.160, dur: 18, dy: 22, delay: 0   },
+    { path: W2, c1: '#9A7235', c2: '#B89050', c3: '#2D6A4F', o: 0.124, dur: 22, dy: 16, delay: 1.5 },
+    { path: W3, c1: '#4A8C6A', c2: '#2D6A4F', c3: '#9A7235', o: 0.104, dur: 14, dy: 12, delay: 0.8 },
   ],
 }
 

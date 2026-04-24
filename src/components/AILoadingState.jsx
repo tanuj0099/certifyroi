@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Search, BarChart3, Brain, TrendingUp, FileText, Check } from 'lucide-react'
 
 const LOADING_STEPS = [
-  { icon: '🔍', text: 'Scanning Bangalore job market...',     delay: 0    },
-  { icon: '📊', text: 'Pulling Naukri salary data...',        delay: 1200 },
-  { icon: '🧠', text: 'Analysing cert demand trends...',      delay: 2400 },
-  { icon: '📈', text: 'Calculating your 5-year trajectory...', delay: 3400 },
-  { icon: '✍️',  text: 'Writing your personalised report...',  delay: 4200 },
+  { icon: Search, text: 'Scanning Bangalore job market...',     delay: 0    },
+  { icon: BarChart3, text: 'Pulling Naukri salary data...',        delay: 1200 },
+  { icon: Brain, text: 'Analysing cert demand trends...',      delay: 2400 },
+  { icon: TrendingUp, text: 'Calculating your 5-year trajectory...', delay: 3400 },
+  { icon: FileText,  text: 'Writing your personalised report...',  delay: 4200 },
 ]
 
 const AILoadingState = ({ certName }) => {
@@ -39,6 +40,7 @@ const AILoadingState = ({ certName }) => {
       {/* Steps */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
         {LOADING_STEPS.map((step, i) => {
+          const Icon = step.icon
           const isActive    = i === currentStep
           const isCompleted = completedSteps.includes(i)
           const isPending   = i > currentStep
@@ -58,10 +60,9 @@ const AILoadingState = ({ certName }) => {
                     background: isCompleted ? 'rgba(16,185,129,0.12)' : isActive ? 'var(--indigo-dim)' : 'rgba(255,255,255,0.03)',
                     border: `1px solid ${isCompleted ? 'rgba(16,185,129,0.3)' : isActive ? 'var(--border-accent)' : 'var(--border)'}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '13px',
                     transition: 'all 0.3s',
                   }}>
-                    {isCompleted ? '✓' : step.icon}
+                    {isCompleted ? <Check size={13} color="#10B981" /> : <Icon size={13} color={isActive ? 'var(--indigo-light)' : 'var(--text-4)'} />}
                   </div>
                   <span style={{
                     fontSize: '13px',

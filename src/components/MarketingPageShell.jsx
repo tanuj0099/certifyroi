@@ -84,7 +84,7 @@ export function SectionLabel({ children }) {
   )
 }
 
-export function StatCard({ label, value, detail, accent = 'var(--indigo)' }) {
+export function StatCard({ label, value, detail, accent = 'var(--accent)' }) {
   return (
     <GlassCard style={{ padding: '20px' }}>
       <div style={{ fontFamily: FM, fontSize: '10px', letterSpacing: '0.08em', color: 'var(--text-4)', marginBottom: '10px' }}>
@@ -107,11 +107,11 @@ export function MarketingFooter() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '24px', marginBottom: '28px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <div style={{ width: '26px', height: '26px', background: 'linear-gradient(135deg,var(--indigo),#4338CA)', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '26px', height: '26px', background: 'linear-gradient(135deg,var(--accent),var(--gold))', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <TrendingUp size={13} color="white" />
               </div>
               <span style={{ fontFamily: FH, fontWeight: '800', fontSize: '15px', color: 'var(--text)', letterSpacing: '-0.01em' }}>
-                Certify<span style={{ color: 'var(--indigo)' }}>ROI</span>
+                Certify<span style={{ color: 'var(--accent)' }}>ROI</span>
               </span>
             </div>
             <p style={{ fontFamily: FB, fontSize: '13px', lineHeight: '1.7', color: 'var(--text-4)', maxWidth: '260px', margin: 0 }}>
@@ -173,7 +173,7 @@ export default function MarketingPageShell({ eyebrow, title, accent, subtitle, c
               {accent ? (
                 <>
                   {' '}
-                  <span style={{ fontStyle: 'italic', color: 'var(--indigo)' }}>{accent}</span>
+                  <span style={{ fontStyle: 'italic', color: 'var(--accent)' }}>{accent}</span>
                 </>
               ) : null}
             </h1>

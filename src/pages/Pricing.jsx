@@ -248,7 +248,7 @@ export default function PricingPage() {
             gap: '8px',
             padding: '8px 14px',
             borderRadius: '8px',
-            background: 'var(--indigo-dim)',
+            background: 'var(--picton-dim)',
             border: '1px solid var(--border-accent)',
           }}
         >
@@ -262,7 +262,7 @@ export default function PricingPage() {
           <span style={{
             fontFamily: F_MONO,
             fontSize: '11px',
-            color: 'var(--indigo)',
+            color: 'var(--accent)',
             letterSpacing: '0.06em',
           }}>
             Data: Q1 2026 - LinkedIn India - NASSCOM - Naukri - AmbitionBox
