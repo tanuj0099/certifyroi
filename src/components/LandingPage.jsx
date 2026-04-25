@@ -852,7 +852,7 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
                   : 'clamp(4rem, 7.5vw, 7.5rem)',
                 lineHeight: 0.88,
                 letterSpacing: '-0.03em',
-                color: C.text,
+                color: C.name === 'light' ? '#FFFFFF' : C.text,
                 marginBottom: '28px',
                 maxWidth: '13ch',
                 textShadow: C.name === 'dark'
