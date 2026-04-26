@@ -1,31 +1,76 @@
 # REVIEW
 
 ## Current state
-Codex completed part of the implementation, but the result is incomplete and visually inconsistent.
+The site has been partially edited, but the implementation is still inconsistent and incomplete.
 
-## Confirmed problems
-- Some tools were removed from the Tools page.
-- Missing tools include Hike Verifier, Compare Cert, and possibly other removed tools.
-- These tools need to be restored and given individual pages/routes.
-- Landing page light mode has poor text readability over the mountain background.
-- Theme toggle works inconsistently across pages.
-- On internal pages, background changes but text, cards, borders, and other UI elements are not fully adapted.
-- Some page layouts and text placement are not in harmony with the landing page.
-- Some pages may contain AI-slop styling and need cleanup without changing core content.
-- Buttons should be visually aligned with the landing-page sign-in button style.
-- There is a white strip / stray leftover artifact near the top-left/top area of the landing page.
-- There is a stray `/>` artifact visible near the top-left area.
-- FAQ page currently shows blank boxes instead of questions and answers.
-- Footer is missing on the landing page and tools page.
-- Some content such as timings or other written values appears illogical and should be checked.
+## Confirmed current issues from latest review
+
+### 1. Top artifact problem
+- A white strip is still visible at the top.
+- There is also a stray `/>` artifact visible at the top-left.
+- Likely cause: leftover markup, removed header residue, broken wrapper spacing, or invalid render fragment.
+
+### 2. Landing hero readability
+- In light mode, text over the mountain image is still not readable enough.
+- Specifically:
+  - "Know the exact payback period before you pay the fee. Calculated for your city and current salary."
+  - the "or a " portion in the main hero composition
+- Cause is likely inconsistent contrast caused by image variance, gradient, fog overlay, or poor layering of text over image.
+
+### 3. Missing footer
+- Landing-page footer is still missing.
+- Footer system overall needs improvement across pages.
+
+### 4. Mode selector readability
+- Student / Switcher / Professional selection area is clipping and truncating.
+- The labels are not fitting properly and feel visually broken.
+- Current presentation looks oversized, low-information, and not properly resolved.
+
+### 5. Tools page structure
+- Tools section looks scattered, flat, and without compositional flow.
+- It does not match the landing page’s visual order or narrative quality.
+- It should be reorganized with stronger hierarchy and centered flow.
+- Vertical text motif from landing page may be reused.
+- Add subtle morph effect on tool switching if it improves coherence.
+
+### 6. Component design inconsistency
+- Internal pages still contain button/box styles that do not match the landing-page capsule system.
+- Cheap neon / glowing / blinking boxes should be removed.
+- Replace them with high-quality restrained capsule or premium surface treatments.
+
+### 7. Heading alignment inconsistency
+- Main headings on:
+  - How It Works
+  - Features
+  - Pricing
+  - About
+  - FAQ
+  - Blog
+  - Tools
+- should be centered and visually composed in the same spirit as the landing page.
+
+### 8. Footer expansion
+- Footer should include:
+  - Terms and Conditions
+  - Cookies
+  - Data Privacy
+- These pages should be accessible from the footer only.
+- These pages need real content.
+
+### 9. Site-wide upgrade
+- Keep semantic color meaning where useful, especially green.
+- Upgrade the overall site quality without changing the product’s core content structure.
 
 ## Design direction
-- Use the landing page as the primary visual reference.
-- Keep the mountain/route editorial premium aesthetic.
-- Remove visual clutter, emojis, broken decorative leftovers, and generic AI-looking UI patterns.
-- Preserve content where possible; fix only what is broken, inconsistent, or obviously nonsensical.
+- Landing page remains the visual anchor.
+- Use restrained premium composition.
+- Prefer clarity, hierarchy, rhythm, and spacing over decorative effects.
+- Use motion only when subtle and purposeful.
+- Remove AI-slop patterns and leftover component styles.
+- Fix root causes, not just surface patches.
 
-## Edit policy
+## Working approach
 - Audit first.
-- Fix highest-priority issues first.
-- Prefer targeted edits over large rewrites.
+- Find exact file/component responsible before editing.
+- Fix P0 structural problems before polish.
+- Prefer component/system-level fixes over one-off hacks.

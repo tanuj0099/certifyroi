@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Zap, AlertTriangle, CheckCircle, RefreshCw,
   TrendingUp, MapPin, User, Star, ArrowRight,
-  Info
+  Info, ShieldCheck, Clock, Wifi, Building2
 } from 'lucide-react'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
@@ -36,6 +36,46 @@ function dc(d) {
   if (d === 'High')      return PICTON
   if (d === 'Medium')    return AMBER
   return '#94A3B8'
+}
+
+// ── Feature 1: Affordability band ─────────────────────────
+function getAffordabilityBand(certCostL, salaryL, isStudent) {
+  const baseline = isStudent ? 4.8 : salaryL
+  if (baseline <= 0 || certCostL <= 0) return null
+  const ratio = certCostL / baseline
+  if (ratio <= 0.10) return { label: 'Good value', color: EMERALD, tip: 'Under 10% of salary — well within budget' }
+  if (ratio <= 0.25) return { label: 'Risky', color: AMBER, tip: '10–25% of salary — tight but manageable' }
+  return { label: 'Premium stretch', color: INDIGO, tip: 'Over 25% of salary — significant commitment' }
+}
+
+// ── Feature 3: Payback confidence ─────────────────────────
+function getPaybackConfidence(demand, hikePercent) {
+  if ((demand === 'Very High' || demand === 'High') && hikePercent >= 25)
+    return { label: 'High confidence', color: EMERALD }
+  if (demand === 'Medium' || (hikePercent >= 15 && hikePercent < 25))
+    return { label: 'Medium confidence', color: AMBER }
+  return { label: 'Low confidence', color: '#94A3B8' }
+}
+
+// ── Feature 5: Per-cert readiness ─────────────────────────
+function getCertReadiness(forWho = '') {
+  const lower = forWho.toLowerCase()
+  const beginnerSignals = ['fresher', 'entry', 'beginner', 'career switch', 'anyone entering', 'fresh', 'no experience']
+  const foundationSignals = ['senior', '2+ yr', '3+ yr', '3+ yrs', '2+ yrs', 'years', '5+ yr', 'experienced', 'mid-level']
+  if (beginnerSignals.some(s => lower.includes(s))) return { label: 'Beginner ready', color: EMERALD }
+  if (foundationSignals.some(s => lower.includes(s))) return { label: 'Needs foundation', color: VIOLET }
+  return { label: 'Intermediate', color: AMBER }
+}
+
+// ── Feature 2: Not-ideal-for note ─────────────────────────
+function getNotIdealNote(cert) {
+  if (!cert) return null
+  const lower = (cert.forWho || '').toLowerCase()
+  const notes = []
+  if (cert.demand === 'Low') notes.push('low market demand in India right now')
+  if (cert.avgHike < 18) notes.push('modest average salary impact (<18%)')
+  if (lower.includes('senior') && !lower.includes('fresher')) notes.push('not suited for freshers or career switchers without related experience')
+  return notes.length > 0 ? notes[0] : null
 }
 
 // ─────────────────────────────────────────────────────────
@@ -297,6 +337,8 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
           const active      = activeCertName === cert.name
           const isPrefilled = preferred.some(function(p) { return p.id === cert.id })
           const demColor    = dc(cert.demand)
+          // Feature 5: per-cert readiness
+          const readiness   = getCertReadiness(cert.forWho)
 
           return (
             <motion.button
@@ -323,8 +365,15 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
                 <div style={{ fontFamily: FH, fontWeight: '700', fontSize: '13px', color: active ? (isPrefilled ? EMERALD : PICTON) : 'var(--text)', letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '2px' }}>
                   {cert.name}
                 </div>
-                <div style={{ fontFamily: FB, fontSize: '11px', color: 'var(--text-4)', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {cert.forWho}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                  <div style={{ fontFamily: FB, fontSize: '11px', color: 'var(--text-4)', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
+                    {cert.forWho}
+                  </div>
+                  {/* Feature 5: Readiness pill */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '1px 6px', borderRadius: '9999px', background: readiness.color + '12', border: '1px solid ' + readiness.color + '25', flexShrink: 0 }}>
+                    <ShieldCheck size={8} color={readiness.color} />
+                    <span style={{ fontFamily: FM, fontSize: '8px', color: readiness.color, letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{readiness.label}</span>
+                  </div>
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px', flexShrink: 0 }}>
@@ -416,23 +465,28 @@ function PickMessage({ certName, prefilledCert, firstName }) {
 }
 
 // ── Stat card ─────────────────────────────────────────────
-// UPDATED: More rounded, more glow (aura)
-function StatCard({ label, value, sub, color, delay = 0 }) {
+function StatCard({ label, value, sub, color, delay = 0, badge }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ ...TT, delay }}
       style={{ 
         padding: '16px', 
-        borderRadius: '20px', /* Changed from 12px to 20px for softer look */
-        background: color + '10', /* Slightly darker background for contrast */
+        borderRadius: '20px',
+        background: color + '10',
         border: '1px solid ' + color + '20',
         textAlign: 'center',
-        boxShadow: '0 4px 20px -5px ' + color + '20', /* Added subtle aura shadow */
+        boxShadow: '0 4px 20px -5px ' + color + '20',
       }}
     >
       <div style={{ fontFamily: FM, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '5px' }}>{label}</div>
       <div style={{ fontFamily: FM, fontSize: 'clamp(0.9rem,2vw,1.4rem)', fontWeight: '800', color, letterSpacing: '-0.03em' }}>{value}</div>
       {sub && <div style={{ fontSize: '10px', color: 'var(--text-4)', marginTop: '4px', fontFamily: FB, lineHeight: '1.4' }}>{sub}</div>}
+      {badge && (
+        <div style={{ marginTop: '7px', display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '9999px', background: badge.color + '15', border: '1px solid ' + badge.color + '30' }}>
+          <div style={{ width: 4, height: 4, borderRadius: '50%', background: badge.color }} />
+          <span style={{ fontFamily: FM, fontSize: '9px', color: badge.color, letterSpacing: '0.06em' }}>{badge.label}</span>
+        </div>
+      )}
     </motion.div>
   )
 }
@@ -690,20 +744,41 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
 
       {/* ── Selected cert detail strip ─────────────────── */}
       <AnimatePresence>
-        {selectedCert ? (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={TT}
-            style={{ marginBottom: '18px', padding: '11px 14px', borderRadius: '10px', background: 'var(--bg)', border: '1px solid var(--border)', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}
-          >
-            <span style={{ fontFamily: FH, fontWeight: '700', fontSize: '12px', color: VIOLET }}>{selectedCert.name}</span>
-            <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', background: dc(selectedCert.demand) + '18', color: dc(selectedCert.demand), fontFamily: FM }}>{selectedCert.demand}</span>
-            <span style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: FB }}>{selectedCert.forWho}</span>
-            <a href={selectedCert.link} target="_blank" rel="noopener noreferrer"
-              style={{ marginLeft: 'auto', fontSize: '11px', color: VIOLET, fontFamily: FM, textDecoration: 'none', letterSpacing: '0.05em' }}>
-              Official Site
-            </a>
-          </motion.div>
-        ) : null}
+        {selectedCert ? (() => {
+          const stripReadiness = getCertReadiness(selectedCert.forWho)
+          const notIdealNote   = getNotIdealNote(selectedCert)
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={TT}
+              style={{ marginBottom: '18px', borderRadius: '12px', background: 'var(--bg)', border: '1px solid var(--border)', overflow: 'hidden' }}
+            >
+              {/* Top row */}
+              <div style={{ padding: '11px 14px', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', borderBottom: notIdealNote ? '1px solid var(--border)' : 'none' }}>
+                <span style={{ fontFamily: FH, fontWeight: '700', fontSize: '12px', color: VIOLET }}>{selectedCert.name}</span>
+                <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', background: dc(selectedCert.demand) + '18', color: dc(selectedCert.demand), fontFamily: FM }}>{selectedCert.demand}</span>
+                {/* Feature 5: Readiness badge in detail strip */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '9999px', background: stripReadiness.color + '13', border: '1px solid ' + stripReadiness.color + '28' }}>
+                  <ShieldCheck size={9} color={stripReadiness.color} />
+                  <span style={{ fontFamily: FM, fontSize: '9px', color: stripReadiness.color, letterSpacing: '0.06em' }}>{stripReadiness.label}</span>
+                </div>
+                <span style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: FB }}>{selectedCert.forWho}</span>
+                <a href={selectedCert.link} target="_blank" rel="noopener noreferrer"
+                  style={{ marginLeft: 'auto', fontSize: '11px', color: VIOLET, fontFamily: FM, textDecoration: 'none', letterSpacing: '0.05em' }}>
+                  Official Site
+                </a>
+              </div>
+              {/* Feature 2: Not-ideal-for note */}
+              {notIdealNote && (
+                <div style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '8px', background: AMBER + '08' }}>
+                  <AlertTriangle size={11} color={AMBER} style={{ flexShrink: 0 }} />
+                  <span style={{ fontFamily: FM, fontSize: '10px', color: AMBER, letterSpacing: '0.03em', lineHeight: '1.5' }}>
+                    Not ideal if: {notIdealNote}
+                  </span>
+                </div>
+              )}
+            </motion.div>
+          )
+        })() : null}
       </AnimatePresence>
 
       {/* ── Sliders + inline data notes ────────────────── */}
@@ -740,6 +815,26 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
             prefix="₹" suffix="L"
             color={INDIGO}
           />
+          {/* Feature 1: Affordability band badge */}
+          {(() => {
+            const band = getAffordabilityBand(certCost, salary, isStudent)
+            if (!band) return null
+            return (
+              <motion.div
+                key={band.label}
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2 }}
+                style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 10px', borderRadius: '9999px', background: band.color + '13', border: '1px solid ' + band.color + '28' }}>
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: band.color }} />
+                  <span style={{ fontFamily: FM, fontSize: '10px', color: band.color, fontWeight: '700', letterSpacing: '0.06em' }}>{band.label}</span>
+                </div>
+                <span style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.02em' }}>{band.tip}</span>
+              </motion.div>
+            )
+          })()}
         </div>
 
         {!isStudent ? (
@@ -773,7 +868,15 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '8px', marginBottom: '12px' }}>
               <StatCard label="New Salary"    value={'₹' + roi.newSalaryL + 'L/yr'}                              color={PICTON}  delay={0}    />
-              <StatCard label="Break-even"    value={roi.breakEvenMonths > 0 ? roi.breakEvenMonths + ' mo' : '--'} sub={roi.anchor} color={AMBER}  delay={0.05} />
+              {/* Feature 3: Payback period + confidence */}
+              <StatCard
+                label="Break-even"
+                value={roi.breakEvenMonths > 0 ? roi.breakEvenMonths + ' mo' : '--'}
+                sub={roi.anchor}
+                color={AMBER}
+                delay={0.05}
+                badge={selectedCert ? getPaybackConfidence(selectedCert.demand, hikePercent) : null}
+              />
               <StatCard label="5-Yr Net Gain" value={'₹' + roi.fiveYearGainL + 'L'}                              color={EMERALD} delay={0.1}  />
               <StatCard label="Monthly +"     value={'₹' + roi.monthlyGainK + 'K'}                               color={VIOLET}  delay={0.15} />
             </div>

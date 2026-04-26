@@ -65,34 +65,23 @@ export function ModePill({ mode, onReset }) {
 function WordRow({ hovered, setHovered, onPick }) {
   return (
     <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 'clamp(4px, 4vw, 64px)',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 1fr)',
+      gap: 'clamp(8px, 2vw, 20px)',
       width: '100%',
-      padding: '0 clamp(12px, 4vw, 48px)',
-      flexWrap: 'nowrap',
+      maxWidth: '680px',
+      padding: '0 clamp(16px, 4vw, 32px)',
     }}>
       {MODES.map((mode, index) => {
         const Icon = mode.icon
         const isHovered = hovered === mode.id
-        const isOtherHovered = hovered && hovered !== mode.id
 
         return (
-          <motion.div
+          <motion.button
             key={mode.id}
-            initial={{ opacity: 0, y: 40, scale: 0.82 }}
-            animate={{
-              opacity: isOtherHovered ? 0.07 : 1,
-              y: 0,
-              scale: isHovered ? 1.04 : 1,
-              filter: isOtherHovered ? 'blur(2px)' : 'blur(0px)',
-            }}
-            transition={{
-              delay: index * 0.1,
-              duration: 0.6,
-              ease: [0.34, 1.1, 0.64, 1],
-            }}
+            initial={{ opacity: 0, y: 24, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: index * 0.08, duration: 0.5, ease: [0.34, 1.1, 0.64, 1] }}
             onMouseEnter={() => setHovered(mode.id)}
             onMouseLeave={() => setHovered(null)}
             onClick={() => onPick(mode.id)}
@@ -101,76 +90,53 @@ function WordRow({ hovered, setHovered, onPick }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              flex: '1 1 0',
-              minWidth: 0,
-              maxWidth: 'clamp(80px, 28vw, 300px)',
-              gap: 'clamp(6px, 1.5vh, 14px)',
+              gap: '10px',
+              padding: 'clamp(16px, 3vw, 28px) clamp(10px, 2vw, 20px)',
+              borderRadius: '14px',
+              border: isHovered ? `1px solid ${mode.color}55` : '1px solid var(--border)',
+              background: isHovered ? `${mode.color}10` : 'var(--surface)',
+              transition: 'border-color 0.18s, background 0.18s, box-shadow 0.18s',
+              boxShadow: isHovered ? `0 4px 20px ${mode.color}18` : 'none',
               userSelect: 'none',
               WebkitTapHighlightColor: 'transparent',
-              padding: 'clamp(6px, 1.5vw, 16px) clamp(4px, 1vw, 12px)',
             }}
           >
-            <motion.div
-              animate={{
-                background: isHovered ? mode.color + '1C' : 'var(--picton-dim)',
-                borderColor: isHovered ? mode.color + '55' : 'var(--border)',
-                boxShadow: isHovered ? '0 0 22px ' + mode.color + '18' : 'none',
-              }}
-              transition={{ duration: 0.22 }}
-              style={{
-                width: 'clamp(32px, 5.5vw, 60px)',
-                height: 'clamp(32px, 5.5vw, 60px)',
-                borderRadius: '50%',
-                border: '1px solid var(--border)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <Icon
-                size={typeof window !== 'undefined' ? Math.max(12, Math.min(22, window.innerWidth * 0.016)) : 16}
-                color={isHovered ? mode.color : 'var(--text-4)'}
-                style={{ transition: 'color 0.2s' }}
-              />
-            </motion.div>
+            <div style={{
+              width: 'clamp(36px, 5vw, 52px)',
+              height: 'clamp(36px, 5vw, 52px)',
+              borderRadius: '50%',
+              background: isHovered ? `${mode.color}18` : 'var(--surface-high)',
+              border: `1px solid ${isHovered ? mode.color + '44' : 'var(--border)'}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+              transition: 'background 0.18s, border-color 0.18s',
+            }}>
+              <Icon size={18} color={isHovered ? mode.color : 'var(--text-4)'} style={{ transition: 'color 0.18s' }} />
+            </div>
 
-            <motion.div
-              animate={{ color: isHovered ? mode.color : 'var(--text)' }}
-              transition={{ duration: 0.15 }}
-              style={{
-                fontFamily: FH,
-                fontWeight: '900',
-                fontSize: 'clamp(18px, 5.2vw, 80px)',
-                letterSpacing: '-0.04em',
-                lineHeight: 1,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                width: '100%',
-                textAlign: 'center',
-              }}
-            >
+            <div style={{
+              fontFamily: FH,
+              fontWeight: '700',
+              fontSize: 'clamp(13px, 2.5vw, 18px)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              color: isHovered ? mode.color : 'var(--text)',
+              textAlign: 'center',
+              transition: 'color 0.18s',
+            }}>
               {mode.label}
-            </motion.div>
+            </div>
 
-            <motion.div
-              animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 6 }}
-              transition={{ duration: 0.18 }}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', pointerEvents: 'none', minHeight: '28px' }}
-            >
-              <div style={{ fontFamily: FM, fontSize: 'clamp(8px, 0.85vw, 10px)', color: mode.color, letterSpacing: '0.07em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                {mode.sub}
-              </div>
-              <div style={{ fontFamily: FB, fontSize: 'clamp(10px, 1vw, 12px)', color: 'var(--text-4)', textAlign: 'center', maxWidth: '160px', lineHeight: 1.4 }}>
-                {mode.desc}
-              </div>
-            </motion.div>
-
-            <motion.div
-              animate={{ scaleX: isHovered ? 1 : 0, opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.24 }}
-              style={{ height: '2px', width: '100%', background: 'linear-gradient(90deg,transparent,' + mode.color + ',transparent)', transformOrigin: 'center', borderRadius: '1px', marginTop: '-8px' }}
-            />
-          </motion.div>
+            <div style={{
+              fontFamily: FB,
+              fontSize: 'clamp(10px, 1.2vw, 12px)',
+              color: 'var(--text-4)',
+              textAlign: 'center',
+              lineHeight: 1.4,
+            }}>
+              {mode.desc}
+            </div>
+          </motion.button>
         )
       })}
     </div>

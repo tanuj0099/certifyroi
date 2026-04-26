@@ -87,12 +87,12 @@ const DataFreshnessBadge = function() {
     <div style={{
       display: 'inline-flex', alignItems: 'center', gap: '6px',
       padding: '4px 10px', borderRadius: '6px',
-      background: 'rgba(16,185,129,0.06)',
-      border: '1px solid rgba(16,185,129,0.18)',
+      background: 'rgba(45,106,79,0.06)',
+      border: '1px solid rgba(45,106,79,0.16)',
       marginBottom: '16px',
     }}>
-      <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 5px #10B981' }} />
-      <span style={{ fontFamily: FM, fontSize: '10px', color: 'rgba(16,185,129,0.8)', letterSpacing: '0.06em' }}>
+      <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--accent)' }} />
+      <span style={{ fontFamily: FM, fontSize: '10px', color: 'var(--accent)', letterSpacing: '0.06em', opacity: 0.72 }}>
         Data: Q1 2026 · LinkedIn India · NASSCOM · Naukri · AmbitionBox
       </span>
     </div>
@@ -149,6 +149,33 @@ const PrivacyPage = function() {
             </div>
           )
         })}
+      </motion.div>
+    </PageWrapper>
+  )
+}
+
+const CookiesPage = function() {
+  return (
+    <PageWrapper maxWidth="780px">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={T}>
+        <h1 style={{ ...hs, fontSize: 'clamp(1.8rem,5vw,3.5rem)' }}>COOKIES &amp;<br /><span style={{ color: 'var(--indigo)' }}>STORAGE</span></h1>
+        {[
+          { title: 'What are cookies?',          body: 'Cookies are small text files stored on your device by your web browser when you visit a website. CertifyROI uses a minimal set of cookies — no advertising, no tracking.' },
+          { title: 'Essential cookies',           body: 'We use Firebase Authentication session cookies to keep you signed in. These are required for the app to function if you are a signed-in user. You cannot opt out of these without signing out entirely.' },
+          { title: 'localStorage',               body: 'We use your browser\'s localStorage to remember your calculator preferences (city, salary range, mode selection) across sessions. This data never leaves your device and is never sent to our servers.' },
+          { title: 'No advertising cookies',     body: 'CertifyROI has no advertising partnerships, no affiliate tracking, and no retargeting pixels. We do not use Google Ads, Meta Pixel, or any third-party advertising network cookies.' },
+          { title: 'No cross-site tracking',     body: 'We do not track you across other websites. Our analytics are privacy-first: aggregated, anonymised page view data only — no heatmaps that identify individual sessions.' },
+          { title: 'How to manage cookies',      body: 'You can clear cookies at any time through your browser settings. Clearing cookies will sign you out of CertifyROI. Your localStorage preferences can also be cleared through browser DevTools (Application > Local Storage).' },
+          { title: 'Contact',                    body: 'Cookie or privacy questions? Email hello@certifyroi.in' },
+        ].map(function(s, i) {
+          return (
+            <div key={i} className="glass" style={{ padding: '18px 20px', marginBottom: '10px' }}>
+              <h3 style={{ fontSize: '14px', color: 'var(--text)', fontFamily: FH, fontWeight: '700', marginBottom: '6px', marginTop: '0' }}>{s.title}</h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-3)', lineHeight: '1.7', fontFamily: FB, margin: '0' }}>{s.body}</p>
+            </div>
+          )
+        })}
+        <p style={{ fontSize: '11px', color: 'var(--text-4)', marginTop: '16px', textAlign: 'center', fontFamily: FB }}>Last updated: March 2026</p>
       </motion.div>
     </PageWrapper>
   )
@@ -627,8 +654,8 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
                     <div key={tab.id} style={{ display:'flex', alignItems:'center', flexShrink:0 }}>
                       {i > 0 ? <StepArrow active={isCompleted || active} /> : null}
                       <button onClick={function() { switchTab(tab.id) }}
-                        style={{ display:'flex', alignItems:'center', gap:'5px', padding:'6px 11px', borderRadius:'8px', border:'1px solid '+(active?'var(--border-accent)':'transparent'), background:active?'var(--indigo-dim)':'transparent', color:active?'var(--indigo-light)':isCompleted?'rgba(99,102,241,0.5)':'var(--text-3)', cursor:'pointer', fontFamily:FH, transition:'all 0.2s', whiteSpace:'nowrap', flexShrink:0, minHeight:'36px' }}>
-                        <div style={{ width:'18px', height:'18px', borderRadius:'50%', background:active?'var(--indigo)':isCompleted?'rgba(99,102,241,0.3)':'var(--surface)', border:'1px solid '+(active?'var(--indigo)':isCompleted?'rgba(99,102,241,0.4)':'var(--border)'), display:'flex', alignItems:'center', justifyContent:'center', fontSize:'10px', fontWeight:'700', color:active?'white':isCompleted?'var(--indigo-light)':'var(--text-4)', flexShrink:0, fontFamily:FM }}>
+                        style={{ display:'flex', alignItems:'center', gap:'5px', padding:'6px 11px', borderRadius:'8px', border:'1px solid '+(active?'var(--border-accent)':'transparent'), background:active?'var(--indigo-dim)':'transparent', color:active?'var(--indigo-light)':isCompleted?'var(--accent-light, var(--accent))':'var(--text-3)', cursor:'pointer', fontFamily:FH, transition:'all 0.2s', whiteSpace:'nowrap', flexShrink:0, minHeight:'36px' }}>
+                        <div style={{ width:'18px', height:'18px', borderRadius:'50%', background:active?'var(--indigo)':isCompleted?'var(--indigo-dim)':'var(--surface)', border:'1px solid '+(active?'var(--indigo)':isCompleted?'var(--border-accent)':'var(--border)'), display:'flex', alignItems:'center', justifyContent:'center', fontSize:'10px', fontWeight:'700', color:active?'white':isCompleted?'var(--indigo-light)':'var(--text-4)', flexShrink:0, fontFamily:FM }}>
                           {tab.num}
                         </div>
                         <tab.icon size={11} />
@@ -641,13 +668,13 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
             </div>
 
             {/* Row 2: Tools — CENTERED */}
-            <div style={{ borderTop:'1px solid rgba(99,102,241,0.08)', background:'rgba(99,102,241,0.02)' }}>
+            <div style={{ borderTop:'1px solid var(--border-subtle)', background:'var(--surface)' }}>
               <div style={{ maxWidth:'1240px', margin:'0 auto', padding:'0 12px', display:'flex', alignItems:'center', justifyContent:'center', height:'40px', overflowX:'auto', scrollbarWidth:'none', WebkitOverflowScrolling:'touch', gap:'2px' }} className="tab-row-scroll">
                 {TOOL_TABS.map(function(tab) {
                   var active = activeTab === tab.id
                   return (
                     <button key={tab.id} onClick={function() { switchTab(tab.id) }}
-                      style={{ display:'flex', alignItems:'center', gap:'5px', padding:'5px 11px', borderRadius:'6px', border:'none', borderBottom:'2px solid '+(active?'var(--indigo)':'transparent'), background:active?'rgba(99,102,241,0.07)':'transparent', color:active?'var(--indigo-light)':'var(--text-4)', fontSize:'12px', fontWeight:active?'700':'400', cursor:'pointer', fontFamily:FH, transition:'all 0.2s', whiteSpace:'nowrap', flexShrink:0, letterSpacing:'-0.01em', height:'100%', minHeight:'36px' }}>
+                      style={{ display:'flex', alignItems:'center', gap:'5px', padding:'5px 11px', borderRadius:'6px', border:'none', borderBottom:'2px solid '+(active?'var(--indigo)':'transparent'), background:active?'var(--indigo-dim)':'transparent', color:active?'var(--indigo-light)':'var(--text-4)', fontSize:'12px', fontWeight:active?'700':'400', cursor:'pointer', fontFamily:FH, transition:'all 0.2s', whiteSpace:'nowrap', flexShrink:0, letterSpacing:'-0.01em', height:'100%', minHeight:'36px' }}>
                       <tab.icon size={11} />{tab.label}
                     </button>
                   )
@@ -694,13 +721,13 @@ const AppPage = function({ activeTab, onTabChange, mode, modeLocked, onModeSelec
               </div>
             </div>
 
-            <div style={{ borderTop:'1px solid rgba(99,102,241,0.08)', marginTop:'3px' }}>
+            <div style={{ borderTop:'1px solid var(--border-subtle)', marginTop:'3px' }}>
               <div style={{ display:'flex', alignItems:'center', overflowX:'auto', gap:'6px', padding:'7px 0 10px' }} className="tab-row-scroll">
                 {TOOL_TABS.map(function(tab) {
                   var active = activeTab === tab.id
                   return (
                     <button key={tab.id} onClick={function() { onTabChange(tab.id) }}
-                      style={{ display:'flex', alignItems:'center', gap:'5px', padding:'5px 10px', borderRadius:'7px', border:'1px solid '+(active?'var(--border-accent)':'var(--border)'), background:active?'rgba(99,102,241,0.08)':'var(--surface)', color:active?'var(--indigo-light)':'var(--text-4)', fontSize:'12px', fontWeight:active?'700':'500', cursor:'pointer', fontFamily:FH, whiteSpace:'nowrap', minHeight:'32px' }}>
+                      style={{ display:'flex', alignItems:'center', gap:'5px', padding:'5px 10px', borderRadius:'7px', border:'1px solid '+(active?'var(--border-accent)':'var(--border)'), background:active?'var(--indigo-dim)':'var(--surface)', color:active?'var(--indigo-light)':'var(--text-4)', fontSize:'12px', fontWeight:active?'700':'500', cursor:'pointer', fontFamily:FH, whiteSpace:'nowrap', minHeight:'32px' }}>
                       <tab.icon size={11} />
                       {tab.label}
                     </button>
@@ -733,7 +760,7 @@ const AppPage = function({ activeTab, onTabChange, mode, modeLocked, onModeSelec
                         onClick={function() { onTabChange('heatmap') }}
                         whileHover={{ x: 4 }}
                         whileTap={{ scale: 0.97 }}
-                        style={{ display:'flex', alignItems:'center', gap:'9px', padding:'13px 24px', borderRadius:'12px', background:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(99,102,241,0.08))', border:'1px solid rgba(99,102,241,0.3)', color:'var(--indigo-light)', fontSize:'14px', fontFamily:FH, fontWeight:'700', cursor:'pointer', letterSpacing:'-0.01em' }}
+                      style={{ display:'flex', alignItems:'center', gap:'9px', padding:'13px 24px', borderRadius:'12px', background:'var(--indigo-dim)', border:'1px solid var(--border-accent)', color:'var(--indigo-light)', fontSize:'14px', fontFamily:FH, fontWeight:'700', cursor:'pointer', letterSpacing:'-0.01em' }}
                       >
                         <Map size={15} />
                         Next: See City Demand
@@ -864,13 +891,13 @@ const Footer = function({ onNavigate }) {
 
           <div>
             <div style={{ fontSize:'10px', color:'var(--text-4)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'14px', fontFamily:FM }}>Legal</div>
-            {['terms','privacy'].map(function(id) {
+            {['terms','privacy','cookies'].map(function(id) {
               return (
                 <button key={id} onClick={function() { nav(id) }}
                   style={{ display:'block', background:'none', border:'none', color:'var(--text-4)', fontSize:'13px', cursor:'pointer', marginBottom:'8px', fontFamily:FB, padding:0, textAlign:'left', transition:'color 0.15s', minHeight:'28px' }}
                   onMouseEnter={function(e) { e.currentTarget.style.color='var(--text)' }}
                   onMouseLeave={function(e) { e.currentTarget.style.color='var(--text-4)' }}>
-                  {id==='terms'?'Terms & Conditions':'Privacy Policy'}
+                  {id==='terms'?'Terms & Conditions':id==='privacy'?'Privacy Policy':'Cookie Policy'}
                 </button>
               )
             })}
@@ -1024,6 +1051,7 @@ function AppRoot() {
                 <Route path="/tools/hike" element={<HikeVerifierTool />} />
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/cookies" element={<CookiesPage />} />
                 <Route path="/FAQ" element={<Navigate to="/faq" replace />} />
                 <Route path="/About" element={<Navigate to="/about" replace />} />
                 <Route path="/Features" element={<Navigate to="/features" replace />} />
@@ -1038,7 +1066,7 @@ function AppRoot() {
           </motion.div>
         </AnimatePresence>
       </main>
-      {currentPage === 'app' ? (
+      {(currentPage === 'app' || currentPage === 'home') ? (
         <Footer onNavigate={(pageId) => navigate(pageId === 'home' ? '/' : '/' + pageId)} />
       ) : null}
     </div>

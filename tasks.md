@@ -1,42 +1,116 @@
 # TASKS
 
-## P0 Critical
-- Audit the current app file-by-file before editing.
-- Restore removed tools on the Tools page.
-- Add individual pages/routes for:
-  - Hike Verifier
-  - Compare Cert
-  - Any other removed tools found in prior implementation
-- Fix FAQ page data/rendering so questions and answers appear correctly.
-- Restore footer on landing page.
-- Restore footer on tools page.
-- Remove stray white strip / broken top artifact on landing page.
-- Remove stray `/>` artifact from landing page and check all files for similar broken markup.
+## P0 Critical fixes
 
-## P1 High
-- Improve landing-page light-mode hero readability over mountain background.
-- Make theme toggle consistent across all pages:
-  - text colors
-  - card backgrounds
-  - box backgrounds
-  - borders
-  - buttons
-  - secondary text
-- Align page rhythm and text placement with landing page where needed.
-- Make button system consistent with landing-page top-right sign-in button.
+### A. Remove top artifacts
+- Audit all layout wrappers, nav/header remnants, and global containers.
+- Find the exact source of:
+  - top white strip
+  - stray `/>` artifact at top-left
+- Remove root cause, not just hide it.
+- Check:
+  - App shell
+  - layout wrappers
+  - old header remnants
+  - fragment leftovers
+  - accidental text nodes
+  - malformed JSX
+  - pseudo-elements
+  - margin/padding causing exposed strip
 
-## P2 Medium
-- Remove AI-slop styling without changing content meaning.
-- Remove emojis and visually generic decorative patterns where present.
-- Reuse vertical text / landing-page motif only where it improves harmony.
-- Audit content for nonsensical timings, values, or placeholder-like copy.
-- Fix any remaining visual inconsistencies page by page.
+### B. Fix landing hero readability in light mode
+- Only solve visibility problem for:
+  - "Know the exact payback period before you pay the fee. Calculated for your city and current salary."
+  - the "or a " part in hero composition
+- Preserve overall hero concept.
+- Improve contrast through layering, local overlays, image treatment, fog reduction, gradient control, or text treatment.
+- Do not redesign the whole hero unnecessarily.
+
+### C. Restore landing-page footer
+- Add footer back to landing page.
+- Ensure it matches site-wide footer system.
+
+## P1 High-priority UI/system fixes
+
+### D. Fix mode selector clarity
+- Student / Switcher / Professional should not clip or truncate.
+- Replace current broken oversized text layout with a balanced premium composition.
+- Keep it clear, readable, and aligned with landing-page design language.
+- Ensure desktop and mobile behavior are both resolved.
+
+### E. Rebuild tools-page structure
+- Reorganize tool selection area with proper shape, spacing, grouping, and flow.
+- Center the composition.
+- Improve scan order and hierarchy.
+- Take inspiration from landing-page centered editorial rhythm.
+- Reuse vertical text motif if it genuinely improves brand consistency.
+- Add subtle morph transition between selected tools if feasible and tasteful.
+- Avoid gimmicky animation.
+
+### F. Replace low-quality buttons and surfaces
+- Across internal pages, replace cheap glowing / neon / blinking boxes.
+- Replace with premium capsule-inspired buttons and surfaces based on landing page.
+- Ensure hover/focus/active states are restrained and polished.
+
+## P2 Consistency upgrades
+
+### G. Center major headings on key pages
+- How It Works
+- Features
+- Pricing
+- About
+- FAQ
+- Blog
+- Tools
+
+Requirements:
+- Center headline composition in the spirit of landing page.
+- Keep hierarchy and spacing consistent.
+- Do not make every page identical; preserve page-specific content.
+
+### H. Improve footer across site
+- Create or complete pages for:
+  - Terms and Conditions
+  - Cookies
+  - Data Privacy
+- Link them from footer only.
+- Add real written content, not placeholder text.
+- Ensure footer is consistent across key pages.
+
+### I. Theme and polish audit
+- Ensure all pages use the same refined button language.
+- Preserve meaningful green highlights where they indicate positive or important value.
+- Remove AI-slop styling patterns everywhere.
+- Remove cheap visual leftovers from previous iterations.
+- Bring entire site to one premium system.
+
+## File audit requirements
+Before editing, identify likely responsible files for:
+- top artifacts
+- hero overlay/text contrast
+- missing footer
+- mode selector truncation
+- tools page composition
+- site-wide capsule button system
+- footer legal pages/routes
+
+## Output format for audit
+Before making changes, report:
+1. What is already correct
+2. What is broken
+3. Root-cause file suspects
+4. P0 plan
+5. P1 plan
 
 ## Done criteria
-- All intended tools appear again on Tools page.
-- Every tool links to its own page.
-- FAQ is functional.
-- Footer is restored.
-- Theme toggle looks correct on every page.
-- Landing page has no stray artifacts.
-- Visual language is consistent across pages.
+- No top white strip
+- No stray `/>`
+- Hero text readable in light mode
+- Landing-page footer restored
+- Mode selector no longer clips
+- Tools page has strong centered flow
+- Neon/glow boxes removed
+- Internal page buttons match premium capsule system
+- Main page headings centered consistently
+- Footer includes real legal/info pages with content
+- Site feels like one coherent product

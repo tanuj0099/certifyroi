@@ -803,13 +803,18 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
                   : 'brightness(0.62) contrast(1.12) saturate(0.82)',
               }}
             />
-            {/* Radial fade — centered, slightly left-biased */}
+            {/* Radial fade — more aggressive on light mode for readability */}
             <div style={{
               position: 'absolute', inset: 0,
-              background: `
-                linear-gradient(to top, ${C.bg} 0%, transparent 28%),
-                radial-gradient(ellipse 82% 70% at 46% 50%, rgba(10,10,10,0.36) 0%, rgba(10,10,10,0.88) 100%)
-              `,
+              background: C.name === 'light'
+                ? `
+                  linear-gradient(to top, ${C.bg} 0%, rgba(244,242,238,0.6) 32%, transparent 55%),
+                  radial-gradient(ellipse 90% 80% at 46% 50%, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.72) 100%)
+                `
+                : `
+                  linear-gradient(to top, ${C.bg} 0%, transparent 28%),
+                  radial-gradient(ellipse 82% 70% at 46% 50%, rgba(10,10,10,0.36) 0%, rgba(10,10,10,0.88) 100%)
+                `,
             }} />
           </div>
 
@@ -852,20 +857,18 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
                   : 'clamp(4rem, 7.5vw, 7.5rem)',
                 lineHeight: 0.88,
                 letterSpacing: '-0.03em',
-                color: C.name === 'light' ? '#FFFFFF' : C.text,
+                color: '#FFFFFF',
                 marginBottom: '28px',
                 maxWidth: '13ch',
-                textShadow: C.name === 'dark'
-                  ? '0 2px 40px rgba(0,0,0,0.7), 0 4px 80px rgba(0,0,0,0.4)'
-                  : '0 2px 28px rgba(0,0,0,0.34), 0 4px 56px rgba(0,0,0,0.2)',
+                textShadow: '0 2px 32px rgba(0,0,0,0.6), 0 4px 80px rgba(0,0,0,0.45)',
               }}
             >
               Your next cert<br />
               is either a{' '}
               <span style={{ color: C.gold, fontStyle: 'italic' }}>goldmine</span>
               <br />
-              or a{' '}
-              <span style={{ color: C.text3, fontStyle: 'italic' }}>mistake.</span>
+              <span style={{ color: 'rgba(255,255,255,0.82)' }}>or a{' '}</span>
+              <span style={{ color: 'rgba(255,255,255,0.65)', fontStyle: 'italic' }}>mistake.</span>
             </motion.h1>
 
             {/* Supporting text */}
@@ -875,11 +878,11 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
               transition={{ duration: 0.8, delay: 0.18 }}
               style={{
                 fontFamily: F_SANS, fontSize: isMobile ? '14px' : '16px',
-                color: C.text2, maxWidth: '380px', lineHeight: '1.6',
+                color: '#FFFFFF',
+                opacity: 0.88,
+                maxWidth: '380px', lineHeight: '1.6',
                 margin: '0 0 36px',
-                textShadow: C.name === 'dark'
-                  ? '0 1px 20px rgba(0,0,0,0.6)'
-                  : '0 1px 16px rgba(0,0,0,0.25)',
+                textShadow: '0 1px 20px rgba(0,0,0,0.7)',
               }}
             >
               Know the exact payback period before you pay the fee. Calculated for your city and current salary.

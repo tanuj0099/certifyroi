@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MapPin } from 'lucide-react'
+import { MapPin, Wifi, Building2, Globe } from 'lucide-react'
 
 // ── Design tokens — read from CSS custom properties ───────
 var F_HEAD = "var(--font-head)"
@@ -24,15 +24,22 @@ const CITIES = [
 ]
 
 const CERT_CATEGORIES = [
-  { id: 'tech',       label: 'Tech & Cloud',   color: PICTON,    certs: ['AWS SAA', 'Azure', 'GCP', 'CKA', 'CompTIA Sec+', 'CEH'] },
-  { id: 'data',       label: 'Data & AI',      color: '#818CF8', certs: ['Google Data Analytics', 'IBM Data Science', 'TensorFlow', 'Tableau'] },
-  { id: 'management', label: 'Project Mgmt',   color: EMERALD,   certs: ['PMP', 'Scrum Master', 'PRINCE2'] },
-  { id: 'business',   label: 'Business & Ops', color: AMBER,     certs: ['Six Sigma', 'APICS CSCP', 'Google PM'] },
-  { id: 'finance',    label: 'Finance',        color: '#34D399', certs: ['CFA Level 1', 'FMVA', 'CPA'] },
-  { id: 'marketing',  label: 'Marketing',      color: '#F472B6', certs: ['Google Digital Marketing', 'HubSpot', 'Meta Blueprint'] },
-  { id: 'product',    label: 'Product & UX',   color: '#A78BFA', certs: ['Google UX', 'Product Mgmt Cert', 'CSPO'] },
-  { id: 'hr',         label: 'HR & People',    color: '#FB923C', certs: ['SHRM-CP', 'HRCI PHR', 'LinkedIn HR'] },
+  { id: 'tech',       label: 'Tech & Cloud',   color: PICTON,    remoteFlag: 'remote',         certs: ['AWS SAA', 'Azure', 'GCP', 'CKA', 'CompTIA Sec+', 'CEH'] },
+  { id: 'data',       label: 'Data & AI',      color: '#818CF8', remoteFlag: 'remote',         certs: ['Google Data Analytics', 'IBM Data Science', 'TensorFlow', 'Tableau'] },
+  { id: 'management', label: 'Project Mgmt',   color: EMERALD,   remoteFlag: 'hybrid',         certs: ['PMP', 'Scrum Master', 'PRINCE2'] },
+  { id: 'business',   label: 'Business & Ops', color: AMBER,     remoteFlag: 'city-dependent', certs: ['Six Sigma', 'APICS CSCP', 'Google PM'] },
+  { id: 'finance',    label: 'Finance',        color: '#34D399', remoteFlag: 'city-dependent', certs: ['CFA Level 1', 'FMVA', 'CPA'] },
+  { id: 'marketing',  label: 'Marketing',      color: '#F472B6', remoteFlag: 'hybrid',         certs: ['Google Digital Marketing', 'HubSpot', 'Meta Blueprint'] },
+  { id: 'product',    label: 'Product & UX',   color: '#A78BFA', remoteFlag: 'remote',         certs: ['Google UX', 'Product Mgmt Cert', 'CSPO'] },
+  { id: 'hr',         label: 'HR & People',    color: '#FB923C', remoteFlag: 'city-dependent', certs: ['SHRM-CP', 'HRCI PHR', 'LinkedIn HR'] },
 ]
+
+// Remote flag config
+const REMOTE_FLAG_CONFIG = {
+  'remote':         { label: 'Remote-friendly',    color: EMERALD,   Icon: Wifi,      tip: 'Strong demand for remote roles' },
+  'hybrid':         { label: 'Hybrid',              color: PICTON,    Icon: Globe,     tip: 'Mix of remote and on-site demand' },
+  'city-dependent': { label: 'City-dependent',      color: AMBER,     Icon: Building2, tip: 'Most roles require metro presence' },
+}
 
 const DEMAND = {
   tech:       { bangalore: 5, hyderabad: 5, pune: 5, mumbai: 4, delhi: 4, chennai: 4, kolkata: 3, ahmedabad: 3, insight: 'AWS/Cloud certs drive 35% higher salaries. 2,400+ open roles on Naukri.', yoy: '+34%', avgHike: '35%', topHirers: ['Infosys', 'TCS', 'Wipro', 'Amazon India'] },
@@ -196,8 +203,27 @@ const Heatmap = ({ prefilledCity = '', prefilledDomain = '', certName = '', resu
           <div style={{ padding: '18px 20px', borderRadius: '12px', background: 'var(--surface)', border: '1px solid var(--border)', marginBottom: '18px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '16px' }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: F_MONO, fontSize: '9px', color: categoryInfo.color, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>
-                  {'Domain overview — ' + categoryInfo.label}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '6px' }}>
+                  <div style={{ fontFamily: F_MONO, fontSize: '9px', color: categoryInfo.color, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                    {'Domain overview — ' + categoryInfo.label}
+                  </div>
+                  {/* Feature 4: Remote-friendly badge */}
+                  {(() => {
+                    const flag = REMOTE_FLAG_CONFIG[categoryInfo.remoteFlag]
+                    if (!flag) return null
+                    const FlagIcon = flag.Icon
+                    return (
+                      <motion.div
+                        key={categoryInfo.id + '-flag'}
+                        initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}
+                        title={flag.tip}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 9px', borderRadius: '9999px', background: flag.color + '12', border: '1px solid ' + flag.color + '28', cursor: 'default' }}
+                      >
+                        <FlagIcon size={9} color={flag.color} />
+                        <span style={{ fontFamily: F_MONO, fontSize: '9px', color: flag.color, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{flag.label}</span>
+                      </motion.div>
+                    )
+                  })()}
                 </div>
                 <div style={{ fontSize: '14px', color: 'var(--text-2)', fontFamily: F_BODY, lineHeight: '1.7', marginBottom: '10px' }}>
                   {domainData.insight}

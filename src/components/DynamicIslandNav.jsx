@@ -21,15 +21,6 @@ const NAV_ITEMS = [
   { label: 'Contact',        pageId: 'contact'       },
 ]
 
-function scrollTo(id) {
-  const el = document.getElementById(id)
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  else {
-    const fb = document.querySelector(`[data-section="${id}"]`)
-    if (fb) fb.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-}
-
 function NavItem({ label, pageId, isActive, onActivate, onNavigate, theme }) {
   const [hovered, setHovered] = useState(false)
   const t = theme
@@ -133,7 +124,7 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
           exit={{ opacity: 0, y: -8, scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 440, damping: 36 }}
           style={{
-            position: 'fixed', top: '72px', left: '16px', right: '16px', zIndex: 9998,
+            position: 'fixed', top: '80px', left: '16px', right: '16px', zIndex: 9998,
             borderRadius: '20px',
             background: t.name === 'dark' ? 'rgba(14,14,14,0.94)' : 'rgba(248,246,242,0.94)',
             backdropFilter: 'blur(24px) saturate(180%)',
@@ -277,10 +268,10 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
 
   return (
     <>
+      {/* Nav pill — floats at top-center, no full-width strip */}
       <div style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
-        display: 'flex', justifyContent: 'center',
-        paddingTop: '0', pointerEvents: 'none',
+        position: 'fixed', top: '14px', left: '50%', transform: 'translateX(-50%)',
+        zIndex: 9999, pointerEvents: 'none',
       }}>
         <motion.div
           ref={islandRef}
@@ -291,8 +282,8 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
             transformStyle: 'preserve-3d', transformPerspective: 800,
             display: 'inline-flex', alignItems: 'center',
             height: isMobile ? '52px' : '48px',
-            padding: isMobile ? '0 12px' : '0 14px',
-            gap: isMobile ? '0' : '4px',
+            padding: '0 14px',
+            gap: '4px',
             background: glassBg,
             backdropFilter: 'blur(20px) saturate(180%)',
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
@@ -323,7 +314,6 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
                 ))}
               </div>
               <div style={{ width: '1px', height: '20px', background: borderColor, flexShrink: 0, margin: '0 4px' }} />
-
               <div style={{ padding: '0 4px', flexShrink: 0 }}>
                 <ThemeToggle isDark={isDark} onToggle={toggleTheme} theme={theme} />
               </div>
@@ -331,7 +321,12 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
           )}
 
           {isMobile && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', paddingLeft: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {/* Logo label on mobile */}
+              <span style={{ fontFamily: F_SANS, fontSize: '13px', fontWeight: '700', color: theme.text, letterSpacing: '-0.02em' }}>
+                Certify<span style={{ color: theme.gold }}>ROI</span>
+              </span>
+              <div style={{ width: '1px', height: '16px', background: borderColor }} />
               <motion.button
                 onClick={() => setMenuOpen((v) => !v)}
                 whileTap={{ scale: 0.9 }}
