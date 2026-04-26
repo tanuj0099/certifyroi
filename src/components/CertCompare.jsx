@@ -11,6 +11,8 @@ var F_MONO = 'var(--font-mono)'
 var F_BODY = 'var(--font-body)'
 
 var COLORS = ['#6366F1', '#10B981', '#F59E0B', '#E11D48']
+var COL_A = '#6366F1'
+var COL_B = '#10B981'
 
 function demandColor(d) {
   return d === 'Very High' ? '#10B981' : d === 'High' ? '#51B1E7' : d === 'Medium' ? '#F59E0B' : '#94A3B8'

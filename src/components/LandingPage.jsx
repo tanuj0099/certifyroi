@@ -807,10 +807,7 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
             <div style={{
               position: 'absolute', inset: 0,
               background: C.name === 'light'
-                ? `
-                  linear-gradient(to top, ${C.bg} 0%, rgba(244,242,238,0.6) 32%, transparent 55%),
-                  radial-gradient(ellipse 90% 80% at 46% 50%, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.72) 100%)
-                `
+                ? `radial-gradient(ellipse 90% 80% at 46% 50%, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.72) 100%)`
                 : `
                   linear-gradient(to top, ${C.bg} 0%, transparent 28%),
                   radial-gradient(ellipse 82% 70% at 46% 50%, rgba(10,10,10,0.36) 0%, rgba(10,10,10,0.88) 100%)
