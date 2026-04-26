@@ -4,7 +4,7 @@
 
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Sun, Moon, Menu, X } from 'lucide-react'
+import { Sun, Moon, Menu, X, User } from 'lucide-react'
 
 const F_SANS  = "'Inter', 'DM Sans', sans-serif"
 const F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
@@ -194,7 +194,7 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
 // ─────────────────────────────────────────────────────────
 // MAIN EXPORT
 // ─────────────────────────────────────────────────────────
-export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, currentPage }) {
+export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, currentPage, user, onSignIn, onSignOut }) {
   const DARK_THEME = {
     name: 'dark',
     text: '#EFEFEF', text2: '#999999', text3: '#5A5A5A', text4: '#2E2E2E',
@@ -317,6 +317,30 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
               <div style={{ padding: '0 4px', flexShrink: 0 }}>
                 <ThemeToggle isDark={isDark} onToggle={toggleTheme} theme={theme} />
               </div>
+              <div style={{ width: '1px', height: '20px', background: borderColor, flexShrink: 0, margin: '0 4px' }} />
+              <div style={{ padding: '0 4px', flexShrink: 0 }}>
+                <button
+                  onClick={user ? onSignOut : onSignIn}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    height: '32px', padding: '0 12px', borderRadius: '16px',
+                    background: user ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'var(--accent)',
+                    border: '1px solid ' + (user ? borderColor : 'var(--accent-light, #4A8C6A)'),
+                    color: user ? theme.text : '#FFFFFF',
+                    fontFamily: F_SANS, fontSize: '12px', fontWeight: '600',
+                    cursor: 'pointer', transition: 'all 0.15s', outline: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if(!user) e.currentTarget.style.transform = 'scale(1.02)'
+                  }}
+                  onMouseLeave={(e) => {
+                    if(!user) e.currentTarget.style.transform = 'scale(1)'
+                  }}
+                >
+                  <User size={13} strokeWidth={2.5} />
+                  {user ? 'Sign Out' : 'Sign In'}
+                </button>
+              </div>
             </>
           )}
 
@@ -327,6 +351,18 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
                 Certify<span style={{ color: theme.gold }}>ROI</span>
               </span>
               <div style={{ width: '1px', height: '16px', background: borderColor }} />
+              <button
+                onClick={user ? onSignOut : onSignIn}
+                style={{
+                  width: '32px', height: '32px', borderRadius: '50%',
+                  background: user ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'var(--accent)',
+                  border: '1px solid ' + (user ? borderColor : 'var(--accent-light, #4A8C6A)'),
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: user ? theme.text2 : '#FFFFFF', flexShrink: 0,
+                }}
+              >
+                <User size={14} strokeWidth={2.5} />
+              </button>
               <motion.button
                 onClick={() => setMenuOpen((v) => !v)}
                 whileTap={{ scale: 0.9 }}

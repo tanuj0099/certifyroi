@@ -24,6 +24,8 @@ import CertCompare from './components/CertCompare.jsx'
 import CareerSimulator from './components/CareerSimulator.jsx'
 import JobCertMap from './components/JobCertMap.jsx'
 import HikeVerifier from './components/HikeVerifier.jsx'
+import { AppSection } from './components/SharedUI.jsx'
+import { MarketingFooter } from './components/MarketingPageShell.jsx'
 const FAQPage = lazy(() => import('./pages/FAQ.jsx'))
 const AboutPage = lazy(() => import('./pages/About.jsx'))
 const FeaturesPage = lazy(() => import('./pages/Features.jsx'))
@@ -68,12 +70,16 @@ function useIsMobile() {
   return mobile
 }
 
-const PageWrapper = function({ children, maxWidth, padding }) {
+const PageWrapper = function({ children, id = '00', title = 'DOCUMENT', maxWidth, padding }) {
   return (
-    <div style={{ position: 'relative', minHeight: '100vh' }}>
+    <div style={{ position: 'relative', minHeight: '100vh', paddingTop: (NAV_H) + 'px' }}>
       <WaveBg variant="app" />
-      <div style={{ maxWidth: maxWidth || '800px', margin: '0 auto', padding: padding || (NAV_H + 24) + 'px 16px 60px', position: 'relative', zIndex: 1 }}>
-        {children}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <AppSection id={id} title={title.toUpperCase()} noBorderTop>
+          <div style={{ maxWidth: maxWidth || '800px' }}>
+            {children}
+          </div>
+        </AppSection>
       </div>
     </div>
   )
@@ -691,8 +697,10 @@ const NavBar = function({ currentPage, activeTab, onNavigate, onTabChange }) {
 // APP PAGE — Phase C: data freshness badge in tools header
 // ─────────────────────────────────────────────────────────
 const AppPage = function({ activeTab, onTabChange, mode, modeLocked, onModeSelect, onModeReset, onCertSelected, prefilledCert, resumeCity, resumeDomain, resumeName }) {
+  const currentStepNum = STEP_TABS.findIndex(t => t.id === activeTab)
+  
   return (
-    <div style={{ paddingTop:(NAV_H+TABS_H)+'px', minHeight:'100vh', background:'var(--app-bg)', position:'relative' }}>
+    <div style={{ paddingTop:(NAV_H)+'px', minHeight:'100vh', background:'var(--app-bg)', position:'relative' }}>
       <WaveBg variant="app" />
 
       <AnimatePresence>
@@ -701,44 +709,99 @@ const AppPage = function({ activeTab, onTabChange, mode, modeLocked, onModeSelec
 
       {modeLocked ? (
         <div style={{ position:'relative', zIndex:1 }}>
-          <div style={{ maxWidth:'1100px', margin:'0 auto', padding:'20px 16px 0' }}>
-            <ModePill mode={mode} onReset={onModeReset} />
-            {/* Phase C: data freshness badge in tools */}
-            <DataFreshnessBadge />
+          <div style={{ maxWidth:'1400px', margin:'0 auto' }}>
+            <AppSection id="APP" title="TOOL FLOW" noBorderTop>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <ModePill mode={mode} onReset={onModeReset} />
+                  <DataFreshnessBadge />
+                </div>
+                
+                {/* Modern Flow Header */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
+                  
+                  {/* Primary Tools (The Flow of 3) */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', marginBottom: '32px' }}>
+                    {STEP_TABS.map((tab, i) => {
+                      const active = activeTab === tab.id
+                      const isCompleted = currentStepNum > i
+                      return (
+                        <div key={tab.id} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                          {i > 0 && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: isCompleted || active ? 1 : 0.3 }}>
+                              <div style={{ width: '6px', height: '1px', background: 'var(--text)' }} />
+                              <ArrowRight size={14} color="var(--text)" />
+                              <div style={{ width: '6px', height: '1px', background: 'var(--text)' }} />
+                            </div>
+                          )}
+                          <button
+                            onClick={() => onTabChange(tab.id)}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '12px',
+                              padding: '12px 20px', borderRadius: '100px',
+                              border: active ? '1px solid var(--border-accent)' : isCompleted ? '1px solid var(--border)' : '1px solid var(--border-subtle)',
+                              background: active ? 'var(--surf-highlight, rgba(45,106,79,0.05))' : isCompleted ? 'var(--surface)' : 'transparent',
+                              color: active ? 'var(--accent)' : isCompleted ? 'var(--text)' : 'var(--text-4)',
+                              cursor: 'pointer', fontFamily: FH, transition: 'all 0.3s ease',
+                              boxShadow: active ? '0 8px 24px rgba(0,0,0,0.05)' : 'none',
+                              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)'
+                            }}
+                          >
+                            <div style={{ 
+                              width: '24px', height: '24px', borderRadius: '50%', 
+                              background: active ? 'var(--accent)' : isCompleted ? 'var(--accent-light, #4A8C6A)' : 'var(--surface-high)', 
+                              color: active || isCompleted ? '#FFF' : 'var(--text-4)', 
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                              fontSize: '11px', fontFamily: FM, fontWeight: '700' 
+                            }}>
+                              {tab.num}
+                            </div>
+                            <tab.icon size={16} />
+                            <span style={{ fontSize: '14px', fontWeight: active ? '700' : '600', letterSpacing: '-0.01em' }}>{tab.label}</span>
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
 
-            <div style={{ borderTop:'1px solid var(--border)', marginTop:'6px' }}>
-              <div style={{ display:'flex', alignItems:'center', overflowX:'auto', gap:'6px', padding:'8px 0 4px' }} className="tab-row-scroll">
-                {STEP_TABS.map(function(tab) {
-                  var active = activeTab === tab.id
-                  return (
-                    <button key={tab.id} onClick={function() { onTabChange(tab.id) }}
-                      style={{ display:'flex', alignItems:'center', gap:'6px', padding:'6px 11px', borderRadius:'8px', border:'1px solid '+(active?'var(--border-accent)':'var(--border)'), background:active?'var(--indigo-dim)':'var(--surface)', color:active?'var(--indigo-light)':'var(--text-3)', cursor:'pointer', fontFamily:FH, whiteSpace:'nowrap', minHeight:'34px' }}>
-                      <tab.icon size={12} />
-                      <span style={{ fontSize:'12px', fontWeight:active?'700':'500', letterSpacing:'-0.01em' }}>{tab.label}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+                  {/* Secondary Tools Separator */}
+                  <div style={{ display: 'flex', alignItems: 'center', width: '100%', maxWidth: '600px', gap: '16px', marginBottom: '24px' }}>
+                    <div style={{ flex: 1, height: '1px', background: 'var(--border-subtle)' }} />
+                    <span style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', letterSpacing: '0.15em' }}>EXPLORE MORE TOOLS</span>
+                    <div style={{ flex: 1, height: '1px', background: 'var(--border-subtle)' }} />
+                  </div>
 
-            <div style={{ borderTop:'1px solid var(--border-subtle)', marginTop:'3px' }}>
-              <div style={{ display:'flex', alignItems:'center', overflowX:'auto', gap:'6px', padding:'7px 0 10px' }} className="tab-row-scroll">
-                {TOOL_TABS.map(function(tab) {
-                  var active = activeTab === tab.id
-                  return (
-                    <button key={tab.id} onClick={function() { onTabChange(tab.id) }}
-                      style={{ display:'flex', alignItems:'center', gap:'5px', padding:'5px 10px', borderRadius:'7px', border:'1px solid '+(active?'var(--border-accent)':'var(--border)'), background:active?'var(--indigo-dim)':'var(--surface)', color:active?'var(--indigo-light)':'var(--text-4)', fontSize:'12px', fontWeight:active?'700':'500', cursor:'pointer', fontFamily:FH, whiteSpace:'nowrap', minHeight:'32px' }}>
-                      <tab.icon size={11} />
-                      {tab.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-          <AnimatePresence mode="wait">
-            <motion.div key={activeTab} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-6 }} transition={T}>
-              <div style={{ maxWidth:'1100px', margin:'0 auto', padding:'0 16px 60px' }}>
+                  {/* Secondary Tools */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                    {TOOL_TABS.map((tab) => {
+                      const active = activeTab === tab.id
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => onTabChange(tab.id)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            padding: '8px 16px', borderRadius: '100px',
+                            border: active ? '1px solid var(--border)' : '1px solid transparent',
+                            background: active ? 'var(--surface)' : 'transparent',
+                            color: active ? 'var(--text)' : 'var(--text-4)',
+                            fontSize: '12px', fontWeight: active ? '600' : '500',
+                            cursor: 'pointer', fontFamily: FB, transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => { if(!active) e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.background = 'var(--surface)' }}
+                          onMouseLeave={(e) => { if(!active) e.currentTarget.style.color = 'var(--text-4)'; e.currentTarget.style.background = 'transparent' }}
+                        >
+                          <tab.icon size={13} />
+                          {tab.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  <motion.div key={activeTab} initial={{ opacity:0, y:15 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }} transition={T}>
 
                 {activeTab==='resume' ? (
                   <div className="glass" style={{ padding:'clamp(16px,3vw,28px)' }}>
@@ -824,8 +887,11 @@ const AppPage = function({ activeTab, onTabChange, mode, modeLocked, onModeSelec
                 ) : null}
 
               </div>
-            </motion.div>
-          </AnimatePresence>
+                </motion.div>
+                </AnimatePresence>
+              </div>
+            </AppSection>
+          </div>
         </div>
       ) : null}
     </div>
@@ -923,49 +989,53 @@ const Footer = function({ onNavigate }) {
 // ─────────────────────────────────────────────────────────
 // APP ROOT
 // ─────────────────────────────────────────────────────────
-const LandingAuthBar = function() {
-  const { user, signInGoogle, signOut, loading } = useAuth()
-  const [busy, setBusy] = useState(false)
-
-  var handleClick = async function() {
-    if (loading || busy) return
-    setBusy(true)
-    try {
-      if (user) await signOut()
-      else await signInGoogle()
-    } catch (e) {
-      console.error('Landing auth failed:', e)
-    }
-    setBusy(false)
-  }
-
+const SignInModal = function({ isOpen, onClose, onSignIn, loading }) {
+  if (!isOpen) return null
   return (
-    <div style={{ position:'fixed', top:0, left:0, right:0, zIndex:9998, pointerEvents:'none' }}>
-      <div style={{ maxWidth:'1400px', margin:'0 auto', padding:'12px 20px 0', display:'flex', justifyContent:'flex-end' }}>
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+      padding: '24px'
+    }}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        style={{
+          background: 'var(--surface)', border: '1px solid var(--border-accent)',
+          borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '400px',
+          boxShadow: '0 24px 48px rgba(0,0,0,0.12)', position: 'relative',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center'
+        }}
+      >
         <button
-          onClick={handleClick}
-          disabled={loading || busy}
+          onClick={onClose}
+          style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: 'var(--text-3)', cursor: 'pointer', padding: '8px' }}
+        >
+          <X size={20} />
+        </button>
+        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--indigo-dim)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+          <User size={24} />
+        </div>
+        <h3 style={{ fontSize: '22px', fontFamily: FH, fontWeight: '800', color: 'var(--text)', marginBottom: '12px', marginTop: 0 }}>Sign in to continue</h3>
+        <p style={{ fontSize: '14px', fontFamily: FB, color: 'var(--text-2)', marginBottom: '28px', lineHeight: '1.6' }}>
+          Get personalized ROI analysis and access premium career tools for free.
+        </p>
+        <button
+          onClick={onSignIn}
+          disabled={loading}
           style={{
-            pointerEvents:'auto',
-            height:'38px',
-            padding:'0 16px',
-            borderRadius:'9999px',
-            border:'1px solid rgba(255,255,255,0.14)',
-            background:'transparent',
-            color:'#F5F5F4',
-            fontFamily:FH,
-            fontSize:'12px',
-            fontWeight:'700',
-            letterSpacing:'0.04em',
-            cursor:loading || busy ? 'not-allowed' : 'pointer',
-            opacity:loading || busy ? 0.65 : 1,
-            backdropFilter:'blur(10px)',
-            WebkitBackdropFilter:'blur(10px)',
+            width: '100%', padding: '14px', borderRadius: '100px',
+            background: 'var(--accent)', color: 'white', border: 'none',
+            fontSize: '15px', fontFamily: FH, fontWeight: '700',
+            cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
           }}
         >
-          {user ? 'Sign Out' : busy ? 'Signing In...' : 'Sign In'}
+          {loading ? 'Signing In...' : 'Continue with Google'}
         </button>
-      </div>
+      </motion.div>
     </div>
   )
 }
@@ -974,6 +1044,8 @@ function AppRoot() {
   const { isDark, toggle: toggleTheme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
+  const { user, signInGoogle, signOut, loading } = useAuth()
+  const [showSignIn, setShowSignIn] = useState(false)
   var [activeTab,     setActiveTab]     = useState('resume')
   var [mode,          setMode]          = useState('professional')
   var [modeLocked,    setModeLocked]    = useState(false)
@@ -1011,12 +1083,17 @@ function AppRoot() {
 
   return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
-      {currentPage === 'home' ? <LandingAuthBar /> : null}
+      <AnimatePresence>
+        <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} onSignIn={() => { signInGoogle(); setShowSignIn(false) }} loading={loading} />
+      </AnimatePresence>
       <DynamicIslandNav
         isDark={isDark}
         toggleTheme={toggleTheme}
         onNavigate={(pageId) => navigate(pageId === 'home' ? '/' : '/' + pageId)}
         currentPage={currentPage}
+        user={user}
+        onSignIn={() => setShowSignIn(true)}
+        onSignOut={signOut}
       />
       <main style={{ flex:1 }}>
         <AnimatePresence mode="wait">
@@ -1067,7 +1144,7 @@ function AppRoot() {
         </AnimatePresence>
       </main>
       {(currentPage === 'app' || currentPage === 'home') ? (
-        <Footer onNavigate={(pageId) => navigate(pageId === 'home' ? '/' : '/' + pageId)} />
+        <MarketingFooter />
       ) : null}
     </div>
   )

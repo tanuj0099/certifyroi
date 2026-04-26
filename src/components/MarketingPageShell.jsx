@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Mail, MapPin, TrendingUp } from 'lucide-react'
 import WaveBg from './WaveBg.jsx'
+import { AppSection } from './SharedUI.jsx'
 
 const FH = "'EB Garamond','Cormorant Garamond',Georgia,serif"
 const FB = "'Inter','DM Sans',sans-serif"
@@ -164,30 +165,31 @@ export default function MarketingPageShell({ eyebrow, title, accent, subtitle, c
   return (
     <div style={{ minHeight: '100vh', position: 'relative', background: 'var(--bg)', color: 'var(--text)' }}>
       <WaveBg variant="landing" />
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{ maxWidth, margin: '0 auto', padding: '120px 24px 0' }}>
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={T}>
-            <SectionLabel>{eyebrow}</SectionLabel>
-            <h1 style={{ fontFamily: FH, fontSize: 'clamp(2.7rem, 6vw, 5rem)', fontWeight: '400', letterSpacing: '-0.03em', lineHeight: 0.92, margin: '0 0 18px', maxWidth: '12ch' }}>
-              {title}
-              {accent ? (
-                <>
-                  {' '}
-                  <span style={{ fontStyle: 'italic', color: 'var(--accent)' }}>{accent}</span>
-                </>
+      <div style={{ position: 'relative', zIndex: 1, paddingTop: '100px' }}>
+        <AppSection id={eyebrow.substring(0,2).toUpperCase()} title={eyebrow} noBorderTop>
+          <div style={{ maxWidth: '880px', margin: '0 auto', width: '100%' }}>
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={T}>
+              <h1 style={{ fontFamily: FH, fontSize: 'clamp(2.7rem, 6vw, 4.5rem)', fontWeight: '400', letterSpacing: '-0.03em', lineHeight: 0.95, margin: '0 0 18px', maxWidth: '14ch' }}>
+                {title}
+                {accent ? (
+                  <>
+                    {' '}
+                    <span style={{ fontStyle: 'italic', color: 'var(--accent)' }}>{accent}</span>
+                  </>
+                ) : null}
+              </h1>
+              {subtitle ? (
+                <p style={{ fontFamily: FB, fontSize: 'clamp(15px, 1.7vw, 18px)', color: 'var(--text-3)', lineHeight: '1.7', maxWidth: '56ch', margin: '0 0 48px' }}>
+                  {subtitle}
+                </p>
               ) : null}
-            </h1>
-            {subtitle ? (
-              <p style={{ fontFamily: FB, fontSize: 'clamp(15px, 1.7vw, 18px)', color: 'var(--text-3)', lineHeight: '1.7', maxWidth: '56ch', margin: 0 }}>
-                {subtitle}
-              </p>
-            ) : null}
-          </motion.div>
-        </div>
+            </motion.div>
 
-        <div style={{ maxWidth, margin: '0 auto', padding: '56px 24px 0' }}>
-          {children}
-        </div>
+            <div style={{ width: '100%' }}>
+              {children}
+            </div>
+          </div>
+        </AppSection>
 
         {footer ? <MarketingFooter /> : null}
       </div>

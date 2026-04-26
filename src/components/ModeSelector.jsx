@@ -24,6 +24,7 @@ const SWITCH_DOMAINS = [
 const FM = "'JetBrains Mono','Commit Mono',monospace"
 const FH = "'Plus Jakarta Sans','Bricolage Grotesque',sans-serif"
 const FB = "'Inter',sans-serif"
+const F_SERIF = "'EB Garamond', 'Cormorant Garamond', Georgia, serif"
 
 const OFFSET = 'calc(var(--nav-h, 64px) + 88px)'
 
@@ -65,78 +66,67 @@ export function ModePill({ mode, onReset }) {
 function WordRow({ hovered, setHovered, onPick }) {
   return (
     <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(3, 1fr)',
-      gap: 'clamp(8px, 2vw, 20px)',
-      width: '100%',
-      maxWidth: '680px',
-      padding: '0 clamp(16px, 4vw, 32px)',
+      display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 'clamp(16px, 2vw, 32px)', width: '100%', maxWidth: '1100px',
+      padding: '0 24px', margin: '0 auto',
     }}>
       {MODES.map((mode, index) => {
-        const Icon = mode.icon
         const isHovered = hovered === mode.id
 
         return (
-          <motion.button
+          <motion.div
             key={mode.id}
-            initial={{ opacity: 0, y: 24, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: index * 0.08, duration: 0.5, ease: [0.34, 1.1, 0.64, 1] }}
-            onMouseEnter={() => setHovered(mode.id)}
-            onMouseLeave={() => setHovered(null)}
-            onClick={() => onPick(mode.id)}
-            style={{
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '10px',
-              padding: 'clamp(16px, 3vw, 28px) clamp(10px, 2vw, 20px)',
-              borderRadius: '14px',
-              border: isHovered ? `1px solid ${mode.color}55` : '1px solid var(--border)',
-              background: isHovered ? `${mode.color}10` : 'var(--surface)',
-              transition: 'border-color 0.18s, background 0.18s, box-shadow 0.18s',
-              boxShadow: isHovered ? `0 4px 20px ${mode.color}18` : 'none',
-              userSelect: 'none',
-              WebkitTapHighlightColor: 'transparent',
-            }}
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1, duration: 0.6, ease: [0.34, 1.1, 0.64, 1] }}
           >
-            <div style={{
-              width: 'clamp(36px, 5vw, 52px)',
-              height: 'clamp(36px, 5vw, 52px)',
-              borderRadius: '50%',
-              background: isHovered ? `${mode.color}18` : 'var(--surface-high)',
-              border: `1px solid ${isHovered ? mode.color + '44' : 'var(--border)'}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-              transition: 'background 0.18s, border-color 0.18s',
-            }}>
-              <Icon size={18} color={isHovered ? mode.color : 'var(--text-4)'} style={{ transition: 'color 0.18s' }} />
-            </div>
-
-            <div style={{
-              fontFamily: FH,
-              fontWeight: '700',
-              fontSize: 'clamp(13px, 2.5vw, 18px)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-              color: isHovered ? mode.color : 'var(--text)',
-              textAlign: 'center',
-              transition: 'color 0.18s',
-            }}>
-              {mode.label}
-            </div>
-
-            <div style={{
-              fontFamily: FB,
-              fontSize: 'clamp(10px, 1.2vw, 12px)',
-              color: 'var(--text-4)',
-              textAlign: 'center',
-              lineHeight: 1.4,
-            }}>
-              {mode.desc}
-            </div>
-          </motion.button>
+            <button
+              onMouseEnter={() => setHovered(mode.id)}
+              onMouseLeave={() => setHovered(null)}
+              onClick={() => onPick(mode.id)}
+              style={{
+                cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                width: '100%', background: isHovered ? mode.color + '0C' : 'var(--surface)',
+                border: isHovered ? '1px solid ' + mode.color + '40' : '1px solid var(--border)',
+                borderRadius: '24px', padding: '32px 24px', textAlign: 'left',
+                opacity: hovered && !isHovered ? 0.4 : 1, outline: 'none',
+                boxShadow: isHovered ? '0 12px 32px ' + mode.color + '15' : '0 4px 12px rgba(0,0,0,0.02)',
+                transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
+                transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+            >
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '50%',
+                background: mode.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginBottom: '20px', transition: 'transform 0.3s',
+                transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+              }}>
+                <mode.icon size={18} color={mode.color} />
+              </div>
+              <div style={{
+                fontFamily: F_SERIF, fontWeight: '400', fontSize: 'clamp(28px, 3.5vw, 42px)',
+                letterSpacing: '-0.02em', lineHeight: 1.1, color: isHovered ? mode.color : 'var(--text)',
+                marginBottom: '12px', transition: 'color 0.3s',
+              }}>
+                {mode.label}
+              </div>
+              <div style={{
+                fontFamily: FB, fontSize: '13px', color: 'var(--text-3)', lineHeight: 1.6,
+                transition: 'opacity 0.3s',
+              }}>
+                {mode.desc}
+              </div>
+              
+              <div style={{ marginTop: 'auto', paddingTop: '32px', width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontFamily: FM, fontSize: '10px', color: mode.color, letterSpacing: '0.1em', fontWeight: '700' }}>SELECT PATH</span>
+                <motion.div
+                  initial={false}
+                  animate={{ flex: isHovered ? 1 : 0, opacity: isHovered ? 0.3 : 0 }}
+                  style={{ height: '1px', background: mode.color }}
+                />
+              </div>
+            </button>
+          </motion.div>
         )
       })}
     </div>

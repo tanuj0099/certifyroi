@@ -78,33 +78,6 @@ function getNotIdealNote(cert) {
   return notes.length > 0 ? notes[0] : null
 }
 
-// ─────────────────────────────────────────────────────────
-// VERTICAL STORY LINE COMPONENT
-// ─────────────────────────────────────────────────────────
-const VerticalStoryLine = () => {
-  const storyItems = [
-    "ANALYSIS COMPLETE", "ROUTE OPTIMIZED", "ROI CONFIRMED", "FUTURE SECURED"
-  ];
-  const scrollItems = [...storyItems, ...storyItems]; // Duplicate for seamless loop
-
-  return (
-    <div className="fixed right-6 top-0 h-full hidden lg:flex items-center z-50 pointer-events-none select-none">
-      <div 
-        className="flex flex-col items-center justify-center space-y-8 animate-scroll-vertical"
-        style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
-      >
-        {scrollItems.map((item, index) => (
-          <span 
-            key={index}
-            className="text-lg font-semibold tracking-[0.4em] text-gray-200 dark:text-gray-700/40"
-          >
-            {item}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 // ─────────────────────────────────────────────────────────
 // CUSTOM SLIDER
@@ -268,76 +241,54 @@ function DataNote({ children }) {
 // ─────────────────────────────────────────────────────────
 // CERT LEADERBOARD
 // ─────────────────────────────────────────────────────────
-function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }) {
-  const [showAll, setShowAll] = useState(false)
+function Leadboard({ domainList, sorted, preferred, showAll, setShowAll, activeCertName, onPick, mappedDomain, isPrefilled }) {
+  const isSinglePrefilled = isPrefilled && preferred.length > 0;
 
   const demandScore = function(d) {
     return d === 'Very High' ? 4 : d === 'High' ? 3 : d === 'Medium' ? 2 : 1
   }
 
-  const domainAliases = {
-    tech: 'tech', data: 'data', management: 'management', business: 'business',
-    finance: 'finance', marketing: 'marketing', product: 'product',
-    design: 'design', hr: 'hr', cybersecurity: 'cybersecurity',
-    medical: 'medical', law: 'law', architecture: 'architecture',
-    engineering: 'engineering', government: 'government', mba: 'mba',
-  }
-  const mappedDomain = domainAliases[resumeDomain] || null
-
-  const domainCerts = mappedDomain
-    ? CERTIFICATIONS.filter(function(c) { return c.domain === mappedDomain })
-    : []
-
-  const sorted = [...CERTIFICATIONS].sort(function(a, b) {
-    return demandScore(b.demand) - demandScore(a.demand) || b.avgHike - a.avgHike
-  })
-
-  const preferred = prefilledCert
-    ? CERTIFICATIONS.filter(function(c) {
-        return c.name.toLowerCase().includes(prefilledCert.toLowerCase()) ||
-               prefilledCert.toLowerCase().includes(c.name.toLowerCase())
-      })
-    : []
-
-  const domainList = domainCerts.sort(function(a, b) {
-    return demandScore(b.demand) - demandScore(a.demand) || b.avgHike - a.avgHike
-  })
-
   const seen = new Set()
   const finalList = []
-  ;[...preferred, ...domainList, ...sorted].forEach(function(c) {
-    if (!seen.has(c.id) && finalList.length < (showAll ? 999 : 10)) {
-      seen.add(c.id)
-      finalList.push(c)
-    }
-  })
+  
+  if (isSinglePrefilled) {
+    preferred.forEach(c => { finalList.push(c) })
+  } else {
+    ;[...preferred, ...domainList, ...sorted].forEach(function(c) {
+      if (!seen.has(c.id) && finalList.length < (showAll ? 999 : 10)) {
+        seen.add(c.id)
+        finalList.push(c)
+      }
+    })
+  }
 
   const hasMoreDomain = !showAll && domainList.length > 10
 
   return (
     <div style={{ marginBottom: '20px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-        <div style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-          {mappedDomain
-            ? (CERT_DOMAINS.find(function(d) { return d.id === mappedDomain })?.label || mappedDomain) + ' · Top Picks'
-            : 'Highest Demand Certs'}
+      {!isSinglePrefilled && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+          <div style={{ fontFamily: FM, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            {mappedDomain
+              ? (CERT_DOMAINS.find(function(d) { return d.id === mappedDomain })?.label || mappedDomain) + ' · Top Picks'
+              : 'Highest Demand Certs'}
+          </div>
+          {mappedDomain && (
+            <button
+              onClick={function() { setShowAll(function(v) { return !v }) }}
+              style={{ fontFamily: FM, fontSize: '9px', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase', padding: 0 }}
+            >
+              {showAll ? 'Show Less ▴' : 'Show All ▾'}
+            </button>
+          )}
         </div>
-        {mappedDomain && (
-          <button
-            onClick={function() { setShowAll(function(v) { return !v }) }}
-            style={{ fontFamily: FM, fontSize: '9px', color: PICTON, background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase', padding: 0 }}
-          >
-            {showAll ? 'Show Less ▴' : 'Show All ▾'}
-          </button>
-        )}
-      </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         {finalList.map(function(cert, i) {
           const active      = activeCertName === cert.name
           const isPrefilled = preferred.some(function(p) { return p.id === cert.id })
           const demColor    = dc(cert.demand)
-          // Feature 5: per-cert readiness
           const readiness   = getCertReadiness(cert.forWho)
 
           return (
@@ -348,16 +299,15 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
               whileTap={{ scale: 0.98 }}
               style={{
                 width: '100%', padding: '12px 14px', borderRadius: '11px',
-                background: active ? (isPrefilled ? 'rgba(16,185,129,0.08)' : 'rgba(81,177,231,0.07)') : 'var(--surface)',
-                border: '1px solid ' + (active ? (isPrefilled ? 'rgba(16,185,129,0.35)' : PICTON + '33') : 'var(--border)'),
+                background: active ? (isPrefilled ? 'var(--accent-light, #4A8C6A)12' : 'var(--accent-light, #4A8C6A)08') : 'var(--surface)',
+                border: '1px solid ' + (active ? 'var(--accent-light, #4A8C6A)' : 'var(--border)'),
                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
                 textAlign: 'left', transition: 'all 0.18s',
-                boxShadow: active ? '0 2px 12px rgba(0,0,0,0.1)' : 'none',
               }}
             >
-              <div style={{ width: 26, height: 26, borderRadius: '7px', flexShrink: 0, background: active ? (isPrefilled ? 'rgba(16,185,129,0.15)' : PICTON + '15') : 'var(--bg)', border: '1px solid ' + (active ? (isPrefilled ? 'rgba(16,185,129,0.3)' : PICTON + '25') : 'var(--border)'), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 26, height: 26, borderRadius: '7px', flexShrink: 0, background: active ? 'var(--surface-high)' : 'var(--bg)', border: '1px solid ' + 'var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {isPrefilled
-                  ? <Star size={11} color={EMERALD} fill={EMERALD} />
+                  ? <Star size={11} color="var(--gold)" fill="var(--gold)" />
                   : <span style={{ fontFamily: FM, fontSize: '10px', fontWeight: '700', color: active ? PICTON : 'var(--text-4)' }}>#{i + 1}</span>
                 }
               </div>
@@ -369,7 +319,6 @@ function CertLeaderboard({ resumeDomain, prefilledCert, onPick, activeCertName }
                   <div style={{ fontFamily: FB, fontSize: '11px', color: 'var(--text-4)', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
                     {cert.forWho}
                   </div>
-                  {/* Feature 5: Readiness pill */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '1px 6px', borderRadius: '9999px', background: readiness.color + '12', border: '1px solid ' + readiness.color + '25', flexShrink: 0 }}>
                     <ShieldCheck size={8} color={readiness.color} />
                     <span style={{ fontFamily: FM, fontSize: '8px', color: readiness.color, letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{readiness.label}</span>
@@ -620,6 +569,7 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
   const [aiError,      setAiError]      = useState(null)
   const [showVerifier, setShowVerifier] = useState(false)
   const [cooldown,     setCooldown]     = useState(0)
+  const [showAll,      setShowAll]      = useState(false)
 
   const [salary,      setSalary]      = useLocalStorage('croi_salary',       isStudent ? 0 : 8)
   const [certCost,    setCertCost]    = useLocalStorage('croi_cert_cost',    2)
@@ -686,12 +636,24 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
 
   var canAnalyse = certName && (user || !guest.exceeded) && cooldown === 0
 
+  const demandScore = function(d) {
+    return d === 'Very High' ? 4 : d === 'High' ? 3 : d === 'Medium' ? 2 : 1
+  }
+  const domainAliases = {
+    tech: 'tech', data: 'data', management: 'management', business: 'business',
+    finance: 'finance', marketing: 'marketing', product: 'product',
+    design: 'design', hr: 'hr', cybersecurity: 'cybersecurity',
+    medical: 'medical', law: 'law', architecture: 'architecture',
+    engineering: 'engineering', government: 'government', mba: 'mba',
+  }
+  const mappedDomain = domainAliases[resumeDomain] || null
+  const domainMatchList = mappedDomain ? CERTIFICATIONS.filter(function(c) { return c.domain === mappedDomain }) : []
+  const sortedByDem = [...CERTIFICATIONS].sort(function(a, b) { return demandScore(b.demand) - demandScore(a.demand) || b.avgHike - a.avgHike })
+  const preferredCerts = prefilledCert ? CERTIFICATIONS.filter(function(c) { return c.name.toLowerCase().includes(prefilledCert.toLowerCase()) || prefilledCert.toLowerCase().includes(c.name.toLowerCase()) }) : []
+
   return (
     <div style={{ position: 'relative' }}>
       
-      {/* ── RENDER VERTICAL STORY LINE ─────────────────────── */}
-      <VerticalStoryLine />
-
       {/* ── Personalisation banner ─────────────────────── */}
       {(firstName || displayCity || prefilledCert) ? (
         <motion.div
@@ -728,12 +690,13 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
       ) : null}
 
       {/* ── Cert leaderboard ───────────────────────────── */}
-      <CertLeaderboard
-        resumeDomain={resumeDomain}
-        prefilledCert={prefilledCert}
-        onPick={pickCert}
-        activeCertName={certName}
-      />
+      {!prefilledCert && (
+        <Leadboard
+          domainList={domainMatchList} sorted={sortedByDem} preferred={preferredCerts}
+          showAll={showAll} setShowAll={setShowAll}
+          activeCertName={certName} onPick={pickCert} mappedDomain={mappedDomain} isPrefilled={!!prefilledCert}
+        />
+      )}
 
       {/* ── Great / Interesting choice message ─────────── */}
       <AnimatePresence mode="wait">
