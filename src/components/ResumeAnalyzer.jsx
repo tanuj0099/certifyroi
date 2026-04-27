@@ -133,7 +133,7 @@ var buildPrompt = function(resumeText, mode, timeline, domainIntent, switchTarge
     : 'Flexible timeline — recommend the best certs regardless of duration.'
 
   var domainNote = switchTarget
-    ? 'User wants to SWITCH CAREERS to: "' + switchTarget + '". CRITICAL INSTRUCTION: If "' + switchTarget + '" is conversational filler (e.g. "oh no"), gibberish, or not a valid professional industry, completely IGNORE the target and auto-detect the best domain based on their resume alone. If it IS a real industry, prioritise certs for it.'
+    ? 'The user has explicitly stated they want to SWITCH CAREERS to the field of: "' + switchTarget + '". This is their #1 priority. Your primary task is to find certifications that help them enter this specific field, even if their resume points elsewhere. For example, if they say "Sports Analytics" and their resume is in finance, you MUST recommend data analytics certs applicable to sports, NOT more finance certs. CRITICAL: If and only if the user\'s target is nonsensical (like "I want to be a dragon"), then you may ignore it and auto-detect from the resume. Otherwise, the user\'s stated target is the absolute priority.'
     : (domainIntent && domainIntent !== 'auto')
     ? 'User wants to grow in: ' + domainIntent + '. Prioritise certs in that domain.'
     : 'Auto-detect best domain from resume.'
