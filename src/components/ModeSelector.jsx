@@ -158,7 +158,6 @@ function DomainPicker({ onConfirm, color }) {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(min(150px, 100%), 1fr))',
         gap: '8px',
-        marginBottom: 'clamp(18px, 3.5vh, 32px)',
       }}>
         {SWITCH_DOMAINS.map((domain, index) => {
           const isSelected = selected === domain.id
@@ -195,35 +194,44 @@ function DomainPicker({ onConfirm, color }) {
             </motion.button>
           )
         })}
-
-        {/* Custom text input */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-          style={{ gridColumn: '1 / -1', marginTop: '4px' }}
-        >
-          <input
-            type="text"
-            placeholder="or type the one you want to switch to..."
-            value={customValue}
-            onChange={(e) => {
-              setCustomValue(e.target.value)
-              if (e.target.value.trim()) setSelected('custom')
-              else if (selected === 'custom') setSelected(null)
-            }}
-            style={{
-              width: '100%', padding: '13px 16px', borderRadius: '11px',
-              border: '1px solid ' + (selected === 'custom' ? color + '65' : 'var(--border)'),
-              background: selected === 'custom' ? color + '18' : 'var(--surface)',
-              color: selected === 'custom' ? color : 'var(--text)',
-              fontSize: 'clamp(11px, 1.2vw, 13px)', fontFamily: FH, outline: 'none',
-              transition: 'all 0.16s',
-              boxShadow: selected === 'custom' ? '0 0 18px ' + color + '18' : 'none',
-            }}
-          />
-        </motion.div>
       </div>
+
+      {/* OR Divider */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '20px 0 16px', opacity: 0.4 }}>
+        <div style={{ flex: 1, height: '1px', background: 'var(--text)' }} />
+        <span style={{ fontFamily: FM, fontSize: '9px', letterSpacing: '0.12em' }}>OR TYPE CUSTOM DOMAIN</span>
+        <div style={{ flex: 1, height: '1px', background: 'var(--text)' }} />
+      </div>
+
+      {/* Custom text input */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+        style={{ width: '100%', marginBottom: 'clamp(18px, 3.5vh, 32px)' }}
+      >
+        <input
+          type="text"
+          placeholder="e.g. Sports Analytics, Healthcare Admin..."
+          value={customValue}
+          onChange={(e) => {
+            setCustomValue(e.target.value)
+            if (e.target.value.trim()) setSelected('custom')
+            else if (selected === 'custom') setSelected(null)
+          }}
+          onFocus={(e) => e.target.style.borderColor = color + '80'}
+          onBlur={(e) => e.target.style.borderColor = selected === 'custom' ? color + '65' : 'var(--border)'}
+          style={{
+            width: '100%', padding: '14px 18px', borderRadius: '12px',
+            border: '1px solid ' + (selected === 'custom' ? color + '65' : 'var(--border)'),
+            background: selected === 'custom' ? color + '12' : 'var(--bg)',
+            color: selected === 'custom' ? color : 'var(--text)',
+            fontSize: 'clamp(12px, 1.2vw, 14px)', fontFamily: FB, outline: 'none',
+            transition: 'all 0.2s', textAlign: 'center',
+            boxShadow: selected === 'custom' ? '0 0 20px ' + color + '15' : 'inset 0 2px 4px rgba(0,0,0,0.02)',
+          }}
+        />
+      </motion.div>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
         <motion.button

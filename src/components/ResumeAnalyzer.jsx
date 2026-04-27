@@ -133,7 +133,7 @@ var buildPrompt = function(resumeText, mode, timeline, domainIntent, switchTarge
     : 'Flexible timeline — recommend the best certs regardless of duration.'
 
   var domainNote = switchTarget
-    ? 'User is SWITCHING CAREERS to: ' + switchTarget + '. Prioritise certs that facilitate entry into ' + switchTarget + ' from their current background. Focus on transition-friendly, widely recognised certs in that domain.'
+    ? 'User wants to SWITCH CAREERS to: "' + switchTarget + '". CRITICAL INSTRUCTION: If "' + switchTarget + '" is conversational filler (e.g. "oh no"), gibberish, or not a valid professional industry, completely IGNORE the target and auto-detect the best domain based on their resume alone. If it IS a real industry, prioritise certs for it.'
     : (domainIntent && domainIntent !== 'auto')
     ? 'User wants to grow in: ' + domainIntent + '. Prioritise certs in that domain.'
     : 'Auto-detect best domain from resume.'
