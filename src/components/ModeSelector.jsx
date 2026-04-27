@@ -135,6 +135,7 @@ function WordRow({ hovered, setHovered, onPick }) {
 
 function DomainPicker({ onConfirm, color }) {
   const [selected, setSelected] = useState(null)
+  const [customValue, setCustomValue] = useState('')
 
   return (
     <motion.div
@@ -167,7 +168,10 @@ function DomainPicker({ onConfirm, color }) {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 + index * 0.035, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-              onClick={() => setSelected(domain.id)}
+              onClick={() => {
+                setSelected(domain.id)
+                setCustomValue('')
+              }}
               whileHover={{ scale: 1.03, y: -1 }}
               whileTap={{ scale: 0.97 }}
               style={{
@@ -191,11 +195,42 @@ function DomainPicker({ onConfirm, color }) {
             </motion.button>
           )
         })}
+
+        {/* Custom text input */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          style={{ gridColumn: '1 / -1', marginTop: '4px' }}
+        >
+          <input
+            type="text"
+            placeholder="or type the one you want to switch to..."
+            value={customValue}
+            onChange={(e) => {
+              setCustomValue(e.target.value)
+              if (e.target.value.trim()) setSelected('custom')
+              else if (selected === 'custom') setSelected(null)
+            }}
+            style={{
+              width: '100%', padding: '13px 16px', borderRadius: '11px',
+              border: '1px solid ' + (selected === 'custom' ? color + '65' : 'var(--border)'),
+              background: selected === 'custom' ? color + '18' : 'var(--surface)',
+              color: selected === 'custom' ? color : 'var(--text)',
+              fontSize: 'clamp(11px, 1.2vw, 13px)', fontFamily: FH, outline: 'none',
+              transition: 'all 0.16s',
+              boxShadow: selected === 'custom' ? '0 0 18px ' + color + '18' : 'none',
+            }}
+          />
+        </motion.div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
         <motion.button
-          onClick={() => { if (selected) onConfirm(selected) }}
+          onClick={() => {
+            if (selected === 'custom' && customValue.trim()) onConfirm(customValue.trim())
+            else if (selected && selected !== 'custom') onConfirm(selected)
+          }}
           animate={{ opacity: selected ? 1 : 0.28 }}
           whileHover={selected ? { scale: 1.04, y: -2 } : {}}
           whileTap={selected ? { scale: 0.97 } : {}}
