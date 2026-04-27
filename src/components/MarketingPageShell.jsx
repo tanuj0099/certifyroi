@@ -161,12 +161,12 @@ export function MarketingFooter() {
   )
 }
 
-export default function MarketingPageShell({ eyebrow, title, accent, subtitle, children, footer = true, maxWidth = '1240px' }) {
+export default function MarketingPageShell({ eyebrow, title, accent, subtitle, children, footer = false, maxWidth = '1240px' }) {
   return (
     <div style={{ minHeight: '100vh', position: 'relative', background: 'var(--bg)', color: 'var(--text)' }}>
       <WaveBg variant="landing" />
       <div style={{ position: 'relative', zIndex: 1, paddingTop: '100px' }}>
-        <AppSection id={eyebrow.substring(0,2).toUpperCase()} title={eyebrow} noBorderTop>
+        <AppSection id={eyebrow.substring(0, 2).toUpperCase()} title={eyebrow} noBorderTop>
           <div style={{ maxWidth: '880px', margin: '0 auto', width: '100%' }}>
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={T}>
               <h1 style={{ fontFamily: FH, fontSize: 'clamp(2.7rem, 6vw, 4.5rem)', fontWeight: '400', letterSpacing: '-0.03em', lineHeight: 0.95, margin: '0 0 18px', maxWidth: '14ch' }}>
@@ -191,7 +191,7 @@ export default function MarketingPageShell({ eyebrow, title, accent, subtitle, c
           </div>
         </AppSection>
 
-        {footer ? <MarketingFooter /> : null}
+        {/* The global footer is now rendered in App.jsx, so this is no longer needed here. */}
       </div>
     </div>
   )

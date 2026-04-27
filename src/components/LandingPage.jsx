@@ -64,8 +64,8 @@ function useIsMobile() {
 // TOKENS
 // ─────────────────────────────────────────────────────────
 const F_SERIF = "'EB Garamond', 'Cormorant Garamond', Georgia, serif"
-const F_SANS  = "'Inter', 'DM Sans', sans-serif"
-const F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
+const F_SANS = "'Inter', 'DM Sans', sans-serif"
+const F_MONO = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
 const RISE = {
   hidden: { y: 28, opacity: 0 },
@@ -102,7 +102,7 @@ function CountUp({ end, prefix = '', suffix = '', duration = 1.8 }) {
   return <motion.span onViewportEnter={() => setOn(true)}>{prefix}{count.toLocaleString('en-IN', { maximumFractionDigits: String(end).includes('.') ? 1 : 0 })}{suffix}</motion.span>
 }
 
-function PillBtn({ onClick = () => {}, children, large }) {
+function PillBtn({ onClick = () => { }, children, large }) {
   const C = useTheme()
   const [h, setH] = useState(false)
   const d = C.name === 'dark'
@@ -737,34 +737,12 @@ function FinalCTA({ onEnter }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// FOOTER
-// ─────────────────────────────────────────────────────────
-function Footer() {
-  const C = useTheme()
-  const isMobile = useIsMobile()
-  return (
-    <div style={{ borderTop: `1px solid ${C.border}`, padding: '32px 0', background: C.bgAlt }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
-        {!isMobile && <div style={{ width: '140px', borderRight: `1px solid ${C.border}` }} />}
-        <div style={{ flex: 1, padding: isMobile ? '0 24px' : '0 6vw', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BarChart2 size={15} color={C.gold} />
-            <span style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: '13px', color: C.text }}>Certify<span style={{ color: C.gold }}>ROI</span></span>
-          </div>
-          <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.08em' }}>DATA: LINKEDIN · NASSCOM · NAUKRI · 2026</div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────
 // APP
 // ─────────────────────────────────────────────────────────
 export default function App({ onNavigate, onEnter, isDark = true }) {
   const C = isDark ? THEMES.dark : THEMES.light
   const isMobile = useIsMobile()
-  const handleEnter = typeof onEnter === 'function' ? onEnter : function() {}
+  const handleEnter = typeof onEnter === 'function' ? onEnter : function () { }
 
   return (
     <ThemeContext.Provider value={C}>
@@ -907,7 +885,6 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
         <SocialProof />
         <FAQ />
         <FinalCTA onEnter={handleEnter} />
-        <Footer />
       </div>
     </ThemeContext.Provider>
   )

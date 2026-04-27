@@ -2289,228 +2289,6 @@ const AppPage = function ({
                   <DataFreshnessBadge />
                 </div>
 
-                {/* Modern Flow Header */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    marginBottom: "32px",
-                  }}
-                >
-                  {/* Primary Tools (The Flow of 3) */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "16px",
-                      flexWrap: "wrap",
-                      marginBottom: "32px",
-                    }}
-                  >
-                    {STEP_TABS.map((tab, i) => {
-                      const active = activeTab === tab.id;
-                      const isCompleted = currentStepNum > i;
-                      return (
-                        <div
-                          key={tab.id}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "16px",
-                          }}
-                        >
-                          {i > 0 && (
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "4px",
-                                opacity: isCompleted || active ? 1 : 0.3,
-                              }}
-                            >
-                              <div
-                                style={{
-                                  width: "6px",
-                                  height: "1px",
-                                  background: "var(--text)",
-                                }}
-                              />
-                              <ArrowRight size={14} color="var(--text)" />
-                              <div
-                                style={{
-                                  width: "6px",
-                                  height: "1px",
-                                  background: "var(--text)",
-                                }}
-                              />
-                            </div>
-                          )}
-                          <button
-                            onClick={() => onTabChange(tab.id)}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "12px",
-                              padding: "12px 20px",
-                              borderRadius: "100px",
-                              border: active
-                                ? "1px solid var(--border-accent)"
-                                : isCompleted
-                                  ? "1px solid var(--border)"
-                                  : "1px solid var(--border-subtle)",
-                              background: active
-                                ? "var(--surf-highlight, rgba(45,106,79,0.05))"
-                                : isCompleted
-                                  ? "var(--surface)"
-                                  : "transparent",
-                              color: active
-                                ? "var(--accent)"
-                                : isCompleted
-                                  ? "var(--text)"
-                                  : "var(--text-4)",
-                              cursor: "pointer",
-                              fontFamily: FH,
-                              transition: "all 0.3s ease",
-                              boxShadow: active
-                                ? "0 8px 24px rgba(0,0,0,0.05)"
-                                : "none",
-                              backdropFilter: "blur(10px)",
-                              WebkitBackdropFilter: "blur(10px)",
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: "24px",
-                                height: "24px",
-                                borderRadius: "50%",
-                                background: active
-                                  ? "var(--accent)"
-                                  : isCompleted
-                                    ? "var(--accent-light, #4A8C6A)"
-                                    : "var(--surface-high)",
-                                color:
-                                  active || isCompleted
-                                    ? "#FFF"
-                                    : "var(--text-4)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontSize: "11px",
-                                fontFamily: FM,
-                                fontWeight: "700",
-                              }}
-                            >
-                              {tab.num}
-                            </div>
-                            <tab.icon size={16} />
-                            <span
-                              style={{
-                                fontSize: "14px",
-                                fontWeight: active ? "700" : "600",
-                                letterSpacing: "-0.01em",
-                              }}
-                            >
-                              {tab.label}
-                            </span>
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Secondary Tools Separator */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
-                      maxWidth: "600px",
-                      gap: "16px",
-                      marginBottom: "24px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        flex: 1,
-                        height: "1px",
-                        background: "var(--border-subtle)",
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontFamily: FM,
-                        fontSize: "10px",
-                        color: "var(--text-4)",
-                        letterSpacing: "0.15em",
-                      }}
-                    >
-                      EXPLORE MORE TOOLS
-                    </span>
-                    <div
-                      style={{
-                        flex: 1,
-                        height: "1px",
-                        background: "var(--border-subtle)",
-                      }}
-                    />
-                  </div>
-
-                  {/* Secondary Tools */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "12px",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {TOOL_TABS.map((tab) => {
-                      const active = activeTab === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => onTabChange(tab.id)}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            padding: "8px 16px",
-                            borderRadius: "100px",
-                            border: active
-                              ? "1px solid var(--border)"
-                              : "1px solid transparent",
-                            background: active
-                              ? "var(--surface)"
-                              : "transparent",
-                            color: active ? "var(--text)" : "var(--text-4)",
-                            fontSize: "12px",
-                            fontWeight: active ? "600" : "500",
-                            cursor: "pointer",
-                            fontFamily: FB,
-                            transition: "all 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!active)
-                              e.currentTarget.style.color = "var(--text-2)";
-                            e.currentTarget.style.background = "var(--surface)";
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!active)
-                              e.currentTarget.style.color = "var(--text-4)";
-                            e.currentTarget.style.background = "transparent";
-                          }}
-                        >
-                          <tab.icon size={13} />
-                          {tab.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeTab}
@@ -3132,6 +2910,7 @@ function AppRoot() {
   const { user, signInGoogle, signOut, loading } = useAuth();
   const [showSignIn, setShowSignIn] = useState(false);
   var [activeTab, setActiveTab] = useState("resume");
+
   var [mode, setMode] = useState("professional");
   var [modeLocked, setModeLocked] = useState(false);
   var [prefilledCert, setPrefilledCert] = useState("");
@@ -3197,6 +2976,12 @@ function AppRoot() {
         onSignIn={() => setShowSignIn(true)}
         onSignOut={signOut}
       />
+      <NavBar
+        currentPage={currentPage}
+        activeTab={activeTab}
+        onNavigate={(pageId) => navigate(pageId === "home" ? "/" : "/" + pageId)}
+        onTabChange={setActiveTab}
+      />
       <main style={{ flex: 1 }}>
         <AnimatePresence mode="wait">
           <motion.div
@@ -3257,66 +3042,31 @@ function AppRoot() {
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/cookies" element={<CookiesPage />} />
                 <Route path="/FAQ" element={<Navigate to="/faq" replace />} />
-                <Route
-                  path="/About"
-                  element={<Navigate to="/about" replace />}
-                />
-                <Route
-                  path="/Features"
-                  element={<Navigate to="/features" replace />}
-                />
-                <Route
-                  path="/How-It-Works"
-                  element={<Navigate to="/how-it-works" replace />}
-                />
-                <Route
-                  path="/Pricing"
-                  element={<Navigate to="/pricing" replace />}
-                />
-                <Route
-                  path="/Contact"
-                  element={<Navigate to="/contact" replace />}
-                />
-                <Route
-                  path="/Terms"
-                  element={<Navigate to="/terms" replace />}
-                />
-                <Route
-                  path="/Privacy"
-                  element={<Navigate to="/privacy" replace />}
-                />
-                <Route
-                  path="*"
-                  element={
-                    <LandingPage
-                      isDark={isDark}
-                      onEnter={() => goToApp("resume")}
-                      onNavigate={(p) => navigate(p === "home" ? "/" : "/" + p)}
-                    />
-                  }
-                />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>
           </motion.div>
         </AnimatePresence>
       </main>
-      {currentPage === "app" || currentPage === "home" ? (
-        <MarketingFooter />
-      ) : null}
+      {/* Render footer on all pages except the main tools app */}
+      {currentPage !== 'app' && <MarketingFooter />}
     </div>
   );
 }
 
-export default function App() {
+function App() {
   return (
-    <ErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
-          <BrowserRouter>
+    <BrowserRouter>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <AuthProvider>
             <AppRoot />
-          </BrowserRouter>
-        </AuthProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
+          </AuthProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </BrowserRouter>
   );
 }
+
+export default App;
+      
