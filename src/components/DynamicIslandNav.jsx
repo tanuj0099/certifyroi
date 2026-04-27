@@ -2,26 +2,41 @@
 // DynamicIslandNav.jsx — CertifyROI
 // ─────────────────────────────────────────────────────────
 
-import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Sun, Moon, Menu, X, User } from 'lucide-react'
+import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Sun, Moon, Menu, X, User, ChevronDown } from 'lucide-react';
 
-const F_SANS  = "'Inter', 'DM Sans', sans-serif"
-const F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
+const F_SANS = "'Inter', 'DM Sans', sans-serif"
+const F_MONO = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
-const NAV_ITEMS = [
-  { label: 'Home',           pageId: 'home'          },
-  { label: 'Tools',          pageId: 'tools/resume'  },
-  { label: 'Negotiate',      pageId: 'tools/negotiation' },
-  { label: 'Gap Analyzer',   pageId: 'tools/gap'         },
-  { label: 'How It Works',   pageId: 'how-it-works'  },
-  { label: 'Features',       pageId: 'features'      },
-  { label: 'Pricing',        pageId: 'pricing'       },
-  { label: 'About',          pageId: 'about'         },
-  { label: 'FAQ',            pageId: 'faq'           },
-  { label: 'Blog',           pageId: 'blog'          },
-  { label: 'Contact',        pageId: 'contact'       },
-]
+const CORE_NAV_ITEMS = [
+  { label: 'Home', pageId: 'home' },
+];
+
+const SECONDARY_NAV_ITEMS = [
+  { label: 'About', pageId: 'about' },
+  { label: 'Blog', pageId: 'blog' },
+  { label: 'FAQ', pageId: 'faq' },
+  { label: 'Contact', pageId: 'contact' },
+];
+
+const TOOLS_NAV_ITEMS = [
+  { label: 'Resume Analyzer', pageId: 'tools/resume' },
+  { label: 'Negotiation Helper', pageId: 'tools/negotiation' },
+  { label: 'Gap Analyzer', pageId: 'tools/gap' },
+];
+
+const PRODUCT_NAV_ITEMS = [
+  { label: 'How It Works', pageId: 'how-it-works' },
+  { label: 'Features', pageId: 'features' },
+  { label: 'Pricing', pageId: 'pricing' },
+];
+
+const ALL_MOBILE_ITEMS = [
+  ...CORE_NAV_ITEMS,
+  { type: 'header', label: 'Tools & Info' },
+  ...TOOLS_NAV_ITEMS, ...PRODUCT_NAV_ITEMS, ...SECONDARY_NAV_ITEMS,
+];
 
 function NavItem({ label, pageId, isActive, onActivate, onNavigate, theme }) {
   const [hovered, setHovered] = useState(false)
@@ -77,6 +92,71 @@ function NavItem({ label, pageId, isActive, onActivate, onNavigate, theme }) {
     </a>
   )
 }
+
+function DropdownContainer({ children, theme }) {
+  const t = theme;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -6, scale: 0.96 }}
+      transition={{ type: 'spring', stiffness: 480, damping: 34 }}
+      style={{
+        position: 'absolute',
+        top: 'calc(100% + 4px)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 9999,
+        borderRadius: '16px',
+        background: t.name === 'dark' ? 'rgba(20,20,20,0.9)' : 'rgba(248,246,242,0.92)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        border: '1px solid ' + t.borderMid,
+        boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
+        padding: '6px',
+        width: '220px',
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function DropdownItem({ label, pageId, onNavigate, theme, onClose }) {
+  const t = theme;
+  return (
+    <a
+      href={'#' + pageId}
+      onClick={(e) => {
+        e.preventDefault();
+        if (onNavigate) onNavigate(pageId);
+        if (onClose) onClose();
+      }}
+      style={{
+        display: 'block',
+        padding: '8px 12px',
+        borderRadius: '8px',
+        textDecoration: 'none',
+        fontFamily: F_SANS,
+        fontSize: '13px',
+        fontWeight: '500',
+        color: t.text2,
+        transition: 'background 0.15s, color 0.15s',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = t.name === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+        e.currentTarget.style.color = t.text;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'transparent';
+        e.currentTarget.style.color = t.text2;
+      }}
+    >
+      {label}
+    </a>
+  );
+}
+
 
 function ThemeToggle({ isDark, onToggle, theme }) {
   const t = theme
@@ -138,21 +218,31 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
             padding: '8px', overflow: 'hidden',
           }}
         >
-          {NAV_ITEMS.map((item, i) => {
+          {ALL_MOBILE_ITEMS.map((item, i) => {
+            if (item.type === 'header') {
+              return (
+                <div key={i} style={{ padding: '12px 16px 4px', fontFamily: F_MONO, fontSize: '10px', color: t.text3, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  {item.label}
+                </div>
+              )
+            }
+
             const isActive = activeHref === item.pageId
             return (
               <motion.div
                 key={item.pageId}
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.04, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: i * 0.03, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               >
                 <a
                   href={'#' + item.pageId}
                   onClick={(e) => {
                     e.preventDefault()
-                    onActivate(item.pageId)
-                    if (onNavigate) onNavigate(item.pageId)
+                    if (item.pageId) {
+                      onActivate(item.pageId)
+                      if (onNavigate) onNavigate(item.pageId)
+                    }
                     onClose()
                   }}
                   style={{
@@ -182,7 +272,7 @@ function MobileMenuPanel({ isOpen, onClose, activeHref, onActivate, isDark, onTo
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: NAV_ITEMS.length * 0.04 + 0.05, duration: 0.3 }}
+            transition={{ delay: ALL_MOBILE_ITEMS.length * 0.03 + 0.05, duration: 0.3 }}
             style={{ padding: '8px 8px 4px', display: 'flex', justifyContent: 'flex-end' }}
           >
             <ThemeToggle isDark={isDark} onToggle={onToggle} theme={t} />
@@ -213,6 +303,8 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
 
   const [activeHref, setActiveHref] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [toolsOpen, setToolsOpen] = useState(false)
+  const [hamburgerOpen, setHamburgerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const islandRef = useRef(null)
@@ -302,8 +394,33 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
         >
           {!isMobile && (
             <>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                {NAV_ITEMS.map((item) => (
+              <div onMouseEnter={() => setHamburgerOpen(true)} onMouseLeave={() => setHamburgerOpen(false)} style={{ position: 'relative' }}>
+                <button
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '50%',
+                    border: '1px solid ' + theme.border,
+                    background: hamburgerOpen ? (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)') : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', color: theme.text2, transition: 'background 0.15s',
+                  }}
+                >
+                  <Menu size={14} strokeWidth={2.5} />
+                </button>
+                <AnimatePresence>
+                  {hamburgerOpen && (
+                    <DropdownContainer theme={theme}>
+                      {SECONDARY_NAV_ITEMS.map(item => (
+                        <DropdownItem key={item.pageId} {...item} onNavigate={onNavigate} theme={theme} onClose={() => setHamburgerOpen(false)} />
+                      ))}
+                    </DropdownContainer>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div style={{ width: '1px', height: '20px', background: borderColor, flexShrink: 0, margin: '0 4px' }} />
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                {CORE_NAV_ITEMS.map((item) => (
                   <NavItem
                     key={item.pageId}
                     label={item.label}
@@ -314,7 +431,27 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
                     theme={theme}
                   />
                 ))}
+                <div onMouseEnter={() => setToolsOpen(true)} onMouseLeave={() => setToolsOpen(false)} style={{ position: 'relative' }}>
+                  <NavItem
+                    label={<span>Tools <ChevronDown size={12} style={{ display: 'inline', marginLeft: '2px', verticalAlign: 'middle' }} /></span>}
+                    pageId="app"
+                    isActive={activeHref.startsWith('tools/')}
+                    onActivate={setActiveHref}
+                    onNavigate={() => onNavigate('app')}
+                    theme={theme}
+                  />
+                  <AnimatePresence>
+                    {toolsOpen && (
+                      <DropdownContainer theme={theme}>
+                        {TOOLS_NAV_ITEMS.map(item => <DropdownItem key={item.pageId} {...item} onNavigate={onNavigate} theme={theme} onClose={() => setToolsOpen(false)} />)}
+                        <div style={{ height: '1px', background: theme.border, margin: '4px 8px' }} />
+                        {PRODUCT_NAV_ITEMS.map(item => <DropdownItem key={item.pageId} {...item} onNavigate={onNavigate} theme={theme} onClose={() => setToolsOpen(false)} />)}
+                      </DropdownContainer>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
+
               <div style={{ width: '1px', height: '20px', background: borderColor, flexShrink: 0, margin: '0 4px' }} />
               <div style={{ padding: '0 4px', flexShrink: 0 }}>
                 <ThemeToggle isDark={isDark} onToggle={toggleTheme} theme={theme} />
@@ -333,10 +470,10 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
                     cursor: 'pointer', transition: 'all 0.15s', outline: 'none'
                   }}
                   onMouseEnter={(e) => {
-                    if(!user) e.currentTarget.style.transform = 'scale(1.02)'
+                    if (!user) e.currentTarget.style.transform = 'scale(1.02)'
                   }}
                   onMouseLeave={(e) => {
-                    if(!user) e.currentTarget.style.transform = 'scale(1)'
+                    if (!user) e.currentTarget.style.transform = 'scale(1)'
                   }}
                 >
                   <User size={13} strokeWidth={2.5} />
@@ -347,29 +484,12 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
           )}
 
           {isMobile && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {/* Logo label on mobile */}
-              <span style={{ fontFamily: F_SANS, fontSize: '13px', fontWeight: '700', color: theme.text, letterSpacing: '-0.02em' }}>
-                Certify<span style={{ color: theme.gold }}>ROI</span>
-              </span>
-              <div style={{ width: '1px', height: '16px', background: borderColor }} />
-              <button
-                onClick={user ? onSignOut : onSignIn}
-                style={{
-                  width: '32px', height: '32px', borderRadius: '50%',
-                  background: user ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'var(--accent)',
-                  border: '1px solid ' + (user ? borderColor : 'var(--accent-light, #4A8C6A)'),
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: user ? theme.text2 : '#FFFFFF', flexShrink: 0,
-                }}
-              >
-                <User size={14} strokeWidth={2.5} />
-              </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'space-between' }}>
               <motion.button
                 onClick={() => setMenuOpen((v) => !v)}
                 whileTap={{ scale: 0.9 }}
                 style={{
-                  width: '32px', height: '32px', borderRadius: '50%',
+                  width: '36px', height: '36px', borderRadius: '50%',
                   border: '1px solid ' + borderColor,
                   background: menuOpen ? (isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)') : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'),
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -385,10 +505,28 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
                     transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    {menuOpen ? <X size={15} strokeWidth={2} /> : <Menu size={15} strokeWidth={2} />}
+                    {menuOpen ? <X size={16} strokeWidth={2.5} /> : <Menu size={16} strokeWidth={2.5} />}
                   </motion.div>
                 </AnimatePresence>
               </motion.button>
+
+              {/* Logo label on mobile */}
+              <span style={{ fontFamily: F_SANS, fontSize: '14px', fontWeight: '700', color: theme.text, letterSpacing: '-0.02em' }}>
+                Certify<span style={{ color: theme.gold }}>ROI</span>
+              </span>
+
+              <button
+                onClick={user ? onSignOut : onSignIn}
+                style={{
+                  width: '36px', height: '36px', borderRadius: '50%',
+                  background: user ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'var(--accent)',
+                  border: '1px solid ' + (user ? borderColor : 'var(--accent-light, #4A8C6A)'),
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: user ? theme.text2 : '#FFFFFF', flexShrink: 0,
+                }}
+              >
+                <User size={15} strokeWidth={2.5} />
+              </button>
             </div>
           )}
         </motion.div>
