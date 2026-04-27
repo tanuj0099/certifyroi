@@ -34,6 +34,7 @@ import {
   Database,
   Clock,
   AlertCircle,
+  Target,
 } from "lucide-react";
 import { AuthProvider, useAuth } from "./hooks/useAuth.jsx";
 import { ThemeProvider, useTheme } from "./hooks/useTheme.jsx";
