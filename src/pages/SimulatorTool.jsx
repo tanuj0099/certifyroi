@@ -7,6 +7,8 @@ export default function SimulatorToolPage() {
       title="Career"
       subtitle="Path Simulator"
       description="Simulate multi-certification career paths. See how stacking certifications impacts your lifetime earning potential."
+      sectionId="05"
+      sectionTitle="SIMULATOR"
     >
       <div className="glass" style={{
         padding: 'clamp(20px, 4vw, 32px)',

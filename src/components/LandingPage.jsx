@@ -811,13 +811,30 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
               style={{
                 fontFamily: F_MONO, fontSize: '11px', color: C.text3,
                 letterSpacing: '0.18em', textTransform: 'uppercase',
-                marginBottom: '32px',
+                marginBottom: '8px',
                 display: 'flex', alignItems: 'center', gap: '12px',
               }}
             >
               <div style={{ width: '28px', height: '1px', background: C.gold }} />
-              ROI Analysis for Indian Professionals
+              Premium ROI Analysis
               <div style={{ width: '28px', height: '1px', background: C.gold }} />
+            </motion.div>
+
+            {/* Subtitle — "For Indian Professionals" */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.02 }}
+              style={{
+                fontFamily: F_SERIF, fontStyle: 'italic', fontWeight: '400',
+                fontSize: isMobile ? 'clamp(1.1rem, 3vw, 1.5rem)' : 'clamp(1.2rem, 2.5vw, 1.8rem)',
+                color: 'rgba(255,255,255,0.72)',
+                letterSpacing: '-0.01em',
+                marginBottom: '32px',
+                lineHeight: 1.2,
+              }}
+            >
+              for Indian Professionals
             </motion.div>
 
             {/* Headline — tightly spaced, on the mountain */}

@@ -36,6 +36,8 @@ export default function ResumeToolPage() {
       title="AI Resume"
       subtitle="Analysis"
       description="Upload your resume and get personalized certification recommendations based on your experience and career goals."
+      sectionId="01"
+      sectionTitle="RESUME_ANALYZER"
     >
       {/* Mode Selector */}
       <AnimatePresence>

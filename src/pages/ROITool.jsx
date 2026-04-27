@@ -8,6 +8,8 @@ export default function ROIToolPage() {
       title="ROI"
       subtitle="Calculator"
       description="Get precise financial projections for any certification. Calculate break-even timelines, 5-year gains, and salary impacts with real India data."
+      sectionId="02"
+      sectionTitle="ROI_CALCULATOR"
     >
       <div className="glass" style={{
         padding: 'clamp(20px, 4vw, 32px)',

@@ -7,6 +7,8 @@ export default function HeatmapToolPage() {
       title="City Demand"
       subtitle="Heatmap"
       description="See which certifications are in high demand in your city. Based on live job posting data from Naukri and LinkedIn India."
+      sectionId="04"
+      sectionTitle="DEMAND_MAP"
     >
       <div className="glass" style={{
         padding: 'clamp(20px, 4vw, 32px)',

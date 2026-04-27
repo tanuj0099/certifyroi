@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, FileText, Briefcase, Target, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Sparkles, FileText, Briefcase, Target, AlertTriangle, CheckCircle, Upload, X } from 'lucide-react'
 import { callGroqForGapAnalysis } from '../services/aiService.jsx'
 
 const FM = "'JetBrains Mono',monospace"
@@ -11,11 +11,58 @@ const INDIGO = '#6366F1'
 const AMBER = '#F59E0B'
 
 export default function GapAnalyzer() {
+  const fileInputRef = useRef(null)
   const [resume, setResume] = useState('')
+  const [resumeFile, setResumeFile] = useState('')
   const [jd, setJd] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
+
+  // Load resume from localStorage on mount (shared with ResumeAnalyzer)
+  useEffect(() => {
+    const savedResume = localStorage.getItem('croi_resume_text') || ''
+    const savedName = localStorage.getItem('croi_resume_name') || ''
+    if (savedResume) {
+      setResume(savedResume)
+      setResumeFile(savedName || 'Loaded from AI Resume tool')
+    }
+  }, [])
+
+  // Save resume to localStorage when changed
+  useEffect(() => {
+    if (resume.trim()) {
+      localStorage.setItem('croi_resume_text', resume)
+    }
+  }, [resume])
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      if (file.type === 'application/pdf') {
+        // For PDF, we'd need PDF.js - for now, show placeholder
+        const text = await file.text().catch(() => 'PDF uploaded - text extraction requires additional setup')
+        setResume(text)
+        setResumeFile(file.name)
+      } else if (file.type.startsWith('text/')) {
+        const text = await file.text()
+        setResume(text)
+        setResumeFile(file.name)
+      } else {
+        setError('Please upload a PDF or text file')
+      }
+    } catch (err) {
+      setError('Failed to read file: ' + err.message)
+    }
+  }
+
+  const clearResume = () => {
+    setResume('')
+    setResumeFile('')
+    localStorage.removeItem('croi_resume_text')
+  }
 
   const analyze = async () => {
     if (!resume.trim() || !jd.trim()) return
@@ -75,19 +122,77 @@ export default function GapAnalyzer() {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-        {/* Resume Input */}
+        {/* Resume Input with Upload */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <FileText size={16} color={INDIGO} />
             <span style={{ fontSize: '11px', color: 'var(--text-3)', fontFamily: FM, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Your Resume</span>
+            {resumeFile && (
+              <span style={{ fontSize: '10px', color: INDIGO, fontFamily: FM, marginLeft: 'auto' }}>📄 {resumeFile}</span>
+            )}
           </div>
-          <textarea
-            value={resume}
-            onChange={e => setResume(e.target.value)}
-            placeholder="Paste your resume text or LinkedIn summary here..."
-            style={inputStyle}
-            onFocus={e => e.target.style.borderColor = INDIGO + '66'}
-            onBlur={e => e.target.style.borderColor = 'var(--border)'}
+          
+          {resume ? (
+            <>
+              <textarea
+                value={resume}
+                onChange={e => setResume(e.target.value)}
+                style={inputStyle}
+                onFocus={e => e.target.style.borderColor = INDIGO + '66'}
+                onBlur={e => e.target.style.borderColor = 'var(--border)'}
+              />
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{ flex: 1, padding: '8px', borderRadius: '8px', background: INDIGO + '12', border: `1px solid ${INDIGO}33`, color: INDIGO, fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: FM }}
+                >
+                  📁 Replace
+                </button>
+                <button
+                  onClick={clearResume}
+                  style={{ flex: 1, padding: '8px', borderRadius: '8px', background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-3)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: FM }}
+                >
+                  ✕ Clear
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  width: '100%', padding: '48px 16px', borderRadius: '16px', background: INDIGO + '08',
+                  border: `2px dashed ${INDIGO}44`, cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', gap: '8px', transition: 'all 0.2s'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = INDIGO + '12'
+                  e.currentTarget.style.borderColor = INDIGO + '66'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = INDIGO + '08'
+                  e.currentTarget.style.borderColor = INDIGO + '44'
+                }}
+              >
+                <Upload size={20} color={INDIGO} />
+                <span style={{ fontSize: '12px', fontWeight: '600', color: INDIGO, fontFamily: FM }}>Upload PDF or Text</span>
+              </button>
+              <textarea
+                placeholder="Or paste your resume text here..."
+                value={resume}
+                onChange={e => setResume(e.target.value)}
+                style={inputStyle}
+                onFocus={e => e.target.style.borderColor = INDIGO + '66'}
+                onBlur={e => e.target.style.borderColor = 'var(--border)'}
+              />
+            </>
+          )}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept=".pdf,.txt,.doc,.docx"
+            style={{ display: 'none' }}
           />
         </div>
 

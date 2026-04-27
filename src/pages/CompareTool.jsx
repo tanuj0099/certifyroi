@@ -7,6 +7,8 @@ export default function CompareToolPage() {
       title="Compare"
       subtitle="Certifications"
       description="Compare any two certifications side-by-side. See salary impacts, job demand, study time, and cost for each cert."
+      sectionId="03"
+      sectionTitle="CERT_COMPARE"
     >
       <div className="glass" style={{
         padding: 'clamp(20px, 4vw, 32px)',

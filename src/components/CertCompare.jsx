@@ -448,9 +448,15 @@ function CertCompare({ salary, prefilledCert }) {
 
   var [certA, setCertA] = useState(prefilledCert || '')
   var [certB, setCertB] = useState('')
+  var [certC, setCertC] = useState('')
+  var [certD, setCertD] = useState('')
+
+  var COLORS_ALL = ['#6366F1', '#10B981', '#F59E0B', '#E11D48']
 
   var dataA = CERTIFICATIONS.find(function(c) { return c.name === certA })
   var dataB = CERTIFICATIONS.find(function(c) { return c.name === certB })
+  var dataC = CERTIFICATIONS.find(function(c) { return c.name === certC })
+  var dataD = CERTIFICATIONS.find(function(c) { return c.name === certD })
 
   var roiCalc = useCallback(function(cert, sal) {
     if (!cert || !sal) return null
@@ -464,7 +470,10 @@ function CertCompare({ salary, prefilledCert }) {
 
   var roiA = roiCalc(dataA, salary)
   var roiB = roiCalc(dataB, salary)
+  var roiC = roiCalc(dataC, salary)
+  var roiD = roiCalc(dataD, salary)
 
+  // Only show radar for first 2 certs
   var bothReady = dataA && dataB && roiA && roiB
   var radarData = bothReady ? buildRadarData(dataA, dataB, roiA, roiB) : []
 
@@ -472,144 +481,160 @@ function CertCompare({ salary, prefilledCert }) {
     ? (parseFloat(roiA.fiveYearNet) > parseFloat(roiB.fiveYearNet) ? 'A' : 'B')
     : null
 
-  var TABLE_ROWS = bothReady ? [
-    { label: 'Expected Hike',   vA: '+' + dataA.avgHike + '%',                     vB: '+' + dataB.avgHike + '%',                     win: dataA.avgHike > dataB.avgHike ? 'A' : 'B' },
-    { label: 'Cert Cost',       vA: '₹' + (dataA.avgCost/100000).toFixed(1) + 'L', vB: '₹' + (dataB.avgCost/100000).toFixed(1) + 'L', win: dataA.avgCost < dataB.avgCost ? 'A' : 'B' },
-    { label: 'Break-even',      vA: roiA.breakEven + ' mo',                         vB: roiB.breakEven + ' mo',                         win: roiA.breakEven < roiB.breakEven ? 'A' : 'B' },
-    { label: '5-Yr Net Gain',   vA: '₹' + roiA.fiveYearNet + 'L',                  vB: '₹' + roiB.fiveYearNet + 'L',                  win: parseFloat(roiA.fiveYearNet) > parseFloat(roiB.fiveYearNet) ? 'A' : 'B' },
-    { label: '5-Yr ROI %',      vA: roiA.roiPct + '%',                              vB: roiB.roiPct + '%',                              win: roiA.roiPct > roiB.roiPct ? 'A' : 'B' },
-    { label: 'Study Time',      vA: dataA.timeMonths + ' mo',                       vB: dataB.timeMonths + ' mo',                       win: dataA.timeMonths < dataB.timeMonths ? 'A' : 'B' },
-    { label: 'Market Demand',   vA: dataA.demand,                                   vB: dataB.demand,                                   win: demandScore(dataA.demand) >= demandScore(dataB.demand) ? 'A' : 'B' },
-    { label: 'Annual Salary +', vA: '₹' + roiA.annualGain + 'L',                   vB: '₹' + roiB.annualGain + 'L',                   win: parseFloat(roiA.annualGain) > parseFloat(roiB.annualGain) ? 'A' : 'B' },
+  // Build comparison table with all selected certs
+  var selectedCerts = []
+  if (dataA && roiA) selectedCerts.push({ cert: dataA, roi: roiA, key: 'A', color: COLORS_ALL[0] })
+  if (dataB && roiB) selectedCerts.push({ cert: dataB, roi: roiB, key: 'B', color: COLORS_ALL[1] })
+  if (dataC && roiC) selectedCerts.push({ cert: dataC, roi: roiC, key: 'C', color: COLORS_ALL[2] })
+  if (dataD && roiD) selectedCerts.push({ cert: dataD, roi: roiD, key: 'D', color: COLORS_ALL[3] })
+
+  var TABLE_ROWS = selectedCerts.length > 0 ? [
+    { label: 'Expected Hike', get: function(r) { return '+' + r.cert.avgHike + '%' }, isWinFunc: function(vals) { return Math.max.apply(null, vals.map(function(v) { return v.cert.avgHike })) } },
+    { label: 'Cert Cost', get: function(r) { return '₹' + (r.cert.avgCost/100000).toFixed(1) + 'L' }, isWinFunc: function(vals) { return Math.min.apply(null, vals.map(function(v) { return v.cert.avgCost })) } },
+    { label: 'Break-even', get: function(r) { return r.roi.breakEven + ' mo' }, isWinFunc: function(vals) { return Math.min.apply(null, vals.map(function(v) { return v.roi.breakEven })) } },
+    { label: '5-Yr Net Gain', get: function(r) { return '₹' + r.roi.fiveYearNet + 'L' }, isWinFunc: function(vals) { return Math.max.apply(null, vals.map(function(v) { return parseFloat(v.roi.fiveYearNet) })) } },
+    { label: '5-Yr ROI %', get: function(r) { return r.roi.roiPct + '%' }, isWinFunc: function(vals) { return Math.max.apply(null, vals.map(function(v) { return v.roi.roiPct })) } },
+    { label: 'Study Time', get: function(r) { return r.cert.timeMonths + ' mo' }, isWinFunc: function(vals) { return Math.min.apply(null, vals.map(function(v) { return v.cert.timeMonths })) } },
+    { label: 'Market Demand', get: function(r) { return r.cert.demand }, isWinFunc: function(vals) { return Math.max.apply(null, vals.map(function(v) { return demandScore(v.cert.demand) })) } },
+    { label: 'Annual Salary +', get: function(r) { return '₹' + r.roi.annualGain + 'L' }, isWinFunc: function(vals) { return Math.max.apply(null, vals.map(function(v) { return parseFloat(v.roi.annualGain) })) } },
   ] : []
 
   return (
     <div>
       <div style={{ fontFamily: F_MONO, fontSize: '10px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '18px' }}>
-        COMPARE TWO CERTIFICATIONS · SIDE BY SIDE
+        COMPARE UP TO 4 CERTIFICATIONS · SIDE BY SIDE
       </div>
 
-      {/* Cert selectors */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-        <CertSelector value={certA} onChange={setCertA} label="Certification A" color={COL_A} />
-        <div style={{ display: 'flex', alignItems: 'center', fontFamily: F_MONO, fontSize: '13px', color: 'var(--text-4)', paddingTop: '22px', flexShrink: 0 }}>
-          VS
-        </div>
-        <CertSelector value={certB} onChange={setCertB} label="Certification B" color={COL_B} />
+      {/* Cert selectors — up to 4 */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+        <CertSelector value={certA} onChange={setCertA} label="Certification A" color={COLORS_ALL[0]} />
+        <CertSelector value={certB} onChange={setCertB} label="Certification B" color={COLORS_ALL[1]} />
+        <CertSelector value={certC} onChange={setCertC} label="Certification C" color={COLORS_ALL[2]} />
+        <CertSelector value={certD} onChange={setCertD} label="Certification D" color={COLORS_ALL[3]} />
       </div>
 
       <AnimatePresence>
-        {bothReady ? (
+        {selectedCerts.length > 0 ? (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
 
-            {/* Winner banner */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }}
-              style={{
-                marginBottom: '20px', padding: '14px 18px', borderRadius: '12px',
-                background: winner === 'A' ? 'rgba(99,102,241,0.08)' : 'rgba(16,185,129,0.08)',
-                border: '1px solid ' + (winner === 'A' ? 'rgba(99,102,241,0.25)' : 'rgba(16,185,129,0.25)'),
-                display: 'flex', alignItems: 'center', gap: '10px',
-              }}
-            >
-              <Award size={16} color={winner === 'A' ? COL_A : COL_B} />
-              <div>
-                <span style={{ fontSize: '13px', fontWeight: '700', color: winner === 'A' ? COL_A : COL_B, fontFamily: F_HEAD }}>
-                  {winner === 'A' ? dataA.name : dataB.name} wins on 5-year ROI
-                </span>
-                <span style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: F_BODY, marginLeft: '8px' }}>
-                  +₹{Math.abs(parseFloat(roiA.fiveYearNet) - parseFloat(roiB.fiveYearNet)).toFixed(1)}L more over 5 years
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Radar chart */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}
-              style={{ marginBottom: '24px', borderRadius: '18px', background: 'var(--surface)', border: '1px solid var(--glass-border)', overflow: 'hidden', position: 'relative' }}
-            >
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, ' + COL_A + ', transparent 40%, transparent 60%, ' + COL_B + ')' }} />
-
-              <div style={{ padding: '18px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+            {/* Winner banner — only for 2-cert comparison */}
+            {bothReady && winner ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }}
+                style={{
+                  marginBottom: '20px', padding: '14px 18px', borderRadius: '12px',
+                  background: winner === 'A' ? 'rgba(99,102,241,0.08)' : 'rgba(16,185,129,0.08)',
+                  border: '1px solid ' + (winner === 'A' ? 'rgba(99,102,241,0.25)' : 'rgba(16,185,129,0.25)'),
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                }}
+              >
+                <Award size={16} color={winner === 'A' ? COLORS_ALL[0] : COLORS_ALL[1]} />
                 <div>
-                  <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '3px' }}>
-                    MULTI-AXIS COMPARISON
+                  <span style={{ fontSize: '13px', fontWeight: '700', color: winner === 'A' ? COLORS_ALL[0] : COLORS_ALL[1], fontFamily: F_HEAD }}>
+                    {winner === 'A' ? dataA.name : dataB.name} wins on 5-year ROI
+                  </span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-4)', fontFamily: F_BODY, marginLeft: '8px' }}>
+                    +₹{Math.abs(parseFloat(roiA.fiveYearNet) - parseFloat(roiB.fiveYearNet)).toFixed(1)}L more over 5 years
+                  </span>
+                </div>
+              </motion.div>
+            ) : null}
+
+            {/* Radar chart — only for 2 cert comparison */}
+            {bothReady ? (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}
+                style={{ marginBottom: '24px', borderRadius: '18px', background: 'var(--surface)', border: '1px solid var(--glass-border)', overflow: 'hidden', position: 'relative' }}
+              >
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, ' + COLORS_ALL[0] + ', transparent 40%, transparent 60%, ' + COLORS_ALL[1] + ')' }} />
+
+                <div style={{ padding: '18px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
+                    <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '3px' }}>
+                      MULTI-AXIS COMPARISON
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: F_BODY }}>
+                      5 dimensions · hover dots to inspect
+                    </div>
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-4)', fontFamily: F_BODY }}>
-                    5 dimensions · hover dots to inspect
+
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    {[{ name: dataA.name, color: COLORS_ALL[0] }, { name: dataB.name, color: COLORS_ALL[1] }].map(function(item, i) {
+                      return (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 10px', borderRadius: '20px', background: item.color + '12', border: '1px solid ' + item.color + '30' }}>
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, boxShadow: '0 0 8px ' + item.color + '80' }} />
+                          <span style={{ fontFamily: F_MONO, fontSize: '10px', color: item.color, fontWeight: '700', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {item.name.split(' ').slice(0, 3).join(' ')}
+                          </span>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  {[{ name: dataA.name, color: COL_A }, { name: dataB.name, color: COL_B }].map(function(item, i) {
+                <div style={{ padding: '0 12px 4px' }}>
+                  <RadarChartSVG data={radarData} nameA={dataA.name} nameB={dataB.name} animate={true} />
+                </div>
+
+                <div style={{ padding: '0 16px 16px', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
+                  {[
+                    { axis: 'Hike %',    desc: 'Salary increase' },
+                    { axis: 'Demand',    desc: 'Job market'      },
+                    { axis: 'Speed',     desc: 'Time to complete'},
+                    { axis: 'Cost Eff.', desc: '5-yr ROI vs cost'},
+                    { axis: 'Job Market',desc: 'Demand + salary' },
+                  ].map(function(item, i) {
                     return (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 10px', borderRadius: '20px', background: item.color + '12', border: '1px solid ' + item.color + '30' }}>
-                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, boxShadow: '0 0 8px ' + item.color + '80' }} />
-                        <span style={{ fontFamily: F_MONO, fontSize: '10px', color: item.color, fontWeight: '700', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {item.name.split(' ').slice(0, 3).join(' ')}
-                        </span>
+                      <div key={i} style={{ padding: '7px 8px', borderRadius: '8px', background: 'var(--bg)', border: '1px solid var(--border)', textAlign: 'center' }}>
+                        <div style={{ fontFamily: F_MONO, fontSize: '8px', color: 'rgba(99,102,241,0.75)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2px' }}>{item.axis}</div>
+                        <div style={{ fontFamily: F_BODY, fontSize: '10px', color: 'var(--text-4)', lineHeight: '1.3' }}>{item.desc}</div>
                       </div>
                     )
                   })}
                 </div>
-              </div>
+              </motion.div>
+            ) : null}
 
-              <div style={{ padding: '0 12px 4px' }}>
-                <RadarChartSVG data={radarData} nameA={dataA.name} nameB={dataB.name} animate={true} />
-              </div>
-
-              <div style={{ padding: '0 16px 16px', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
-                {[
-                  { axis: 'Hike %',    desc: 'Salary increase' },
-                  { axis: 'Demand',    desc: 'Job market'      },
-                  { axis: 'Speed',     desc: 'Time to complete'},
-                  { axis: 'Cost Eff.', desc: '5-yr ROI vs cost'},
-                  { axis: 'Job Market',desc: 'Demand + salary' },
-                ].map(function(item, i) {
+            {/* Comparison table — handles 2-4 certs */}
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr' + (selectedCerts.length > 0 ? ' ' + selectedCerts.map(function() { return '120px' }).join(' ') : ''), gap: '8px', marginBottom: '8px', overflowX: 'auto' }}>
+                <div />
+                {selectedCerts.map(function(item, i) {
                   return (
-                    <div key={i} style={{ padding: '7px 8px', borderRadius: '8px', background: 'var(--bg)', border: '1px solid var(--border)', textAlign: 'center' }}>
-                      <div style={{ fontFamily: F_MONO, fontSize: '8px', color: 'rgba(99,102,241,0.75)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2px' }}>{item.axis}</div>
-                      <div style={{ fontFamily: F_BODY, fontSize: '10px', color: 'var(--text-4)', lineHeight: '1.3' }}>{item.desc}</div>
+                    <div key={item.key} style={{ fontFamily: F_MONO, fontSize: '10px', color: item.color, textAlign: 'center', padding: '6px', borderRadius: '8px', background: item.color + '07', border: '1px solid ' + item.color + '15', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {item.cert.name.split(' ').slice(0, 2).join(' ')}
                     </div>
                   )
                 })}
               </div>
-            </motion.div>
-
-            {/* Comparison table */}
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 120px', gap: '8px', marginBottom: '8px' }}>
-                <div />
-                <div style={{ fontFamily: F_MONO, fontSize: '10px', color: COL_A, textAlign: 'center', padding: '6px', borderRadius: '8px', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.15)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {dataA.name.split(' ').slice(0, 2).join(' ')}
-                </div>
-                <div style={{ fontFamily: F_MONO, fontSize: '10px', color: COL_B, textAlign: 'center', padding: '6px', borderRadius: '8px', background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.15)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {dataB.name.split(' ').slice(0, 2).join(' ')}
-                </div>
-              </div>
 
               {TABLE_ROWS.map(function(row, i) {
+                var winVal = row.isWinFunc(selectedCerts)
                 return (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25, delay: 0.22 + i * 0.04 }}
-                    style={{ display: 'grid', gridTemplateColumns: '1fr 120px 120px', gap: '8px', marginBottom: '6px' }}
+                    style={{ display: 'grid', gridTemplateColumns: '1fr' + (selectedCerts.length > 0 ? ' ' + selectedCerts.map(function() { return '120px' }).join(' ') : ''), gap: '8px', marginBottom: '6px' }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', fontSize: '12px', color: 'var(--text-3)', fontFamily: F_BODY }}>
                       {row.label}
                     </div>
-                    <div style={{ padding: '8px', borderRadius: '8px', textAlign: 'center', background: row.win === 'A' ? 'rgba(99,102,241,0.1)' : 'var(--surface)', border: '1px solid ' + (row.win === 'A' ? 'rgba(99,102,241,0.22)' : 'var(--border)'), fontFamily: F_MONO, fontSize: '12px', color: row.win === 'A' ? COL_A : 'var(--text-3)', fontWeight: row.win === 'A' ? '700' : '500' }}>
-                      {row.vA}{row.win === 'A' ? <span style={{ marginLeft: '4px', fontSize: '9px' }}>✓</span> : null}
-                    </div>
-                    <div style={{ padding: '8px', borderRadius: '8px', textAlign: 'center', background: row.win === 'B' ? 'rgba(16,185,129,0.1)' : 'var(--surface)', border: '1px solid ' + (row.win === 'B' ? 'rgba(16,185,129,0.22)' : 'var(--border)'), fontFamily: F_MONO, fontSize: '12px', color: row.win === 'B' ? COL_B : 'var(--text-3)', fontWeight: row.win === 'B' ? '700' : '500' }}>
-                      {row.vB}{row.win === 'B' ? <span style={{ marginLeft: '4px', fontSize: '9px' }}>✓</span> : null}
-                    </div>
+                    {selectedCerts.map(function(item, j) {
+                      var val = row.get(item)
+                      var isWinner = (row.label.indexOf('Hike') !== -1 || row.label.indexOf('5-Yr') !== -1 || row.label.indexOf('Demand') !== -1 || row.label.indexOf('Salary') !== -1)
+                        ? (parseFloat(val) === parseFloat(winVal.toString()))
+                        : (parseFloat(val.replace(/[^0-9.]/g, '')) === parseFloat(winVal.toString().replace(/[^0-9.]/g, '')))
+                      return (
+                        <div key={item.key} style={{ padding: '8px', borderRadius: '8px', textAlign: 'center', background: isWinner ? item.color + '10' : 'var(--surface)', border: '1px solid ' + (isWinner ? item.color + '22' : 'var(--border)'), fontFamily: F_MONO, fontSize: '12px', color: isWinner ? item.color : 'var(--text-3)', fontWeight: isWinner ? '700' : '500' }}>
+                          {val}{isWinner ? <span style={{ marginLeft: '4px', fontSize: '9px' }}>✓</span> : null}
+                        </div>
+                      )
+                    })}
                   </motion.div>
                 )
               })}
 
-              {/* FIX: DataNote added — comparison table showed calculated numbers with no source attribution.
-                  Users need to know where avgHike, avgCost, and timeMonths come from to trust the comparison. */}
+              {/* Data note */}
               <div style={{ marginTop: '14px', padding: '10px 12px', borderRadius: '8px', background: 'var(--surface)', border: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                 <Info size={11} color="var(--text-4)" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span style={{ fontFamily: F_BODY, fontSize: '11px', color: 'var(--text-4)', lineHeight: '1.55' }}>
@@ -618,14 +643,14 @@ function CertCompare({ salary, prefilledCert }) {
               </div>
             </motion.div>
 
-            {/* Best for tags */}
+            {/* Best for tags — only for selected certs */}
             <motion.div
               initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.35 }}
-              style={{ marginTop: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}
+              style={{ marginTop: '16px', display: 'grid', gridTemplateColumns: selectedCerts.length === 2 ? '1fr 1fr' : 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}
             >
-              {[{ cert: dataA, color: COL_A }, { cert: dataB, color: COL_B }].map(function(item, i) {
+              {selectedCerts.map(function(item, i) {
                 return (
-                  <div key={i} style={{ padding: '14px', borderRadius: '10px', background: item.color + '07', border: '1px solid ' + item.color + '20' }}>
+                  <div key={item.key} style={{ padding: '14px', borderRadius: '10px', background: item.color + '07', border: '1px solid ' + item.color + '20' }}>
                     <div style={{ fontFamily: F_MONO, fontSize: '9px', color: item.color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '7px' }}>Best for</div>
                     <div style={{ fontSize: '12px', color: 'var(--text-3)', fontFamily: F_BODY, lineHeight: '1.55', marginBottom: '9px' }}>{item.cert.forWho}</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
@@ -646,17 +671,17 @@ function CertCompare({ salary, prefilledCert }) {
         ) : null}
       </AnimatePresence>
 
-      {/* Empty state — FIX: ⚖️ emoji → Scale icon from lucide-react */}
-      {(!dataA || !dataB) ? (
+      {/* Empty state */}
+      {selectedCerts.length === 0 ? (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
           style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--text-4)', fontSize: '13px', fontFamily: F_BODY }}
         >
           <Scale size={32} color="var(--text-4)" style={{ margin: '0 auto 14px', display: 'block', opacity: 0.4 }} />
           <div style={{ fontFamily: F_HEAD, fontWeight: '700', fontSize: '15px', color: 'var(--text-3)', marginBottom: '6px' }}>
-            Pick two certifications to compare
+            Pick certifications to compare
           </div>
-          <div>Radar chart · Break-even · 5-year gain — side by side</div>
+          <div>Up to 4 certifications · Radar chart · Break-even · 5-year gain — side by side</div>
         </motion.div>
       ) : null}
     </div>
