@@ -11,7 +11,9 @@ const F_MONO  = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
 const NAV_ITEMS = [
   { label: 'Home',           pageId: 'home'          },
-  { label: 'Tools',          pageId: 'app'           },
+  { label: 'Tools',          pageId: 'tools/resume'  },
+  { label: 'Negotiate',      pageId: 'tools/negotiation' },
+  { label: 'Gap Analyzer',   pageId: 'tools/gap'         },
   { label: 'How It Works',   pageId: 'how-it-works'  },
   { label: 'Features',       pageId: 'features'      },
   { label: 'Pricing',        pageId: 'pricing'       },

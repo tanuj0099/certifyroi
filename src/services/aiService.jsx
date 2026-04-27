@@ -119,6 +119,24 @@ export const callGroqForPitch = async (_unusedApiKey, prompt) => {
   )
 }
 
+export const callGroqForNegotiation = async (_unusedApiKey, prompt) => {
+  return callGroq(
+    [{ role: 'system', content: 'You are a tough, expert salary negotiation coach for Indian professionals. Provide a confident, natural, 30-second conversational script to read to HR/Manager. Output ONLY the script.' },
+     { role: 'user', content: prompt }],
+    500,
+    0.72
+  )
+}
+
+export const callGroqForGapAnalysis = async (_unusedApiKey, prompt) => {
+  return callGroq(
+    [{ role: 'system', content: 'You are an expert technical recruiter and career coach in India (2026). Analyze the gap between the candidate\'s resume and the target Job Description. Identify exactly what is missing and recommend specific certifications to bridge the gap. Output ONLY the requested format.' },
+     { role: 'user', content: prompt }],
+    600,
+    0.65
+  )
+}
+
 export const callGroqForResume = async (_unusedApiKey, prompt) => {
   return callGroq(
     [

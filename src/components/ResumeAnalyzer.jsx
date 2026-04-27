@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { CERTIFICATIONS, CERT_DOMAINS } from '../tokens.js'
 import { callGroqForResume } from '../services/aiService.jsx'
+import { useProfile } from './useProfile.jsx'
 
 // ── Font tokens → CSS variables ───────────────────────────
 var FM = 'var(--font-mono)'
@@ -125,7 +126,7 @@ var readPdfFile = async function(file) {
 }
 
 // ── Prompt builder ────────────────────────────────────────
-var buildPrompt = function(resumeText, mode, timeline, domainIntent, switchTarget) {
+var buildPrompt = function(resumeText, mode, timeline, domainIntent, switchTarget, completedCerts) {
   var timelineNote = timeline === 'fast'
     ? 'IMPORTANT: User needs FAST-TRACK only — certs completable in 1-3 months. Never recommend anything longer.'
     : timeline === 'medium'
@@ -138,7 +139,11 @@ var buildPrompt = function(resumeText, mode, timeline, domainIntent, switchTarge
     ? 'User wants to grow in: ' + domainIntent + '. Prioritise certs in that domain.'
     : 'Auto-detect best domain from resume.'
 
-  return 'You are CertifyROI, a career advisor for Indian professionals (2026).\nUser mode: ' + mode + '\nTimeline: ' + timelineNote + '\nDomain: ' + domainNote + '\n\nResume:\n' + resumeText.slice(0, 2200) + '\n\nReply in EXACTLY this format, no extra text:\n\n**NAME:** [full name or "Not found"]\n**PROFILE SUMMARY:** 2-3 specific sentences about their background and biggest career opportunity\n**CITY:** [city from resume or "Not specified"]\n**DOMAIN:** [primary: tech/data/management/business/finance/marketing/product/design/hr]\n\n**SKILL GAPS:**\n- gap one\n- gap two\n- gap three\n\n**TOP CERT #1 (PRIMARY MOVE):**\nName: exact name\nWhy: specific reason tied to their resume\nROI: hike %\nTimeline: X months\nFast Track: one concrete first step with resource name\n\n**TOP CERT #2:**\nName: exact name\nWhy: specific reason\nROI: hike %\nTimeline: X months\nFast Track: one concrete first step\n\n**TOP CERT #3:**\nName: exact name\nWhy: specific reason\nROI: hike %\nTimeline: X months\nFast Track: one concrete first step\n\n**IMMEDIATE ACTION:** one thing to do THIS WEEK with platform name\n**MARKET INSIGHT:** one sentence on India demand for top cert in their city\n\nUnder 380 words. India-specific. Be specific to their actual resume.'
+  var prereqNote = '\nPREREQUISITES: Ensure they have the foundational knowledge for your recommendations. If an advanced cert requires basics they lack, recommend the foundational cert first.'
+  
+  var historyNote = completedCerts ? '\nCompleted Certs: ' + completedCerts + '\nCRITICAL: Do NOT recommend any certifications from the "Completed Certs" list. Instead, recommend the next logical step.' : ''
+
+  return 'You are CertifyROI, a career advisor for Indian professionals (2026).\nUser mode: ' + mode + '\nTimeline: ' + timelineNote + '\nDomain: ' + domainNote + historyNote + prereqNote + '\n\nResume:\n' + resumeText.slice(0, 2200) + '\n\nReply in EXACTLY this format, no extra text:\n\n**NAME:** [full name or "Not found"]\n**PROFILE SUMMARY:** 2-3 specific sentences about their background and biggest career opportunity\n**CITY:** [city from resume or "Not specified"]\n**DOMAIN:** [primary: tech/data/management/business/finance/marketing/product/design/hr]\n\n**SKILL GAPS:**\n- gap one\n- gap two\n- gap three\n\n**TOP CERT #1 (PRIMARY MOVE):**\nName: exact name\nWhy: specific reason tied to their resume\nROI: hike %\nTimeline: X months\nFast Track: one concrete first step with resource name\n\n**TOP CERT #2:**\nName: exact name\nWhy: specific reason\nROI: hike %\nTimeline: X months\nFast Track: one concrete first step\n\n**TOP CERT #3:**\nName: exact name\nWhy: specific reason\nROI: hike %\nTimeline: X months\nFast Track: one concrete first step\n\n**IMMEDIATE ACTION:** one thing to do THIS WEEK with platform name\n**MARKET INSIGHT:** one sentence on India demand for top cert in their city\n\nUnder 380 words. India-specific. Be specific to their actual resume.'
 }
 
 // ── Parser ────────────────────────────────────────────────
@@ -679,6 +684,8 @@ var ResumeAnalyzer = function({ mode, onCertSelected }) {
   var [timeline,     setTimeline]     = useState('flexible')
   var [domainIntent, setDomainIntent] = useState('auto')
   var fileRef = useRef(null)
+  var { profile } = useProfile()
+  var completedCerts = profile?.certHistory?.map(function(c) { return c.certName }).join(', ') || ''
 
   var switchTarget = null
   if (mode === 'switcher') {
@@ -743,8 +750,7 @@ var ResumeAnalyzer = function({ mode, onCertSelected }) {
     setLoading(true); setResult(null); setError(null); setRejection(null)
     try {
       var safeText = text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').slice(0, 2200).trim()
-      var raw      = await callGroqForResume(null, buildPrompt(safeText, mode, timeline, domainIntent, switchTarget))
-      if (!raw || raw.length < 30) throw new Error('Empty response — try again')
+      var raw      = await callGroqForResume(null, buildPrompt(safeText, mode, timeline, domainIntent, switchTarget, completedCerts))
       var parsed = parseResponse(raw)
       setResult(parsed.certs?.length ? parsed : {
         name: parsed.name, summary: 'Analysis complete', city: '', domain: 'business',

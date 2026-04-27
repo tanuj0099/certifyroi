@@ -555,10 +555,10 @@ function AIResult({ result, certName, onReset }) {
 // ─────────────────────────────────────────────────────────
 function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
   mode          = mode          || 'professional'
-  prefilledCert = prefilledCert || ''
-  resumeName    = resumeName    || ''
-  resumeCity    = resumeCity    || ''
-  resumeDomain  = resumeDomain  || ''
+  prefilledCert = prefilledCert || localStorage.getItem('croi_prefilled_cert') || ''
+  resumeName    = resumeName    || localStorage.getItem('croi_resume_name') || ''
+  resumeCity    = resumeCity    || localStorage.getItem('croi_resume_city') || ''
+  resumeDomain  = resumeDomain  || localStorage.getItem('croi_resume_domain') || ''
 
   const isStudent = mode === 'student'
 
@@ -570,6 +570,9 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
   const [showVerifier, setShowVerifier] = useState(false)
   const [cooldown,     setCooldown]     = useState(0)
   const [showAll,      setShowAll]      = useState(false)
+  
+  // Store the active city multiplier so we can show a badge
+  const [cityPremium, setCityPremium] = useState(null)
 
   const [salary,      setSalary]      = useLocalStorage('croi_salary',       isStudent ? 0 : 8)
   const [certCost,    setCertCost]    = useLocalStorage('croi_cert_cost',    2)
@@ -597,9 +600,20 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
              prefilledCert.toLowerCase().includes(c.name.toLowerCase())
     })
     if (found) {
+      // Apply dynamic city premium based on detected city
+      let mult = 1.0;
+      if (resumeCity) {
+        const cityMultipliers = { 'Bangalore': 1.15, 'Mumbai': 1.18, 'Hyderabad': 1.10, 'Pune': 1.08, 'Delhi': 1.05, 'Chennai': 1.05 };
+        const cityKey = Object.keys(cityMultipliers).find(k => resumeCity.toLowerCase().includes(k.toLowerCase()));
+        if (cityKey) {
+          mult = cityMultipliers[cityKey];
+          setCityPremium({ city: cityKey, percentage: Math.round((mult - 1) * 100) });
+        }
+      }
+      
       setSelectedCert(found)
       setCertCost(found.avgCost / 100000)
-      setHikePercent(found.avgHike)
+      setHikePercent(Math.round(found.avgHike * mult))
     }
   }, [prefilledCert])
 
@@ -609,9 +623,20 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
 
   const pickCert = useCallback(function(cert) {
     setSelectedCert(cert)
+    
+    let mult = 1.0;
+    if (displayCity) {
+      const cityMultipliers = { 'Bangalore': 1.15, 'Mumbai': 1.18, 'Hyderabad': 1.10, 'Pune': 1.08, 'Delhi': 1.05, 'Chennai': 1.05 };
+      const cityKey = Object.keys(cityMultipliers).find(k => displayCity.toLowerCase().includes(k.toLowerCase()));
+      if (cityKey) {
+        mult = cityMultipliers[cityKey];
+        setCityPremium({ city: cityKey, percentage: Math.round((mult - 1) * 100) });
+      }
+    }
+    
     setCertName(cert.name)
     setCertCost(cert.avgCost / 100000)
-    setHikePercent(cert.avgHike)
+    setHikePercent(Math.round(cert.avgHike * mult))
     setAiResult(null)
     setAiError(null)
   }, [])
@@ -810,12 +835,43 @@ function Hero({ mode, prefilledCert, resumeName, resumeCity, resumeDomain }) {
               suffix="%"
               color={EMERALD}
             />
+            {/* Display local market calibration badge */}
+            <AnimatePresence>
+              {cityPremium && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', marginBottom: '8px' }}>
+                    <MapPin size={11} color={EMERALD} />
+                    <span style={{ fontFamily: FB, fontSize: '11px', color: EMERALD }}>Calibrated for {cityPremium.city} market (+{cityPremium.percentage}% premium applied)</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <DataNote>
               Hike benchmarks: AmbitionBox post-cert salary data + NASSCOM 2026 · India median: 25–40% · Individual results vary by company tier and negotiation
             </DataNote>
           </>
         ) : null}
       </div>
+
+      {/* ── Red Flags / Warnings ───────────────────────── */}
+      {(!isStudent && selectedCert) ? (() => {
+        var warnings = []
+        if (selectedCert.demand === 'Low') warnings.push('Low market demand in India right now. Consider alternatives.')
+        if (roi && roi.breakEvenMonths > 24) warnings.push('Payback period is over 2 years. This is a very slow financial return.')
+        if (salary >= 30 && hikePercent < 15) warnings.push('At your salary level (₹30L+), a <15% hike has minimal impact. Consider an executive or advanced certification.')
+        
+        if (warnings.length === 0) return null
+        return (
+          <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {warnings.map((w, i) => (
+              <div key={i} style={{ padding: '10px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                <AlertTriangle size={14} color="#EF4444" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <span style={{ fontSize: '12px', color: '#EF4444', fontFamily: FB, lineHeight: '1.5' }}>{w}</span>
+              </div>
+            ))}
+          </motion.div>
+        )
+      })() : null}
 
       {/* ── Stat cards ─────────────────────────────────── */}
       <AnimatePresence mode="wait">

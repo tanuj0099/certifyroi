@@ -4,10 +4,12 @@ import ResumeAnalyzer from '../components/ResumeAnalyzer.jsx'
 import ModeSelector, { ModePill } from '../components/ModeSelector.jsx'
 import ToolPageWrapper from '../components/ToolPageWrapper.jsx'
 import { AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 
 const T = { duration: 0.32, ease: [0.4, 0, 0.2, 1] }
 
 export default function ResumeToolPage() {
+  const navigate = useNavigate()
   const [mode, setMode] = useState('professional')
   const [modeLocked, setModeLocked] = useState(false)
 
@@ -22,7 +24,11 @@ export default function ResumeToolPage() {
   }
 
   const handleCertSelected = (certName, city, domain, name) => {
-    // Can add navigation to ROI calculator page here in future
+    localStorage.setItem('croi_prefilled_cert', certName || '')
+    localStorage.setItem('croi_resume_city', city || '')
+    localStorage.setItem('croi_resume_domain', domain || '')
+    localStorage.setItem('croi_resume_name', name || '')
+    navigate('/tools/roi')
   }
 
   return (

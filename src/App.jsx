@@ -67,6 +67,8 @@ const SimulatorTool = lazy(() => import("./pages/SimulatorTool.jsx"));
 const JobMapTool = lazy(() => import("./pages/JobMapTool.jsx"));
 const CollegeTool = lazy(() => import("./pages/CollegeTool.jsx"));
 const HikeVerifierTool = lazy(() => import("./pages/HikeVerifierTool.jsx"));
+const NegotiationTool = lazy(() => import("./pages/NegotiationTool.jsx"));
+const GapAnalyzerTool = lazy(() => import("./pages/GapAnalyzerTool.jsx"));
 
 const T = { duration: 0.32, ease: [0.4, 0, 0.2, 1] };
 const FM = "'JetBrains Mono','Commit Mono',monospace";
@@ -103,6 +105,28 @@ function useIsMobile() {
   }, []);
   return mobile;
 }
+
+// ─────────────────────────────────────────────────────────
+// PAGE SKELETON — Shown during Lazy Loading
+// ─────────────────────────────────────────────────────────
+const PageSkeleton = () => {
+  const { isDark } = useTheme();
+  const bg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)';
+  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+
+  return (
+    <div style={{ paddingTop: '120px', maxWidth: '1240px', margin: '0 auto', padding: '0 24px', minHeight: '100vh' }}>
+      <motion.div animate={{ opacity: [0.3, 0.7, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}>
+        <div style={{ maxWidth: '800px', marginBottom: '48px' }}>
+          <div style={{ width: '120px', height: '12px', background: bg, borderRadius: '4px', marginBottom: '24px' }} />
+          <div style={{ width: '60%', height: '48px', background: bg, borderRadius: '8px', marginBottom: '16px' }} />
+          <div style={{ width: '40%', height: '24px', background: bg, borderRadius: '6px', marginBottom: '48px' }} />
+        </div>
+        <div style={{ width: '100%', height: '400px', background: bg, border: `1px solid ${border}`, borderRadius: '24px' }} />
+      </motion.div>
+    </div>
+  );
+};
 
 const PageWrapper = function ({
   children,
@@ -2233,7 +2257,7 @@ const AppPage = function ({
       style={{
         paddingTop: NAV_H + "px",
         minHeight: "100vh",
-        background: "var(--app-bg)",
+        background: "var(--bg)",
         position: "relative",
       }}
     >
@@ -3149,7 +3173,7 @@ function AppRoot() {
 
   return (
     <div
-      style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+      style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg)", color: "var(--text)" }}
     >
       <AnimatePresence>
         <SignInModal
@@ -3182,7 +3206,7 @@ function AppRoot() {
             exit={{ opacity: 0 }}
             transition={T}
           >
-            <Suspense fallback={<div style={{ minHeight: "40vh" }} />}>
+            <Suspense fallback={<PageSkeleton />}>
               <Routes location={location} key={location.pathname}>
                 <Route
                   path="/"
@@ -3227,6 +3251,8 @@ function AppRoot() {
                 <Route path="/tools/jobmap" element={<JobMapTool />} />
                 <Route path="/tools/college" element={<CollegeTool />} />
                 <Route path="/tools/hike" element={<HikeVerifierTool />} />
+                <Route path="/tools/negotiation" element={<NegotiationTool />} />
+                <Route path="/tools/gap" element={<GapAnalyzerTool />} />
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/cookies" element={<CookiesPage />} />
