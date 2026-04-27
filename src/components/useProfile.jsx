@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useAuth } from './useAuth.jsx'
+import { useAuth } from '../hooks/useAuth.jsx'
 
 // ── Local storage key ──────────────────────────────────────
 const LS_KEY = 'croi_profile'
