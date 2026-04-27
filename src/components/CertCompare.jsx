@@ -533,10 +533,14 @@ function CertCompare({ salary, prefilledCert }) {
               <motion.div
                 initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }}
                 style={{
-                  marginBottom: '20px', padding: '14px 18px', borderRadius: '12px',
-                  background: winner === 'A' ? 'rgba(99,102,241,0.08)' : 'rgba(16,185,129,0.08)',
-                  border: '1px solid ' + (winner === 'A' ? 'rgba(99,102,241,0.25)' : 'rgba(16,185,129,0.25)'),
-                  display: 'flex', alignItems: 'center', gap: '10px',
+                  marginBottom: '20px',
+                  padding: '14px 18px',
+                  borderRadius: '12px',
+                  background: winner.color + '08',
+                  border: '1px solid ' + winner.color + '25',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
                 }}
               >
                 <Award size={16} color={winner.color} />
@@ -557,9 +561,13 @@ function CertCompare({ salary, prefilledCert }) {
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}
                 style={{ marginBottom: '24px', borderRadius: '18px', background: 'var(--surface)', border: '1px solid var(--glass-border)', overflow: 'hidden', position: 'relative' }}
               >
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, ' + COLORS_ALL[0] + ', transparent 40%, transparent 60%, ' + COLORS_ALL[1] + ')' }} />
-
-                <div style={{ padding: '18px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, ' + COLORS[0] + ', transparent 40%, transparent 60%, ' + COLORS[1] + ')' }} />
+                <div
+                  style={{
+                    padding: '18px 20px 0', display: 'flex', justifyContent: 'space-between',
+                    alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px'
+                  }}
+                >
                   <div>
                     <div style={{ fontFamily: F_MONO, fontSize: '9px', color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '3px' }}>
                       MULTI-AXIS COMPARISON
