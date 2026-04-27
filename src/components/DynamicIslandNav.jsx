@@ -405,10 +405,10 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
               </div>
             </div>
             <AnimatePresence>
-              {hamburgerOpen && (
+              {pageMenuOpen && (
                 <DropdownContainer theme={theme}>
                   {SECONDARY_NAV_ITEMS.map(item => (
-                    <DropdownItem key={item.pageId} {...item} onNavigate={onNavigate} theme={theme} onClose={() => setHamburgerOpen(false)} />
+                    <DropdownItem key={item.pageId} {...item} onNavigate={onNavigate} theme={theme} onClose={() => setPageMenuOpen(false)} />
                   ))}
                 </DropdownContainer>
               )}
