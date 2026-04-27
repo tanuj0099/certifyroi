@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────
 // DynamicIslandNav.jsx — CertifyROI
 // ─────────────────────────────────────────────────────────
-
+ 
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Sun, Moon, Menu, X, User, ChevronDown } from 'lucide-react';
@@ -10,13 +10,13 @@ const F_SANS = "'Inter', 'DM Sans', sans-serif"
 const F_MONO = "'JetBrains Mono', 'IBM Plex Mono', monospace"
 
 const MAIN_NAV_ITEMS = [
-  { label: 'Home', pageId: 'home' },
-  { label: 'How It Works', pageId: 'how-it-works' },
-  { label: 'Features', pageId: 'features' },
-  { label: 'Pricing', pageId: 'pricing' },
+  { label: 'Home', pageId: 'home' }
 ];
 
 const SECONDARY_NAV_ITEMS = [
+  { label: 'How It Works', pageId: 'how-it-works' },
+  { label: 'Features', pageId: 'features' },
+  { label: 'Pricing', pageId: 'pricing' },
   { label: 'About', pageId: 'about' },
   { label: 'Blog', pageId: 'blog' },
   { label: 'FAQ', pageId: 'faq' },
@@ -41,7 +41,7 @@ const OTHER_TOOLS = [
 
 const ALL_MOBILE_ITEMS = [
   ...MAIN_NAV_ITEMS,
-  { type: 'header', label: 'Tools & Info' },
+  { type: 'header', label: 'Tools & Pages' },
   ...MAIN_TOOLS, ...OTHER_TOOLS, ...SECONDARY_NAV_ITEMS,
 ];
 
@@ -311,7 +311,7 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
   const [activeHref, setActiveHref] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [toolsOpen, setToolsOpen] = useState(false)
-  const [hamburgerOpen, setHamburgerOpen] = useState(false)
+  const [pageMenuOpen, setPageMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const islandRef = useRef(null)
@@ -327,21 +327,26 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
   }, [currentPage])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
-    if (!menuOpen) return
-    const onScroll = () => setMenuOpen(false)
+    if (!menuOpen && !toolsOpen) return
+    const onScroll = () => {
+      setMenuOpen(false);
+      setToolsOpen(false);
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [menuOpen])
-
+  }, [menuOpen, toolsOpen])
+ 
   const glassBg = isDark ? 'rgba(12,12,12,0.84)' : 'rgba(248,246,242,0.90)'
   const borderColor = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.09)'
-  const innerHL = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.7)'
+  const innerHL = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.7)';
   const shadow = scrolled
     ? (isDark ? '0 20px 60px rgba(0,0,0,0.55), 0 8px 24px rgba(0,0,0,0.35)' : '0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10)')
     : (isDark ? '0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)')
@@ -380,24 +385,24 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
             </AnimatePresence>
           </motion.button>
         ) : (
-          <div onMouseEnter={() => setHamburgerOpen(true)} onMouseLeave={() => setHamburgerOpen(false)} style={{ position: 'relative' }}>
+          <div onMouseEnter={() => setPageMenuOpen(true)} onMouseLeave={() => setPageMenuOpen(false)} style={{ position: 'relative' }}>
             <div style={{
               width: '48px', height: '48px', borderRadius: '50%',
               background: glassBg, backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)',
               border: '1px solid ' + borderColor, boxShadow: shadow,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <button
+              <div
                 style={{
                   width: '32px', height: '32px', borderRadius: '50%',
                   border: '1px solid ' + theme.border,
-                  background: hamburgerOpen ? (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)') : 'transparent',
+                  background: pageMenuOpen ? (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)') : 'transparent',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: theme.text2, transition: 'background 0.15s',
+                  color: theme.text2, transition: 'background 0.15s',
                 }}
               >
                 <Menu size={14} strokeWidth={2.5} />
-              </button>
+              </div>
             </div>
             <AnimatePresence>
               {hamburgerOpen && (
@@ -415,178 +420,124 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
       {/* Central Nav Island — Improved structure */}
       <motion.div
         ref={islandRef}
-        style={{
-          position: 'fixed', top: '14px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
-          pointerEvents: 'auto', cursor: 'default', userSelect: 'none',
-        }}
         initial={{ y: -64, opacity: 0, scale: 0.92 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ type: 'spring', stiffness: 360, damping: 34, delay: 0.1 }}
+        onHoverStart={() => !isMobile && setToolsOpen(true)}
+        onHoverEnd={() => !isMobile && setToolsOpen(false)}
       >
         <motion.div
+          animate={{
+            width: toolsOpen && !isMobile ? 'calc(100vw - 32px)' : 'auto',
+            maxWidth: toolsOpen && !isMobile ? '1200px' : 'auto',
+            height: toolsOpen && !isMobile ? 'auto' : '48px',
+            borderRadius: toolsOpen && !isMobile ? '0px' : '999px',
+            borderWidth: '2px',
+            borderColor: isDark ? '#333333' : '#111111',
+            boxShadow: toolsOpen && !isMobile ? (isDark ? '0 24px 48px rgba(0,0,0,0.8)' : '0 24px 48px rgba(0,0,0,0.25)') : shadow,
+          }}
+          transition={{ type: 'spring', stiffness: 400, damping: 35 }}
           style={{
-            display: 'inline-flex', alignItems: 'center',
-            height: toolsOpen ? 'auto' : '48px',
-            padding: toolsOpen ? '12px' : (isMobile ? '0 24px' : '0 14px'),
-            gap: '4px',
+            position: 'fixed', top: '14px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
+            pointerEvents: 'auto', cursor: 'default', userSelect: 'none',
+            display: 'flex', alignItems: 'center',
+            padding: isMobile ? '0 24px' : '0',
             background: glassBg,
             backdropFilter: 'blur(20px) saturate(180%)',
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-            borderRadius: toolsOpen ? '16px' : '100px',
-            border: '1px solid ' + borderColor,
-            boxShadow: shadow,
-            outline: '1px solid ' + innerHL,
-            outlineOffset: '-2px',
-            flexDirection: toolsOpen ? 'column' : 'row',
-            minWidth: toolsOpen ? '100vw' : 'auto',
-            maxWidth: toolsOpen ? '100vw' : 'auto',
+            overflow: 'hidden',
           }}
-          transition={{ all: 0.3 }}
         >
-          {/* Main nav + theme toggle row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: isMobile || toolsOpen ? 'wrap' : 'nowrap', justifyContent: toolsOpen ? 'center' : 'flex-start' }}>
-            {isMobile ? (
-              <span style={{ fontFamily: F_SANS, fontSize: '14px', fontWeight: '700', color: theme.text, letterSpacing: '-0.02em' }}>
-                Certify<span style={{ color: theme.gold }}>ROI</span>
-              </span>
-            ) : (
-              <>
-                {MAIN_NAV_ITEMS.map((item) => (
-                  <NavItem
+          <AnimatePresence mode="wait">
+            {toolsOpen && !isMobile ? (
+              <motion.div
+                key="tools-grid"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  width: '100%',
+                  padding: '24px 32px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: '16px',
+                }}
+              >
+                {/* Main Tools Section */}
+                <div style={{ gridColumn: 'span 4' }}>
+                  <div style={{ fontFamily: F_MONO, fontSize: '10px', color: theme.text3, letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: '800', marginBottom: '12px', paddingBottom: '8px', borderBottom: '2px solid ' + (isDark ? '#333333' : '#111111') }}>
+                    Primary Tools
+                  </div>
+                </div>
+                {[...MAIN_TOOLS, ...OTHER_TOOLS.slice(0,1)].map((item, idx) => (
+                  <motion.a
                     key={item.pageId}
-                    label={item.label}
-                    pageId={item.pageId}
-                    isActive={activeHref === item.pageId}
-                    onActivate={setActiveHref}
-                    onNavigate={onNavigate}
-                    theme={theme}
-                  />
+                    href={'#' + item.pageId}
+                    onClick={(e) => { e.preventDefault(); setToolsOpen(false); if (onNavigate) onNavigate(item.pageId); }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.04, duration: 0.3 }}
+                    style={{ display: 'block', padding: '14px 16px', borderRadius: '0px', background: 'transparent', textDecoration: 'none', fontFamily: F_SANS, fontSize: '14px', fontWeight: '600', color: theme.text, transition: 'all 0.2s ease', cursor: 'pointer', border: '2px solid transparent' }}
+                    whileHover={{ border: '2px solid ' + (isDark ? '#555555' : '#333333'), background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' }}
+                  >
+                    {item.label}
+                  </motion.a>
                 ))}
-              </>
-            )}
-            {!isMobile && (
-              <div style={{ width: '1px', height: '24px', background: borderColor, margin: '0 4px' }} />
-            )}
-            {/* Theme toggle moved inside — desktop only */}
-            {!isMobile && (
-              <ThemeToggle isDark={isDark} onToggle={toggleTheme} theme={theme} />
-            )}
-          </div>
 
-          {/* Tools section — expands when open */}
-          <div
-            onMouseEnter={() => setToolsOpen(true)}
-            onMouseLeave={() => setToolsOpen(false)}
-            style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
-          >
-            <button
-              onClick={() => setToolsOpen(!toolsOpen)}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                padding: toolsOpen ? '8px 12px' : '6px 12px',
-                borderRadius: '8px',
-                background: activeHref.startsWith('tools/') ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)') : 'transparent',
-                border: 'none', cursor: 'pointer',
-                color: theme.text2, fontFamily: F_SANS, fontSize: '13px', fontWeight: '600',
-                transition: 'all 0.15s',
-              }}
-              onMouseEnter={(e) => {
-                if (!toolsOpen) e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
-              }}
-              onMouseLeave={(e) => {
-                if (!toolsOpen) e.currentTarget.style.background = 'transparent'
-              }}
-            >
-              Tools <ChevronDown size={12} style={{ transform: toolsOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
-            </button>
-
-            {/* Tools dropdown — full-width from border to border */}
-            <AnimatePresence>
-              {toolsOpen && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                  style={{
-                    position: 'absolute', top: 'calc(100% + 4px)', left: '-12px', right: '-12px',
-                    background: glassBg, backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                    border: '1px solid ' + borderColor,
-                    borderRadius: '12px',
-                    padding: '12px',
-                    display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
-                    gap: '8px',
-                    minWidth: '80vw',
-                    maxWidth: '90vw',
-                    zIndex: 10000,
-                  }}
-                >
-                  <div style={{ gridColumn: '1 / -1', paddingBottom: '4px', borderBottom: '1px solid ' + borderColor }}>
-                    <div style={{ fontFamily: F_MONO, fontSize: '10px', color: theme.text3, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Main Flow</div>
+                {/* Other Tools Section */}
+                <div style={{ gridColumn: 'span 4', marginTop: '12px' }}>
+                  <div style={{ fontFamily: F_MONO, fontSize: '10px', color: theme.text3, letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: '800', marginBottom: '12px', paddingBottom: '8px', borderBottom: '2px solid ' + (isDark ? '#333333' : '#111111') }}>
+                    Additional Tools
                   </div>
-                  {MAIN_TOOLS.map(item => (
-                    <a
-                      key={item.pageId}
-                      href={'#' + item.pageId}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setToolsOpen(false)
-                        if (onNavigate) onNavigate(item.pageId)
-                      }}
-                      style={{
-                        display: 'block', padding: '8px 12px', borderRadius: '8px',
-                        background: 'transparent', textDecoration: 'none',
-                        fontFamily: F_SANS, fontSize: '13px', color: theme.text2,
-                        transition: 'all 0.15s', cursor: 'pointer',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
-                        e.currentTarget.style.color = theme.text
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent'
-                        e.currentTarget.style.color = theme.text2
-                      }}
+                </div>
+                {OTHER_TOOLS.slice(1).map((item, idx) => (
+                  <motion.a
+                    key={item.pageId}
+                    href={'#' + item.pageId}
+                    onClick={(e) => { e.preventDefault(); setToolsOpen(false); if (onNavigate) onNavigate(item.pageId); }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: (MAIN_TOOLS.length + 1 + idx) * 0.04, duration: 0.3 }}
+                    style={{ display: 'block', padding: '14px 16px', borderRadius: '0px', background: 'transparent', textDecoration: 'none', fontFamily: F_SANS, fontSize: '14px', fontWeight: '500', color: theme.text2, transition: 'all 0.2s ease', cursor: 'pointer', border: '2px solid transparent' }}
+                    whileHover={{ border: '2px solid ' + (isDark ? '#555555' : '#333333'), background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)', color: theme.text }}
+                  >
+                    {item.label}
+                  </motion.a>
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="default-nav"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '0 10px' }}
+              >
+                {isMobile ? (
+                  <span style={{ fontFamily: F_SANS, fontSize: '14px', fontWeight: '700', color: theme.text, letterSpacing: '-0.02em' }}>
+                    Certify<span style={{ color: theme.gold }}>ROI</span>
+                  </span>
+                ) : (
+                  <>
+                    {MAIN_NAV_ITEMS.map((item) => (
+                      <NavItem key={item.pageId} {...item} isActive={activeHref === item.pageId} onActivate={setActiveHref} onNavigate={onNavigate} theme={theme} />
+                    ))}
+                    <div style={{ width: '1px', height: '24px', background: borderColor, margin: '0 4px' }} />
+                    <button
+                      onClick={() => setToolsOpen(true)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', background: activeHref.startsWith('tools/') ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)') : 'transparent', border: 'none', cursor: 'pointer', color: theme.text2, fontFamily: F_SANS, fontSize: '13px', fontWeight: '600', transition: 'all 0.15s' }}
                     >
-                      {item.label}
-                    </a>
-                  ))}
-                  <div style={{ gridColumn: '1 / -1', padding: '4px 0', borderTop: '1px solid ' + borderColor, borderBottom: '1px solid ' + borderColor, margin: '4px 0' }} />
-                  <div style={{ gridColumn: '1 / -1', paddingBottom: '4px' }}>
-                    <div style={{ fontFamily: F_MONO, fontSize: '10px', color: theme.text3, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Other Tools</div>
-                  </div>
-                  {OTHER_TOOLS.map(item => (
-                    <a
-                      key={item.pageId}
-                      href={'#' + item.pageId}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setToolsOpen(false)
-                        if (onNavigate) onNavigate(item.pageId)
-                      }}
-                      style={{
-                        display: 'block', padding: '8px 12px', borderRadius: '8px',
-                        background: 'transparent', textDecoration: 'none',
-                        fontFamily: F_SANS, fontSize: '13px', color: theme.text2,
-                        transition: 'all 0.15s', cursor: 'pointer',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
-                        e.currentTarget.style.color = theme.text
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent'
-                        e.currentTarget.style.color = theme.text2
-                      }}
-                    >
-                      {item.label}
-                    </a>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                      Tools <ChevronDown size={12} style={{ transition: 'transform 0.2s' }} />
+                    </button>
+                    <div style={{ width: '1px', height: '24px', background: borderColor, margin: '0 4px' }} />
+                    <ThemeToggle isDark={isDark} onToggle={toggleTheme} theme={theme} />
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </motion.div>
 
@@ -597,62 +548,79 @@ export default function DynamicIslandNav({ isDark, toggleTheme, onNavigate, curr
         style={{ position: 'fixed', top: '14px', right: '14px', zIndex: 9999, pointerEvents: 'auto' }}
       >
         {isMobile ? (
-          <div style={{
+          <motion.div whileTap={{ scale: 0.9 }} style={{
             width: '48px', height: '48px', borderRadius: '50%',
             background: glassBg, backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)',
             border: '1px solid ' + borderColor, boxShadow: shadow,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <button
-              onClick={user ? onSignOut : onSignIn}
+            <motion.button
+              onClick={user ? onSignOut : onSignIn}              
+              whileTap={{ scale: 0.9 }}
               style={{
-                width: '32px', height: '32px', borderRadius: '50%',
-                background: user ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'linear-gradient(135deg, #63A8AC 0%, #7CB8BA 50%, #63A8AC 100%)',
-                border: '1px solid ' + (user ? theme.border : 'rgba(99,168,172,0.6)'),
+                width: '32px', height: '32px', borderRadius: '0px',
+                background: user ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'linear-gradient(135deg, #E0E0E0 0%, #D0D0D0 50%, #E0E0E0 100%)',
+                border: '2px solid ' + (user ? theme.border : '#1a1a1a'),
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: user ? theme.text2 : '#FFFFFF', flexShrink: 0,
-                boxShadow: user ? 'none' : '0 4px 12px rgba(99,168,172,0.3)',
+                cursor: 'pointer', color: user ? theme.text2 : '#1a1a1a', flexShrink: 0,
+                boxShadow: user ? 'none' : '0 6px 16px rgba(0,0,0,0.2)',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
               title={user ? 'Sign Out' : 'Sign In'}
+              onMouseEnter={(e) => {
+                if (!user) {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #E8E8E8 0%, #D8D8D8 50%, #E8E8E8 100%)'
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.3)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!user) {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #E0E0E0 0%, #D0D0D0 50%, #E0E0E0 100%)'
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)'
+                }
+              }}
             >
               <User size={15} strokeWidth={2.5} />
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         ) : (
-          <button
+          <motion.button
             onClick={user ? onSignOut : onSignIn}
+            whileHover={!user ? { y: -3 } : {}}
+            whileTap={!user ? { y: -1, scale: 0.98 } : {}}
             style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
-              height: '48px', padding: '0 20px', borderRadius: '100px',
+              display: 'flex', alignItems: 'center', gap: '8px',
+              height: '48px', padding: '0 20px', borderRadius: '0px',
               background: user
                 ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)')
-                : 'linear-gradient(135deg, #63A8AC 0%, #7CB8BA 50%, #8AC4C8 100%)',
-              border: '1px solid ' + (user ? borderColor : 'rgba(99,168,172,0.8)'),
-              color: user ? theme.text : '#FFFFFF',
-              fontFamily: F_SANS, fontSize: '12px', fontWeight: '600',
+                : 'linear-gradient(135deg, #E8E8E8 0%, #D0D0D0 25%, #E0E0E0 50%, #D8D8D8 75%, #E8E8E8 100%)',
+              border: '2px solid ' + (user ? (isDark ? '#333333' : '#111111') : '#1a1a1a'),
+              color: user ? theme.text : '#1a1a1a',
+              fontFamily: F_SANS, fontSize: '12px', fontWeight: '700', letterSpacing: '0.5px',
               cursor: 'pointer',
-              transition: 'all 0.2s',
+              transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
               outline: 'none',
-              boxShadow: user ? 'none' : '0 8px 24px rgba(99,168,172,0.25), 0 2px 8px rgba(99,168,172,0.15)',
+              boxShadow: user ? 'none' : '0 12px 32px rgba(0,0,0,0.25), 0 4px 12px rgba(200,200,200,0.15)',
+              backdropFilter: 'brightness(1.1)',
+              position: 'relative',
+              overflow: 'hidden',
             }}
             onMouseEnter={(e) => {
               if (!user) {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #6DB6BA 0%, #85C0C8 50%, #92CCd0 100%)'
-                e.currentTarget.style.boxShadow = '0 12px 32px rgba(99,168,172,0.35), 0 4px 12px rgba(99,168,172,0.2)'
-                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.background = 'linear-gradient(135deg, #F0F0F0 0%, #D8D8D8 25%, #E8E8E8 50%, #E0E0E0 75%, #F0F0F0 100%)'
+                e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.35), 0 8px 16px rgba(220,220,220,0.25)'
               }
             }}
             onMouseLeave={(e) => {
               if (!user) {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #63A8AC 0%, #7CB8BA 50%, #8AC4C8 100%)'
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(99,168,172,0.25), 0 2px 8px rgba(99,168,172,0.15)'
-                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.background = 'linear-gradient(135deg, #E8E8E8 0%, #D0D0D0 25%, #E0E0E0 50%, #D8D8D8 75%, #E8E8E8 100%)'
+                e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.25), 0 4px 12px rgba(200,200,200,0.15)'
               }
             }}
           >
             <User size={13} strokeWidth={2.5} />
             {user ? 'Sign Out' : 'Sign In'}
-          </button>
+          </motion.button>
         )}
       </motion.div>
       <MobileMenuPanel

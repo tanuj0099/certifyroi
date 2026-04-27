@@ -1,4 +1,4 @@
-import CertCompare from '../components/CertCompare.jsx'
+import CompareToolEnhanced from '../components/CompareToolEnhanced.jsx'
 import ToolPageWrapper from '../components/ToolPageWrapper.jsx'
 
 export default function CompareToolPage() {
@@ -6,16 +6,16 @@ export default function CompareToolPage() {
     <ToolPageWrapper
       title="Compare"
       subtitle="Certifications"
-      description="Compare any two certifications side-by-side. See salary impacts, job demand, study time, and cost for each cert."
+      description="Compare 2-4 certifications side-by-side. See salary impacts, job demand, study time, cost, and more for each cert."
       sectionId="03"
       sectionTitle="CERT_COMPARE"
     >
       <div className="glass" style={{
         padding: 'clamp(20px, 4vw, 32px)',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-xl)',
+        border: '2px solid var(--border)',
+        borderRadius: '0px',
       }}>
-        <CertCompare salary={8} prefilledCert="" />
+        <CompareToolEnhanced salary={8} />
       </div>
     </ToolPageWrapper>
   )

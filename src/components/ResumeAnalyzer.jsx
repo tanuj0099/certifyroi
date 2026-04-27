@@ -692,6 +692,11 @@ var ResumeAnalyzer = function({ mode, onCertSelected }) {
     try { switchTarget = localStorage.getItem('certifyroi_switch_domain') || null } catch(e) {}
   }
 
+  useEffect(function() {
+    var savedText = localStorage.getItem('certifyroi_shared_resume_text')
+    if (savedText) setText(savedText)
+  }, [])
+
   var hasFile   = !!fileName
   var hasResult = !!result
 
@@ -712,6 +717,7 @@ var ResumeAnalyzer = function({ mode, onCertSelected }) {
           return
         }
         setText(extracted)
+        localStorage.setItem('certifyroi_shared_resume_text', extracted)
       } catch(e) {
         // FIX: clear fileName on parse exception too
         setFileName('')
@@ -732,6 +738,7 @@ var ResumeAnalyzer = function({ mode, onCertSelected }) {
 
   var clearAll = function() {
     setText(''); setFileName(''); setResult(null); setError(null); setRejection(null)
+    localStorage.removeItem('certifyroi_shared_resume_text')
   }
 
   // FIX: separate dismiss-rejection from clear-all.
@@ -877,7 +884,10 @@ var ResumeAnalyzer = function({ mode, onCertSelected }) {
           >
             <textarea
               value={text}
-              onChange={function(e) { setText(e.target.value) }}
+              onChange={function(e) { 
+                setText(e.target.value) 
+                localStorage.setItem('certifyroi_shared_resume_text', e.target.value)
+              }}
               placeholder="Paste your resume, LinkedIn About section, or work experience here. Include your city for better results."
               rows={6}
               style={{ width: '100%', padding: '14px', background: 'var(--bg)', border: '1px solid ' + (text.trim() ? PICTON + '44' : 'var(--border)'), borderRadius: '11px', color: 'var(--text)', fontSize: '13px', fontFamily: FB, outline: 'none', resize: 'vertical', lineHeight: '1.6', transition: 'border-color 0.18s', boxSizing: 'border-box' }}

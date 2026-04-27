@@ -3,6 +3,7 @@ import WaveBg from './WaveBg.jsx'
 import { MarketingFooter } from './MarketingPageShell.jsx'
 import { useThemeContext } from './SharedUI.jsx'
 import { useIsMobile } from './SharedUI.jsx'
+import VerticalSidebar from './VerticalSidebar.jsx'
 
 const F_HEAD = "'EB Garamond','Cormorant Garamond',Georgia,serif"
 const F_BODY = "'Inter','DM Sans',sans-serif"
@@ -34,6 +35,10 @@ export default function ToolPageWrapper({
   return (
     <div style={{ minHeight: '100vh', position: 'relative', background: 'var(--bg)', color: 'var(--text)' }}>
       <WaveBg variant="landing" />
+      
+      {/* Vertical ROI Text Sidebar */}
+      {!isMobile && <VerticalSidebar text="ROI Analysis for Indian professionals" />}
+      
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* Main layout with sidebar on desktop */}
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>

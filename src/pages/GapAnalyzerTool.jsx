@@ -11,7 +11,7 @@ export default function GapAnalyzerTool() {
       sectionId="10"
       sectionTitle="GAP_ANALYZER"
     >
-      <div className="glass" style={{ padding: 'clamp(20px, 4vw, 32px)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)' }}>
+      <div className="glass" style={{ padding: 'clamp(20px, 4vw, 32px)', borderRadius: '0px', border: '2px solid var(--border)' }}>
          <GapAnalyzer />
       </div>
     </ToolPageWrapper>

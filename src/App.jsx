@@ -1581,6 +1581,18 @@ const TOOL_TABS = [
     icon: TrendingUp,
     desc: "Did the cert pay off?",
   },
+  {
+    id: "gap",
+    label: "Gap Analyzer",
+    icon: Target,
+    desc: "Compare skills vs. target roles",
+  },
+  {
+    id: "negotiation",
+    label: "Negotiation Script",
+    icon: FileText,
+    desc: "AI script for salary hikes",
+  },
 ];
 
 const StepArrow = function ({ active }) {
@@ -2169,25 +2181,22 @@ const NavBar = function ({ currentPage, activeTab, onNavigate, onTabChange }) {
           {/* Row 2: Tools — CENTERED */}
           <div
             style={{
-              borderTop: "1px solid var(--border-subtle)",
-              background: "var(--surface)",
+              marginTop: "16px",
+              background: "transparent",
+              display: "flex",
+              justifyContent: "center",
             }}
           >
             <div
               style={{
-                maxWidth: "1240px",
+                width: "100%",
+                maxWidth: "900px",
                 margin: "0 auto",
                 padding: "0 12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "40px",
-                overflowX: "auto",
-                scrollbarWidth: "none",
-                WebkitOverflowScrolling: "touch",
-                gap: "2px",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                gap: "12px",
               }}
-              className="tab-row-scroll"
             >
               {TOOL_TABS.map(function (tab) {
                 var active = activeTab === tab.id;
@@ -2199,26 +2208,21 @@ const NavBar = function ({ currentPage, activeTab, onNavigate, onTabChange }) {
                     }}
                     style={{
                       display: "flex",
-                      alignItems: "center",
-                      gap: "5px",
-                      padding: "5px 11px",
-                      borderRadius: "6px",
-                      border: "none",
-                      borderBottom:
-                        "2px solid " +
-                        (active ? "var(--indigo)" : "transparent"),
-                      background: active ? "var(--indigo-dim)" : "transparent",
-                      color: active ? "var(--indigo-light)" : "var(--text-4)",
-                      fontSize: "12px",
-                      fontWeight: active ? "700" : "400",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "8px",
+                      padding: "16px",
+                      borderRadius: "0px", // Neubrutalism
+                      border: "2px solid #000",
+                      background: active ? "#CCFF00" : "#FFFFFF", // Neon accent
+                      color: "#000",
+                      boxShadow: active ? "1px 1px 0 #000" : "4px 4px 0 #000",
+                      transform: active ? "translate(3px, 3px)" : "none",
+                      fontSize: "14px",
+                      fontWeight: "800",
                       cursor: "pointer",
                       fontFamily: FH,
                       transition: "all 0.2s",
-                      whiteSpace: "nowrap",
-                      flexShrink: 0,
-                      letterSpacing: "-0.01em",
-                      height: "100%",
-                      minHeight: "36px",
                     }}
                   >
                     <tab.icon size={11} />
@@ -2261,6 +2265,18 @@ const AppPage = function ({
         position: "relative",
       }}
     >
+      {/* Sticky Vertical Navigation Text (Neubrutalism touch) */}
+      <div style={{
+        position: 'fixed', left: '24px', top: '50%', transform: 'translateY(-50%)',
+        writingMode: 'vertical-rl', textOrientation: 'mixed',
+        fontFamily: "'Playfair Display', 'Fraunces', serif", fontWeight: '900',
+        fontSize: 'clamp(1rem, 2vw, 1.5rem)', color: 'var(--text)',
+        letterSpacing: '0.15em', textTransform: 'uppercase',
+        borderLeft: '4px solid #000', paddingLeft: '12px', zIndex: 10,
+      }}>
+        {activeTab} · Tool
+      </div>
+
       <WaveBg variant="app" />
 
       <AnimatePresence>
@@ -2821,6 +2837,13 @@ const SignInModal = function ({ isOpen, onClose, onSignIn, loading }) {
           textAlign: "center",
         }}
       >
+        <style>{`
+          @keyframes mercuryFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `}</style>
         <button
           onClick={onClose}
           style={{
@@ -2881,13 +2904,16 @@ const SignInModal = function ({ isOpen, onClose, onSignIn, loading }) {
           style={{
             width: "100%",
             padding: "14px",
-            borderRadius: "100px",
-            background: "var(--accent)",
-            color: "white",
-            border: "none",
+            borderRadius: "0px", // Neubrutalist sharp edges
+            background: "linear-gradient(270deg, #e0e0e0, #ffffff, #a0a0a0, #ffffff)",
+            backgroundSize: "400% 400%",
+            animation: "mercuryFlow 3s ease infinite",
+            color: "#000",
+            border: "2px solid #000",
+            boxShadow: "4px 4px 0 #000",
             fontSize: "15px",
             fontFamily: FH,
-            fontWeight: "700",
+            fontWeight: "900",
             cursor: loading ? "not-allowed" : "pointer",
             opacity: loading ? 0.7 : 1,
             display: "flex",

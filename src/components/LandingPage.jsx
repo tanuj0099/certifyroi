@@ -528,9 +528,9 @@ function ElevenPM({ onEnter }) {
 }
 
 // ─────────────────────────────────────────────────────────
-// THREE MODES
+// THREE MODES (SPLIT SCREEN PARALLAX - NEUBRUTALISM)
 // ─────────────────────────────────────────────────────────
-function ThreeModes() {
+function ThreeModesSplitScreen() {
   const C = useTheme()
   const isMobile = useIsMobile()
   const modes = [
@@ -538,21 +538,47 @@ function ThreeModes() {
     { label: 'Switcher', sub: 'Changing domains', desc: 'Domain switch in 5–8 months. Only fast-track options shown. Long certs hidden.' },
     { label: 'Professional', sub: 'Levelling up', desc: 'Maximum ROI on your next cert. Break-even analysis, city benchmarks, and a pitch-your-boss email.' },
   ]
+
+  const accentColors = ['#CCFF00', '#FF00FF', '#00FFFF']
+
   return (
-    <StorySection id="06" title="SYS_MODES" bg={C.bg}>
-      <motion.div variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }}>
-        <h2 style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: 'clamp(1.8rem, 4.5vw, 3.2rem)', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, margin: '0 0 52px' }}>Three modes.<br /><span style={{ color: C.gold }}>One tool.</span></h2>
-      </motion.div>
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '24px' : '32px', padding: isMobile ? '24px' : '32px', background: C.surface, border: `1px solid ${C.border}` }}>
-        {modes.map((m, i) => (
-          <motion.div key={m.label} variants={RISE} initial="hidden" whileInView="show" viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
-            <div style={{ fontFamily: F_SANS, fontWeight: '700', fontSize: '17px', color: C.text, letterSpacing: '-0.02em', marginBottom: '6px' }}>{m.label}</div>
-            <div style={{ fontFamily: F_MONO, fontSize: '11px', color: C.text3, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>{m.sub}</div>
-            <div style={{ fontFamily: F_SANS, fontSize: '14px', color: C.text2, lineHeight: '1.65' }}>{m.desc}</div>
-          </motion.div>
-        ))}
+    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', borderTop: '2px solid #000', borderBottom: '2px solid #000' }}>
+      {/* Left: Sticky Parallax Hero */}
+      <div style={{ 
+        flex: 1, position: isMobile ? 'relative' : 'sticky', top: 0, height: isMobile ? 'auto' : '100vh', 
+        background: C.name === 'dark' ? '#111' : '#F4F2EE', 
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px', borderRight: isMobile ? 'none' : '2px solid #000',
+        borderBottom: isMobile ? '2px solid #000' : 'none'
+      }}>
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }}
+          style={{ textAlign: 'left', maxWidth: '400px' }}
+        >
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: '900', fontSize: 'clamp(3rem, 6vw, 5rem)', color: C.text, lineHeight: 1, margin: '0 0 20px' }}>
+            CHOOSE<br />YOUR<br /><span style={{ background: '#CCFF00', color: '#000', padding: '0 10px', border: '2px solid #000', display: 'inline-block', transform: 'rotate(-2deg)' }}>PATH.</span>
+          </h2>
+          <p style={{ fontFamily: F_MONO, fontSize: '14px', color: C.text2, lineHeight: '1.5' }}>The algorithm dynamically calibrates the timeline and financial ROI strictly based on your current career altitude.</p>
+        </motion.div>
       </div>
-    </StorySection>
+
+      {/* Right: Scrolling Neubrutalist Cards */}
+      <div style={{ flex: 1, padding: isMobile ? '40px 20px' : '80px 40px', background: C.bg, display: 'flex', flexDirection: 'column', gap: '40px' }}>
+        {modes.map((m, i) => {
+          const accent = accentColors[i % accentColors.length];
+          return (
+            <motion.div key={m.label} initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.5, delay: i * 0.1 }}
+              style={{ 
+                background: '#FFF', border: '2px solid #000', boxShadow: `8px 8px 0 ${accent}`, 
+                padding: '32px', color: '#000', position: 'relative'
+              }}>
+              <div style={{ position: 'absolute', top: '-15px', right: '20px', background: '#000', color: accent, fontFamily: F_MONO, fontSize: '12px', padding: '4px 12px', fontWeight: 'bold' }}>{m.sub}</div>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: '900', fontSize: '32px', marginBottom: '16px', letterSpacing: '-0.02em' }}>{m.label}</div>
+              <div style={{ fontFamily: F_SANS, fontSize: '16px', color: '#333', lineHeight: '1.6', fontWeight: '500' }}>{m.desc}</div>
+            </motion.div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
@@ -795,6 +821,16 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
 
           {/* Centered content ON the mountain */}
           <div style={{
+            position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)',
+            writingMode: 'vertical-rl', textOrientation: 'mixed',
+            fontFamily: "'Playfair Display', 'Fraunces', serif", fontWeight: '800',
+            fontSize: isMobile ? '1.2rem' : '1.5rem', color: '#FFFFFF',
+            letterSpacing: '0.15em', textTransform: 'uppercase',
+            borderLeft: '4px solid #CCFF00', paddingLeft: '12px', zIndex: 10
+          }}>
+            ROI Analysis for Indian Professionals
+          </div>
+          <div style={{
             position: 'relative', zIndex: 2,
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
@@ -818,23 +854,6 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
               <div style={{ width: '28px', height: '1px', background: C.gold }} />
               Premium ROI Analysis
               <div style={{ width: '28px', height: '1px', background: C.gold }} />
-            </motion.div>
-
-            {/* Subtitle — "For Indian Professionals" */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.02 }}
-              style={{
-                fontFamily: F_SERIF, fontStyle: 'italic', fontWeight: '400',
-                fontSize: isMobile ? 'clamp(1.1rem, 3vw, 1.5rem)' : 'clamp(1.2rem, 2.5vw, 1.8rem)',
-                color: 'rgba(255,255,255,0.72)',
-                letterSpacing: '-0.01em',
-                marginBottom: '32px',
-                lineHeight: 1.2,
-              }}
-            >
-              for Indian Professionals
             </motion.div>
 
             {/* Headline — tightly spaced, on the mountain */}
@@ -898,7 +917,7 @@ export default function App({ onNavigate, onEnter, isDark = true }) {
         <HowItWorks onEnter={handleEnter} />
         <VsSection />
         <ElevenPM onEnter={handleEnter} />
-        <ThreeModes />
+        <ThreeModesSplitScreen />
         <SocialProof />
         <FAQ />
         <FinalCTA onEnter={handleEnter} />
