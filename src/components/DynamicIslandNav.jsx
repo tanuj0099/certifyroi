@@ -40,7 +40,7 @@ const OTHER_TOOLS = [
 ];
 
 const ALL_MOBILE_ITEMS = [
-  ...CORE_NAV_ITEMS,
+  ...MAIN_NAV_ITEMS,
   { type: 'header', label: 'Tools & Info' },
   ...MAIN_TOOLS, ...OTHER_TOOLS, ...SECONDARY_NAV_ITEMS,
 ];
