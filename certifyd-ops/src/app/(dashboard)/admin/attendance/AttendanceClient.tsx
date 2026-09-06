@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Clock, MonitorPlay, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
+import { getAttendanceLogsAction } from '@/actions/attendanceActions';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key';
@@ -12,6 +13,9 @@ const supabaseClient = createClient(supabaseUrl, supabaseKey);
 export function AttendanceClient({ initialLogs, teamMembers }: { initialLogs: any[], teamMembers: any[] }) {
   const [onlineUsers, setOnlineUsers] = useState<Record<string, any>>({});
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [dailyLogs, setDailyLogs] = useState<any[]>(initialLogs);
+  const [isLoading, setIsLoading] = useState(false);
+  const isInitialMount = React.useRef(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -36,9 +40,43 @@ export function AttendanceClient({ initialLogs, teamMembers }: { initialLogs: an
     };
   }, []);
 
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
+    let isMounted = true;
+    const fetchLogs = async () => {
+      setIsLoading(true);
+      try {
+        const { logs } = await getAttendanceLogsAction(selectedDate);
+        if (isMounted) setDailyLogs(logs);
+      } catch (error) {
+        console.error('Failed to fetch logs:', error);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+    
+    fetchLogs();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedDate]);
+
   function getStatus(email: string) {
     if (selectedDate !== new Date().toISOString().split('T')[0]) return 'offline';
     return onlineUsers[email] ? 'active' : 'offline';
+  }
+
+  function formatActiveTime(seconds: number) {
+    if (!seconds) return '-';
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
   }
 
   return (
@@ -80,6 +118,24 @@ export function AttendanceClient({ initialLogs, teamMembers }: { initialLogs: an
               teamMembers.map((member) => {
                 const status = getStatus(member.email.toLowerCase());
                 const presenceData = onlineUsers[member.email.toLowerCase()];
+                const log = dailyLogs.find(l => l.user_email.toLowerCase() === member.email.toLowerCase());
+                const isToday = selectedDate === new Date().toISOString().split('T')[0];
+
+                let firstSeen = '-';
+                if (log?.session_start) {
+                  firstSeen = new Date(log.session_start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } else if (presenceData && isToday) {
+                  firstSeen = new Date(presenceData.online_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+
+                let activeTime = '-';
+                if (log?.active_seconds) {
+                  activeTime = formatActiveTime(log.active_seconds);
+                }
+                
+                if (status === 'active') {
+                  activeTime = activeTime !== '-' ? `${activeTime} (Live)` : 'Live';
+                }
                 
                 return (
                   <motion.tr 
@@ -102,7 +158,7 @@ export function AttendanceClient({ initialLogs, teamMembers }: { initialLogs: an
                       </div>
                     </td>
                     <td className="px-5 py-3.5 text-gray-300">
-                      {presenceData ? new Date(presenceData.online_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
+                      {firstSeen}
                     </td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-1.5">
@@ -115,7 +171,7 @@ export function AttendanceClient({ initialLogs, teamMembers }: { initialLogs: an
                       </div>
                     </td>
                     <td className="px-5 py-3.5 text-right font-mono font-medium text-white">
-                      {status === 'active' ? 'Live' : '-'}
+                      {activeTime}
                     </td>
                   </motion.tr>
                 );
